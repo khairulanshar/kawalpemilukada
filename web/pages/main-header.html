@@ -1,0 +1,65 @@
+<div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+    </button>
+
+    <button type="button" class="navbar-toggle" ng-click="kawal.showMenu()" id="menuBtn">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+    </button>
+
+    <div class="navbar-brand-div">
+        <a class="navbar-brand" href="javascript:" ng-click="handleHash('/tabulasi.html')">Kawal Pemilu Kepala Daerah</a>
+    </div>
+</div>
+<!-- /.navbar-header -->
+
+<ul class="nav navbar-top-links navbar-right" id="main-header">
+    <!-- /.dropdown -->
+    <!--<li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:">
+            <i class="fa fa-tasks fa-fw font-white"></i>  <i class="fa fa-caret-down font-white"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-tasks">
+
+            <li class="divider"></li>
+            <li>
+                <a class="text-center" href="javascript:">
+                    <strong>Lihat Wilayah saya</strong>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+        
+    </li>
+    
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:">
+            <i class="fa fa-bell fa-fw font-white"></i>  <i class="fa fa-caret-down font-white"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-alerts">
+            <li class="divider"></li>
+            <li>
+                <a class="text-center" href="javascript:">
+                    <strong>Lihat Semua <i>Alerts</i></strong>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </li>-->
+    <!-- /.dropdown -->
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:">
+            <i class="fa fa-user fa-fw font-white"></i>  <i class="fa fa-caret-down font-white"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-user" ng-include="selectedTemplate.dropdownuser" ng-controller="UserController as userCtrl"></ul>
+
+    </li>
+    <!-- /.dropdown -->
+</ul>
+<!-- /.navbar-top-links -->

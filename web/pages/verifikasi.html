@@ -1,0 +1,54 @@
+<form role="form"  ng-controller="verifiaksiController as verifiaksiCtrl" ng-submit="verifiaksiCtrl.doverifiaksi()">
+    <div class="row">
+        <div class="modal-header"><h4 class="modal-title">Verifikasi Data</h4></div>
+        <div class="modal-body">
+            <fieldset>
+                <p ng-show="verifiaksiCtrl.sedangprocess">
+                    Sedang diverifikasi...
+                </p>
+                <p ng-show="verifiaksiCtrl.submitShow">
+                    Data Anda belum terverifikasi. Silahkan Isi NIK dan Nama Lengkap sesuai dengan KTP Anda.
+                </p>
+                <div class="form-group" ng-show="verifiaksiCtrl.submitShow">
+                    <input class="form-control" placeholder="NIK sesuai di KTP" name="nikKTP" type="input" autofocus="" ng-model="verifiaksiCtrl.verifiaksi.NIK">
+                </div>
+                <div class="form-group" ng-show="verifiaksiCtrl.submitShow">
+                    <input class="form-control" placeholder="Nama sesuai di KTP" name="namaKTP" type="input" autofocus="" ng-model="verifiaksiCtrl.verifiaksi.NAMA">
+                </div>
+                <div class="alert alert-success" ng-repeat="successAlert in verifiaksiCtrl.successAlerts">{{successAlert.text}}</div>
+                <div class="alert alert-danger" ng-repeat="errorAlert in verifiaksiCtrl.errorAlerts">{{errorAlert.text}}</div>
+            </fieldset>
+        </div>
+    </div>
+    <div class="row">
+        <div style="padding-bottom: 20px;">
+            <center>
+                <a href="https://seal.godaddy.com/verifySeal?sealID=UUO2XzFeiz6qTifdOauokC7gip3moNoCRYoZVCvgxBQ1i1wsLYVNwbgbySs2" target="signed"><img style="cursor:pointer;cursor:hand" src="https://seal.godaddy.com/images/3/en/siteseal_gd_3_h_l_m.gif" alt="SSL site seal - click to verify"></a>
+            </center>
+        </div>
+    </div>
+    <div class="row">
+        <div class="alert alert-warning" ng-show="verifiaksiCtrl.submitShow">
+            <ul>
+                <li>Verifikasi ini terjadi secara real-time dengan website Lembaga Negara dan cukup diverifikasi satu kali.</li>
+                <li>Data NIK Anda <b>TIDAK</b> akan disimpan dalam Sistem KawalPilkada.id</li>
+                <li>Nama yang tertera di KTP akan dibandingkan dengan nama di <b>{{verifiaksiCtrl.sosial}}</b> Anda.</li> 
+            </ul>
+            <br/>
+            <center>
+                <a ng-href="{{user.link}}" target="{{user.type}}"><img ng-src="{{user.imgurl}}" style="border-radius:50%;"></a>
+                <span><a ng-href="{{user.link}}" target="{{user.type}}">{{user.nama}}</a></span>
+            </center>
+            <br/>
+
+            <p><b>Terimakasih Atas Kerjasamanya</b>.</p>
+        </div>
+
+        <div class="modal-footer">
+            <input type="submit" class="btn btn-primary" value="Verfikasi" ng-show="verifiaksiCtrl.submitShow">
+            <a href="/logout" class="btn btn-danger" ng-show="verifiaksiCtrl.submitShow"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+            <div ng-include="selectedTemplate.closeModal"></div>
+        </div>
+    </div>
+
+</form>

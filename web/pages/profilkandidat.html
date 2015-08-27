@@ -1,0 +1,240 @@
+
+<div ng-controller="profilKandidatController as profilKandidatCtrl">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Profil Kandidat {{profilKandidatCtrl.kandidat.nama}}</h1>
+        </div>
+    </div>
+    <div class="row">
+        <center>
+            <div class="panel panel-default" style="border:0px;background-color:white;width: 280px;">
+                <div class="panel-heading kandidat">
+                    <div class="row">
+                        <div style="float:left;">
+                            <img ng-src="{{profilKandidatCtrl.kandidat.img_url}}" style="width:150px;height: 150px;" class="img-responsive attach-foto1">
+                        </div>
+                        <div class="text-right">
+                            <div class="huge">{{profilKandidatCtrl.kandidat.urut}}</div>
+                            <div>No Urut</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center text-uppercase text-primary" style="padding-top: 10px;">{{profilKandidatCtrl.kandidat.nama}}</div>
+                        <div class="col-xs-12 text-center text-uppercase text-muted">{{profilKandidatCtrl.wilayah.nama}}</div>
+                    </div>    
+                </div>
+            </div>
+        </center>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    Profil Kandidat Kepala Daerah
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    Profil Kandidat Wakil Kepala Daerah
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" ng-controller="komentarController as komentarCtrl" ng-init="komentarCtrl.setfileisrequired(true)">
+    <div class="col-lg-12">
+
+        <div class="panel panel-default panel-black1">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-comments-o fa-3x"></i>
+                    </div>
+
+                </div>
+            </div>
+            <div class="panel-body">
+
+                <div class="panel-group">
+                    <center>
+                        <div class="row" ng-show="(!user.logged)">
+                            <h4>Silahkan Login Terlebih dahulu untuk memberikan penilain.</h4>
+                            <div style="width: 197px;">
+                                <a class="btn btn-block btn-social btn-twitter"  style="color: white;line-height: 24px;" ng-click="komentarCtrl.login('/login?form_action=logintwit&rurl=')">
+                                    <i class="fa fa-twitter"></i> Login dengan Twitter
+                                </a>
+                                <a class="btn btn-block btn-social btn-facebook"  style="color: white;line-height: 24px;" ng-click="komentarCtrl.login('/login?form_action=loginfb&rurl=')">
+                                    <i class="fa fa-facebook"></i> Sign in with Facebook
+                                </a>
+                            </div>
+                        </div>
+                    </center>
+                    <div class="row" ng-show="user.logged">
+
+                        <div class="col-md-12" style="padding-left: 20px;padding-right: 20px;">
+                            <form role="form" ng-submit="komentarCtrl.kirimPesan()">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <textarea class="form-control textarea-fixed" rows="3" placeholder="Sampaikan pendapat dan penilaian anda beserta file pendukung..." ng-model="komentarCtrl.isi"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="panel-footer">
+                                        <div class="alert alert-danger" ng-show="komentarCtrl.showError">Sampaikan pendapat dan penilaian anda beserta file pendukung...</div>
+                                        <div class="input">
+                                            <label for="photo"><i class="fa fa-camera-retro fa-2x"></i></label>
+                                            <input type="file" id="photo" accept="image/*" class="hidden" onchange="angular.element(this).scope().komentarCtrl.photoChange(this)">
+                                            <label for="file"><i class="fa fa-paperclip fa-2x"></i></label>
+                                            <input type="file" id="file" accept="application/pdf" class="hidden"  onchange="angular.element(this).scope().komentarCtrl.fileChange(this)">
+                                            <span class="pull-right">
+                                                <label for="krimPesanInput"><i class="fa fa-paper-plane-o fa-2x"></i></label>
+                                                <input type="submit" id="krimPesanInput" value="Kirim Pesan" class="hidden">
+                                            </span>
+                                        </div>
+                                        <div style="padding-top: 20px;" ng-show="komentarCtrl.showPhoto">
+                                            <div class="alert alert-info"><img ng-src="{{komentarCtrl.photosrc}}" class="img-responsive" style="width:25%;min-width: 100px;"></div>
+                                        </div>
+                                        <div style="padding-top: 20px;" ng-show="komentarCtrl.showFile">
+                                            <div class="alert alert-info"><b>{{komentarCtrl.filename}}</b></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                    <ul class="timeline">
+                        <li  ng-repeat="pesan in komentarCtrl.pesans" ng-class-odd="''" ng-class-even="'timeline-inverted'"  ng-init="komentarCtrl.pesanInitialization(komentarCtrl, pesan, $index, user)">
+
+                            <div class="timeline-badge">
+                                <img ng-src="{{pesan.dari_img}}" class="img-circle-50">
+                                <div class="time-text-center"><small class="text-muted"><i class="fa fa-clock-o"></i> {{pesan.creationDate}} WIB</small></div>
+                            </div>
+                            <div class="timeline-panel">
+                                <div class="timeline-heading-parent">
+                                    <div class="timeline-heading">
+                                        <h4 class="timeline-title"><a ng-href="{{pesan.dari_link}}" target="pesan">{{pesan.dari_nama}}</a></h4>
+                                    </div>
+                                    <div class="timeline-body">
+                                        <p parse-url="komentarCtrl.props" ng-model="pesan.msg"></p>
+                                        <div style="padding-top: 20px;" ng-show="pesan.foundFileUrl">
+                                            <a href="{{pesan.fileUrl}}" target="fileattachment">{{pesan.fileName}}</a>
+                                        </div>
+                                        <div style="padding-top: 20px;" ng-show="pesan.foundImageUrl">
+                                            <a href="{{pesan.imageUrl}}" target="fileattachment"><img ng-src="{{pesan.imageUrl}}" class="img-responsive" style="width:100%;"></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <hr>
+                                    <div class="timeline-heading-footer">
+                                        <div class="header">
+                                            <a href="javascript:" ng-click="komentarCtrl.btnTanggapan(user, pesan)" ng-class="{active : komentarCtrl.isSelected(pesan,'btnTanggapan')}"><i class="fa fa-pencil-square-o"></i> Tanggapi</a>
+                                            <a href="javascript:" ng-click="komentarCtrl.kirimSetuju(user, komentarCtrl, pesan, $index)" ><i class="fa fa-thumbs-o-up"></i> Setuju</a>
+                                            <a href="javascript:" ng-click="komentarCtrl.kirimTidakSetuju(user, komentarCtrl, pesan, $index)" ><i class="fa fa-thumbs-o-down"></i> Tidak Setuju</a>
+                                            <a href="javascript:" ng-click="komentarCtrl.kirimHapus(user, komentarCtrl, pesan, $index)" ng-show="pesan.showHapus"><i class="fa fa-trash-o"></i> Hapus</a>
+
+                                            <div class="block-button">
+                                                <a href="javascript:" ng-click="komentarCtrl.hideandshowTanggapan(pesan)" ng-class="{active : komentarCtrl.isSelected(pesan,'hideandshowTanggapan')}">{{pesan.tanggapanPesans.length}} Tanggapan</a>
+                                                <a href="javascript:" ng-click="komentarCtrl.hideandshowSetuju(pesan)" ng-class="{active : komentarCtrl.isSelected(pesan,'hideandshowSetuju')}">{{pesan.setujuPesans.length}} Setuju</a>
+                                                <a href="javascript:" ng-click="komentarCtrl.hideandshowTidakSetuju(pesan)" ng-class="{active : komentarCtrl.isSelected(pesan,'hideandshowTidakSetuju')}">{{pesan.tidakSetujuPesans.length}} Tidak Setuju</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="timeline-heading-footer" ng-show="(!user.logged) && pesan.showTanggapiError">
+                                        <div class="alert alert-danger">Silahkan Login terlebih dahulu.</div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <hr ng-show="pesan.showTanggapi">
+                                    <div class="timeline-heading-footer panel-footer" ng-show="pesan.showTanggapi">
+                                        <div class="input-group">
+                                            <input ng-model="pesan.tanggapan" type="text" class="form-control input-sm" placeholder="Tulis Tanggapan Anda...">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-blue btn-sm" ng-click="komentarCtrl.kirimTanggapan(komentarCtrl, pesan, $index)">
+                                                    <i class="fa fa-paper-plane-o"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <hr ng-show="pesan.tanggapanPesanShow">
+                                    <div class="timeline-tanggapan" ng-show="pesan.tanggapanPesanShow">
+                                        <ul class="chat">
+                                            <li class="left clearfix" ng-repeat="tanggapanPesan in pesan.tanggapanPesans" ng-class-odd="'panel-body'" ng-class-even="'panel-footer'">
+                                                <small class="pull-right text-muted text-right">
+                                                    <strong class="primary-font"><a ng-href="{{tanggapanPesan.dari_link}}" target="pesan">{{tanggapanPesan.dari_nama}}</a></strong>
+                                                    <br><i class="fa fa-clock-o fa-fw"></i> {{tanggapanPesan.creationDate}} WIB
+                                                </small>
+                                                <span class="chat-img">
+                                                    <a ng-href="{{tanggapanPesan.dari_link}}" target="pesan"><img ng-src="{{tanggapanPesan.dari_img}}" alt="User Avatar" class="img-circle img-circle-50"></a>
+                                                </span>
+                                                <div class="chat-body clearfix">
+                                                    <p parse-url="komentarCtrl.props" ng-model="tanggapanPesan.msg"></p>
+                                                </div>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <hr ng-show="pesan.setujuPesanShow">
+                                    <div class="timeline-tanggapan" ng-show="pesan.setujuPesanShow">
+                                        <ul class="chat">
+                                            <li class="left clearfix" ng-repeat="setujuPesan in pesan.setujuPesans" ng-class-odd="'panel-body'" ng-class-even="'panel-footer'">
+                                                <small class="pull-right text-muted">
+                                                    <i class="fa fa-clock-o fa-fw"></i> {{setujuPesan.creationDate}} WIB
+                                                </small>
+                                                <span class="chat-img">
+                                                    <img ng-src="{{setujuPesan.dari_img}}" alt="User Avatar" class="img-circle img-circle-50">
+                                                </span>
+                                                <div class="chat-body clearfix">
+                                                    <div class="header">
+                                                        <strong class="primary-font">{{setujuPesan.dari_nama}}</strong>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <hr ng-show="pesan.tidakSetujuPesanShow">
+                                    <div class="timeline-tanggapan" ng-show="pesan.tidakSetujuPesanShow">
+                                        <ul class="chat">
+                                            <li class="left clearfix" ng-repeat="tidakSetujuPesan in pesan.tidakSetujuPesans" ng-class-odd="'panel-body'" ng-class-even="'panel-footer'">
+                                                <small class="pull-right text-muted">
+                                                    <i class="fa fa-clock-o fa-fw"></i> {{tidakSetujuPesan.creationDate}} WIB
+                                                </small>
+                                                <span class="chat-img">
+                                                    <img ng-src="{{tidakSetujuPesan.dari_img}}" alt="User Avatar" class="img-circle img-circle-50">
+                                                </span>
+                                                <div class="chat-body clearfix">
+                                                    <div class="header">
+                                                        <strong class="primary-font">{{tidakSetujuPesan.dari_nama}}</strong>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </li>
+                        <li>
+                            <button class="btn btn-default  timeline-badge btn-circle btn-lg"  ng-click="komentarCtrl.getMoredata()" style="color: rgba(0,122,255,0.9);border:2px solid #ddd;"><i class="fa fa-refresh"></i></button>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

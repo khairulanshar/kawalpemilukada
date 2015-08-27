@@ -1,0 +1,204 @@
+<div ng-controller="dashboardController as dashboardCtrl">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Dashboard</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="form-group">
+                <div class="dropdown dropdown-display">
+                    <div class="dropdown-toggle" data-toggle="dropdown">
+                        <span>Pemilu Kepala Daerah (PemiluKaDa) Tahun: {{$tahun}}</span>  <i class="fa fa-caret-down"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="tahun in tahuns">
+                            <a href="javascript:" ng-click="dashboardCtrl.setTahun(this)">{{tahun}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-green1">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-inbox fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">{{panelproprerty.TPS}}</div>
+                            <div>Tempat Pemungutan Suara</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="javascript:">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-blue">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-users fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">{{panelproprerty.kandidat}}</div>
+                            <div>Kandidat</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="javascript:">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-red1">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-user fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge"><a href="javascript:" ng-click="dashboardCtrl.getUser()" style="color:white;text-decoration: none;">{{panelproprerty.users}}</a></div>
+                            <div>Pengguna</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="javascript:">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-oranye">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-comments fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">{{panelproprerty.comments}}</div>
+                            <div>Comments</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="javascript:">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-green">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-globe fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">{{panelproprerty.provinsi}}</div>
+                            <div>Provinsi</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="javascript:">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-globe fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">{{panelproprerty.kabupaten}}</div>
+                            <div>Kabupaten/ Kota</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="javascript:">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-red">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-globe fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">{{panelproprerty.kecamatan}}</div>
+                            <div>Kecamatan</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="javascript:">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-yellow">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-globe fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge">{{panelproprerty.desa}}</div>
+                            <div>Desa Kelurahan</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="javascript:">
+                    <div class="panel-footer">
+                        <span class="pull-left">View Details</span>
+                        <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>

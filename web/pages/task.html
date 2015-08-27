@@ -1,0 +1,156 @@
+
+<div ng-controller="tabulasiController as tabulasiCtrl">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Mengisi/ Memverifikasi Data Suara</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="form-group">
+                <div class="dropdown dropdown-display">
+                    <div class="dropdown-toggle" data-toggle="dropdown" >
+                        <span>Pemilu Kepala Daerah (PemiluKaDa) Tahun: {{$parent.$tahun}}</span>  <i class="fa fa-caret-down"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="tahun in $parent.tahuns">
+                            <a href="javascript:" ng-click="tabulasiCtrl.setTahun(this)">{{tahun}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" >
+        <div class="col-lg-12" style="padding:20px 5px;" ng-show="tabulasiCtrl.showTable(tabulasiCtrl.DataSuaras) || tabulasiCtrl.showTable(tabulasiCtrl.DataSuarasTPS)">
+            <input type="checkbox" ng-model="tabulasiCtrl.showHitungCepat"> Tampikan Hitung Cepat
+            <span>&nbsp;|&nbsp;</span>
+            <input type="checkbox" ng-model="tabulasiCtrl.showC1"> Tampikan C1
+        </div>
+    </div>
+    <div class="row" >
+        <div class="col-lg-12">
+            <div class="panel panel-default panel-black">
+                <div class="panel-heading">
+                    <nav ng-repeat="controlWilayah in tabulasiCtrl.controlWilayahs| orderBy :'id'"> 
+                        <i class="fa fa-angle-double-right" ng-show="controlWilayah.showdiv" style="padding-left:15px;"></i>
+                        <div ng-click="tabulasiCtrl.setPage(controlWilayah, $index)" class="heading-content">{{controlWilayah.nama}}</div>
+                    </nav>
+                </div>
+                <div class="panel-body">
+                    <div ng-show="tabulasiCtrl.showTable(tabulasiCtrl.KandidatWilayahs)">
+                        <table class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>Kandidat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="kandidatWilayah in tabulasiCtrl.KandidatWilayahs" class="tr-pointer" ng-click="tabulasiCtrl.getChild(kandidatWilayah)">
+                                    <td>{{kandidatWilayah.nama}}</td>
+                                    <td>
+                                        <div class="row" >
+                                            <div class="col-md-4" ng-repeat="kandidat in kandidatWilayah.kandidat| orderBy :'urut'">
+                                                <div class="panel panel-default" style="border:0px;">
+                                                    <div class="panel-heading">
+                                                        <div class="row">
+                                                            <div class="col-xs-4">
+                                                                <img ng-src="{{kandidat.img_url}}" class="img-responsive attach-foto1">
+                                                            </div>
+                                                            <div class="col-xs-8 text-right">
+                                                                <div class="huge">{{kandidat.urut}}</div>
+                                                                <div>No Urut</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel-footer" style="background-color: black;color:white;text-align: center;">
+                                                        <span style="word-wrap: break-word;color:white;font-size: 20px;">{{kandidat.nama}}</span>
+                                                        <div class="clearfix"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <tr ng-show="tabulasiCtrl.blmadaData"><td colspan="3">Belum ada data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div ng-show="tabulasiCtrl.showTable(tabulasiCtrl.DataSuaras)">
+                        <table class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nama Wilayah</th>
+                                    <th ng-repeat="urut in tabulasiCtrl.uruts" ng-show="tabulasiCtrl.showHitungCepat">Hitung Cepat di TPS<br>{{tabulasiCtrl.DataSuaras[0].suaraKandidat[urut + ""].nama}}</th>
+                                    <th ng-repeat="urut in tabulasiCtrl.uruts" ng-show="tabulasiCtrl.showC1">Suara C1<br>{{tabulasiCtrl.DataSuaras[0].suaraKandidat[urut + ""].nama}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="dataSuara in tabulasiCtrl.DataSuaras" class="tr-pointer" ng-click="tabulasiCtrl.getChild(dataSuara)">
+                                    <td>{{dataSuara.nama}}</td>
+                                    <td ng-repeat="urut in tabulasiCtrl.uruts" ng-show="tabulasiCtrl.showHitungCepat">{{dataSuara.suaraKandidat[urut + ""].suaraTPS}}</td>
+                                    <td ng-repeat="urut in tabulasiCtrl.uruts" ng-show="tabulasiCtrl.showC1">{{dataSuara.suaraKandidat[urut + ""].suaraVerifikasiC1}}</td>
+                                </tr>
+                                <tr ng-show="tabulasiCtrl.blmadaData"><td colspan="4">Belum ada data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div ng-show="tabulasiCtrl.showTable(tabulasiCtrl.DataSuarasTPS)">
+                        <table class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nama Wilayah</th>
+                                    <th ng-show="tabulasiCtrl.showHitungCepat">Hitung Cepat di TPS</th>
+                                    <th>Gambar C1 KPU</th>
+                                    <th>Suara C1</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="dataSuara in tabulasiCtrl.DataSuarasTPS" class="tr-pointer" ng-click="tabulasiCtrl.getChild(dataSuara)" ng-init="tabulasiCtrl.init(tabulasiCtrl, dataSuara, $index)">
+                                    <td style="text-align: center;vertical-align: middle;">TPS#{{dataSuara.nama}}</td>
+                                    <td style="text-align: right;vertical-align: middle;" ng-show="tabulasiCtrl.showHitungCepat">
+                                        <div ng-repeat="urut in tabulasiCtrl.uruts" ng-init="tabulasiCtrl.init2(tabulasiCtrl, dataSuara, urut, $index)">
+                                            <input type="number" class="form-control number" ng-model="dataSuara.suaraKandidat[urut + ''].suaraTPS" placeholder="{{dataSuara.suaraKandidat[urut + ''].nama}}">
+                                        </div>
+                                        <div>
+                                            <input type="number" class="form-control number" ng-model="dataSuara.suarasahHC" placeholder="Suara Sah Hitung Cepat">
+                                        </div>
+                                        <div>
+                                            <input type="number" class="form-control number" ng-model="dataSuara.suarasahHC" placeholder="Suara Tidak Sah Hitung Cepat">
+                                        </div>
+                                        
+                                    </td>
+                                    <td style="text-align: right;vertical-align: middle;" ng-show="tabulasiCtrl.showC1">
+                                        <div style="width: 200px; height: 300px; overflow: hidden;">
+                                            <img ng-src="{{dataSuara.currentkpugambar}}" style="position: relative; left: -400px; top: -120px;width:600px;">
+                                        </div>
+                                    </td>
+                                    <td style="text-align: right;vertical-align: middle;" ng-show="tabulasiCtrl.showC1">
+                                        <div  ng-repeat="urut in tabulasiCtrl.uruts" ng-init="tabulasiCtrl.init2(tabulasiCtrl, dataSuara, urut, $index)">
+                                            <input type="number" class="form-control number" ng-model="dataSuara.suaraKandidat[urut + ''].suaraVerifikasiC1" placeholder="{{dataSuara.suaraKandidat[urut + ''].nama}}">
+                                        </div>
+                                        <div>
+                                            <input type="number" class="form-control number" ng-model="dataSuara.suarasah" placeholder="Suara Sah">
+                                        </div>
+                                        <div>
+                                            <input type="number" class="form-control number" ng-model="dataSuara.suaratidaksah" placeholder="Suara Tidak Sah">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr ng-show="tabulasiCtrl.blmadaData"><td colspan="4">Belum ada data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <nav ng-repeat="controlWilayah in tabulasiCtrl.controlWilayahs| orderBy :'id'">  
+                        <i class="fa fa-angle-double-right" ng-show="controlWilayah.showdiv" style="padding-left:15px;"></i>
+                        <div ng-click="tabulasiCtrl.setPage(controlWilayah, $index)" class="heading-content">{{controlWilayah.nama}}</div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
