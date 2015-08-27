@@ -302,11 +302,6 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                     }
                 }
             };
-            $scope.$watch(function() {
-                return window.location.hash;
-            }, function(value) {
-                context.getData();
-            });
             var desaSelected = {};
             var desaSelectedPrev = {};
             var desaSelectedNext = {};
@@ -432,6 +427,11 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 }
             };
             $KawalService.sendToGa();
+            $scope.$watch(function() {
+                return window.location.hash;
+            }, function(value) {
+                context.getData();
+            });
         }]);
     app.controller('profilKandidatController', ['$scope', '$http', '$KawalService', function($scope, $http, $KawalService) {
             this.kandidat = $KawalService.getSelectedKandidat();
@@ -995,17 +995,22 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                     $scope.$parent.$parent.$tingkat = hashs[1];
                     $scope.$parent.$parent.$tahun = hashs[2];
                 }
+                $KawalService.getDashboard($http, $scope);
 
             };
-            this.setHash();
+            var context=this;
             this.getUser = function() {
                 if ($scope.user.userlevel >= 1000) {
                     $scope.panelproprerty.users = "...";
                     $KawalService.getUser($http, $scope);
                 }
             };
-            $KawalService.getDashboard($http, $scope);
             $KawalService.sendToGa();
+            $scope.$watch(function() {
+                return window.location.hash;
+            }, function(value) {
+                context.setHash();
+            });
         }]);
     app.controller('UserController', ['$scope', '$window', '$http', '$KawalService', function($scope, $window, $http, $KawalService) {
             this.login = function(url) {
