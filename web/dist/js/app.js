@@ -1,4 +1,4 @@
-/*versi 1.20 18-8-2015*/
+/*versi 1.20 27-8-2015*/
 var $forwardHTTPS = false;
 (function() {
     var app = angular.module('KawalPemiluKaDaApp', ['controllers', 'mainfooter-directives', 'mainheader-directives', 'mainside-directives']);
@@ -598,6 +598,7 @@ var $forwardHTTPS = false;
             $scope.tahuns = [2014];
             $scope.jenisPesans = ["Pesan Untuk Semua"];
             $scope.$tahun = 2014;
+            $scope.$tingkat="Provinsi";
             $scope.user = {
                 logged: false,
                 userlevelDesc: "",
@@ -611,8 +612,8 @@ var $forwardHTTPS = false;
                  "grafik.html",
                  "task.html","users.html",*/  "privasi.html"];
             $scope.selectedTemplate = {
-                "hash": '#/tabulasi.html/Provinsi',
-                "path": "pages/tabulasi.html",
+                "hash": '#/dashboard.html',
+                "path": "pages/dashboard.html",
                 "dropdownuser": "/pages/kosong.html",
                 "pathmodal": "/pages/kosong.html"
             };
@@ -637,7 +638,7 @@ var $forwardHTTPS = false;
             try {
                 if (window.location.hash.length === 0) {
                     setTimeout(function() {
-                        $scope.selectedTemplate.hash = '#/tabulasi.html/Provinsi';
+                        $scope.selectedTemplate.hash = '#/dashboard.html/Provinsi/2014';
                         $KawalService.handleHash($scope.selectedTemplate.hash.substr(1), $scope);
                     }, 500);
                     return;

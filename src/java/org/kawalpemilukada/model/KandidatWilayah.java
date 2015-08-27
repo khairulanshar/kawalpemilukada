@@ -19,8 +19,10 @@ class Kandidat {
     public Integer urut;
     public String nama;
     public String img_url;
+    public Integer jumlahKomentar;
 
     public Kandidat() {
+        this.jumlahKomentar=0;
     }
 }
 
@@ -77,25 +79,26 @@ public class KandidatWilayah {
         kandidat.put("id", kandidatLocal.id);
         kandidat.put("img_url", kandidatLocal.img_url);
         kandidat.put("urut", kandidatLocal.urut);
+        kandidat.put("jumlahKomentar", kandidatLocal.jumlahKomentar);
         return kandidat;
     }
 
     public void updatekandidat(
-            Long id,
             String nama,
             String img_url,
-            Integer urut
+            Integer urut,
+            Integer jumlahKomentar
     ) throws ParseException {
         for (int i = 0; i < this.kandidat.size(); i++) {
-            if (this.kandidat.get(i).id.equals(id)) {
+            if (this.kandidat.get(i).urut==urut) {
                 if (nama.length() > 0) {
                     this.kandidat.get(i).nama = nama;
                 }
                 if (img_url.length() > 0) {
                     this.kandidat.get(i).img_url = img_url;
                 }
-                if (urut.toString().length() > 0) {
-                    this.kandidat.get(i).urut = urut;
+                if (jumlahKomentar > -1) {
+                    this.kandidat.get(i).jumlahKomentar = jumlahKomentar;
                 }
             }
         }

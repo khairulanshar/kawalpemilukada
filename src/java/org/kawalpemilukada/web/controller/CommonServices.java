@@ -84,7 +84,6 @@ public class CommonServices {
             Properties prop = new Properties();
             prop.load(request.getSession().getServletContext().getResourceAsStream("/WEB-INF/" + propFileName));
             result = prop.getProperty(property);
-            System.out.println(result);
         } catch (Exception e) {
             System.out.println("Exception: " + e);
         }
@@ -513,10 +512,15 @@ public class CommonServices {
         if (filterBy.length() > 0 && filter.length() > 0) {
             query = query.filter(filterBy, filter);
         }
-        query = query.filter("status", "Y");
+        //query = query.filter("status", "Y");
         query = query.order("-creationDate").offset(offset).limit(limit);
         //https://code.google.com/p/getStartCursor-appengine/wiki/Queries#Cursor_Example
         return query;
+    }
+    public static int countPesan(String key) {
+        Key<StringKey> dashKey = Key.create(StringKey.class, key);
+        QueryKeys<Pesan> query = ofy().load().type(Pesan.class).ancestor(dashKey).keys();
+        return query.list().size();
     }
 
     public static UserData getUser(HttpServletRequest request) {

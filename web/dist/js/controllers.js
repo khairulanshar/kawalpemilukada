@@ -164,9 +164,9 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                     parentkpuid = 0;
                 }
                 if (hashs[1] === "Kabupaten-Kota" && parentkpuid > 0) {
-                    $KawalService.handleHash(window.location.hash.substr(1) + "/" + kandidatWilayah.parentkpuid + "/" + kandidatWilayah.kpuid, $scope);
+                    $KawalService.handleHash("/tabulasi.html" + "/" + hashs[1] + "/" + hashs[2] + "/" + kandidatWilayah.parentkpuid + "/" + kandidatWilayah.kpuid, $scope);
                 } else {
-                    $KawalService.handleHash(window.location.hash.substr(1) + "/" + kandidatWilayah.kpuid, $scope);
+                    $KawalService.handleHash("/tabulasi.html" + "/" + hashs[1] + "/" + hashs[2] + "/" + kandidatWilayah.kpuid, $scope);
                 }
             };
             this.showTable = function(data) {
@@ -333,7 +333,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 }
 
                 var hashs = window.location.hash.substr(2).split("/");
-                if (hashs[0] !== "tabulasi.html") {
+                if (hashs[0] !== "tabulasi.html" && hashs[0] !== "dashboard.html") {
                     return;
                 }
                 context.tingkat = hashs[1];
@@ -968,8 +968,36 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
     app.controller('dashboardController', ['$scope', '$http', '$KawalService', function($scope, $http, $KawalService) {
             this.setTahun = function(selected) {
                 $scope.$parent.$parent.$tahun = selected.tahun;
+                var hashs = window.location.hash.substr(2).split("/");
+                $KawalService.handleHash(hashs[0] + "/" + hashs[1] + "/" + selected.tahun, $scope.$parent.$parent);
                 $KawalService.getDashboard($http, $scope);
             };
+            this.setTingkat = function(tingkat) {
+                $scope.$parent.$parent.$tingkat = tingkat;
+                var hashs = window.location.hash.substr(2).split("/");
+                $KawalService.handleHash(hashs[0] + "/" + tingkat + "/" + hashs[2], $scope.$parent.$parent);
+            };
+            this.setHash = function() {
+                if (window.location.hash.substr(window.location.hash.length - 1) === "/") {
+                    window.location.hash = window.location.hash.substr(0, window.location.hash.length - 1);
+                }
+                var hashs = window.location.hash.substr(2).split("/");
+                if (hashs[0] !== "dashboard.html") {
+                    return;
+                }
+                if (hashs.length <= 1) {
+                    $KawalService.handleHash(hashs[0] + "/" + $scope.$parent.$parent.$tingkat + "/" + $scope.$parent.$parent.tahuns[0], $scope.$parent.$parent);
+                } else if (hashs.length === 2) {
+                    $scope.$parent.$parent.$tahun = $scope.$parent.$parent.tahuns[0]
+                    $scope.$parent.$parent.$tingkat = hashs[1];
+                    $KawalService.handleHash(hashs[0] + "/" + hashs[1] + "/" + $scope.$parent.$parent.$tahun, $scope.$parent.$parent);
+                } else {
+                    $scope.$parent.$parent.$tingkat = hashs[1];
+                    $scope.$parent.$parent.$tahun = hashs[2];
+                }
+
+            };
+            this.setHash();
             this.getUser = function() {
                 if ($scope.user.userlevel >= 1000) {
                     $scope.panelproprerty.users = "...";

@@ -833,7 +833,7 @@ table.dataTable thead .sorting:after {
     background-color: rgba(51, 122, 183,0.3);/*rgb(0, 122, 255);/*#FF69B4;/*rgba(255,19,0,1);*/
     color:white;
 }
-.panel-black .panel-heading.kandidat,.panel-black .panel-heading.kandidat{
+.panel-black .panel-heading.kandidat,.panel-black .panel-heading.kandidat, .panel-body.kandidat{
     border: 1px solid;
     border-color: #e5e6e9 #dfe0e4 #d0d1d5;
     border-radius: 4px;

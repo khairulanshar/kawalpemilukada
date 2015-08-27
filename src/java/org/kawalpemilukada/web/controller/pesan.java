@@ -11,16 +11,19 @@ import com.google.gson.Gson;
 import com.googlecode.objectify.Key;
 import static com.googlecode.objectify.ObjectifyService.ofy;
 import com.googlecode.objectify.cmd.Query;
+import com.googlecode.objectify.cmd.QueryKeys;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.LinkedHashMap;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
+import org.kawalpemilukada.model.KandidatWilayah;
 import org.kawalpemilukada.model.Pesan;
 import org.kawalpemilukada.model.StringKey;
 import org.kawalpemilukada.model.UserData;
@@ -102,6 +105,23 @@ public class pesan extends HttpServlet {
 
             } catch (Exception e) {
             }
+        } else if (type.equalsIgnoreCase("COUNT")) {
+            try {
+                String key = input.get(0).toString();
+                if (key.equalsIgnoreCase("Pesan Untuk Semua")) {
+                    key = "wall";
+                } else if (key.equalsIgnoreCase("Pesan Untuk Saya")) {
+                    try {
+                        UserData user = CommonServices.getUser(request);
+                        key = "msg" + user.uid.toString();
+                    } catch (Exception e) {
+                        key = "wall";
+                    }
+                }
+                int pesan = CommonServices.countPesan(key);
+                records.put("countPesan", pesan);
+            } catch (Exception e) {
+            }
         } else if (type.equalsIgnoreCase("POST")) {
             try {
                 UserData user = CommonServices.getUser(request);
@@ -139,12 +159,8 @@ public class pesan extends HttpServlet {
                         }
                         Pesan pesan = new Pesan(key);
                         pesan.dari_id = user.uid;
-                        if (key.contains("#setuju#") || key.contains("#tidaksetuju#")) {
-                            //pesan.id = user.uid;//Long.parseLong(user.id.replace(user.type, ""));
-                        } else {
-                            CommonServices.addPoinToUser(user, 10);
-                            records.put("user", JSONValue.parse(gson.toJson(user)));
-                        }
+                        CommonServices.addPoinToUser(user, 10);
+                        records.put("user", JSONValue.parse(gson.toJson(user)));
                         pesan.dari_nama = user.nama;
                         pesan.dari_img = user.imgurl;
                         pesan.dari_link = user.link;
@@ -163,7 +179,7 @@ public class pesan extends HttpServlet {
                             offset = 0;
                         }
 
-                        JSONArray jsonArrays = (JSONArray) input.get(12);
+                        JSONArray jsonArrays = (JSONArray) input.get(16);
                         for (Object jsonArray1 : jsonArrays) {
                             JSONArray file = (JSONArray) jsonArray1;
                             pesan.addFile(file.get(0).toString(), file.get(1).toString(), file.get(2).toString(), file.get(3).toString());
@@ -171,6 +187,21 @@ public class pesan extends HttpServlet {
                         records.put("parentId", parentId);
                         ofy().save().entity(pesan).now();
                         records.put("pesan", JSONValue.parse(gson.toJson(pesan)));
+                        if ((!key.equalsIgnoreCase("Pesan Untuk Semua")) && (!key.equalsIgnoreCase("Pesan Untuk Saya"))) {
+                            int countpesan = CommonServices.countPesan(key);
+                            String tahun = input.get(12).toString();
+                            String tingkat = input.get(13).toString();
+                            String tingkatId = input.get(14).toString();
+                            String urut = input.get(15).toString();
+                            Key<StringKey> parentKey = Key.create(StringKey.class, CommonServices.setParentId(tahun, tingkat));
+                            Key<KandidatWilayah> keyWithParent = Key.create(parentKey, KandidatWilayah.class, tingkat + tingkatId);
+                            List<KandidatWilayah> kandidatWilayahs = ofy().load().type(KandidatWilayah.class).ancestor(keyWithParent).list();
+                            KandidatWilayah k = kandidatWilayahs.get(0);
+                            k.updatekandidat("", "", Integer.parseInt(urut), countpesan);
+                            ofy().save().entity(k).now();
+                            records.put("kandidatWilayah", JSONValue.parse(gson.toJson(k)));
+                        }
+
                     }
 
                     if (key.equalsIgnoreCase("Pesan Untuk Semua") || key.equalsIgnoreCase("Pesan Untuk Saya")) {

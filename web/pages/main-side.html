@@ -13,6 +13,9 @@
             <button class="btn btn-bluex" type="button" ng-click="mainSide.hideMenu()">Sembunyikan Menu</button>
         </li>
         <li>
+            <a href="javascript:" ng-click="mainSide.setPage('#/dashboard.html?Provinsi&2014')" ng-class="{active : mainSide.isSelected2('#/dashboard.html')}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+        </li>
+        <li>
             <a href="javascript:" ng-click="mainSide.setPage('#/user-profile.html')" ng-class="{active : mainSide.isSelected('#/user-profile.html')}"><i class="fa fa-pencil-square-o"></i> Pendaftaran</a>
         </li>
         <li ng-class="{active : mainSide.isSelected2('#/tabulasi.html')}">
@@ -37,9 +40,7 @@
                 </li>
             </ul>
         </li>
-        <li>
-            <a href="javascript:" ng-click="mainSide.setPage('#/dashboard.html')" ng-class="{active : mainSide.isSelected('#/dashboard.html')}"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
-        </li>
+        
         
         <!--<li ng-class="{active : mainSide.isSelected2('#/task.html')}">
             <a href="javascript:" class="hasChild"><i class="fa fa-tasks fa-fw"></i> Mengisi/ Memverifikasi Data Suara<span class="fa arrow"></span></a>
