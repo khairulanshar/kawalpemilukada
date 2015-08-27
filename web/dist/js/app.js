@@ -1,5 +1,5 @@
 /*versi 1.20 18-8-2015*/
-var $forwardHTTPS = true;
+var $forwardHTTPS = false;
 (function() {
     var app = angular.module('KawalPemiluKaDaApp', ['controllers', 'mainfooter-directives', 'mainheader-directives', 'mainside-directives']);
     app.service('$KawalService', function() {
@@ -194,9 +194,12 @@ var $forwardHTTPS = true;
                                 $scope.pesans[$index].setujuPesans = data.parentPesan.setujuPesans;
                                 $scope.pesans[$index].tidakSetujuPesans = data.parentPesan.tidakSetujuPesans;
                                 $scope.pesans[$index].tanggapan = "";
-                                callback($scope.pesans[$index]);
+                                $scope.callback($scope.pesans[$index], data);
+                            } else {
+                                $scope.callback(data);
                             }
                         } catch (e) {
+                            console.log(e)
                         }
                     })
                     .error(function(data, status, headers, config) {
@@ -605,8 +608,8 @@ var $forwardHTTPS = true;
                 "user-profile.html",
                 "tabulasi.html",
                 /*"komentar.html",
-                "grafik.html",
-                "task.html","users.html",*/  "privasi.html"];
+                 "grafik.html",
+                 "task.html","users.html",*/  "privasi.html"];
             $scope.selectedTemplate = {
                 "hash": '#/tabulasi.html/Provinsi',
                 "path": "pages/tabulasi.html",

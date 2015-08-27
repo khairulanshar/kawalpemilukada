@@ -129,8 +129,8 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
             this.showC1 = true;
             this.openPage = function(page, kandidat, wilayah) {
                 $KawalService.setSelectedKandidat(kandidat, wilayah);
-                $scope.selectedTemplate.hash = page + wilayah.tahun + '/' + wilayah.id.replace(wilayah.kpuid, '') + '/' + wilayah.kpuid + '/' + $KawalService.replaceSpecial(wilayah.nama, '-') + '/' + $KawalService.replaceSpecial(kandidat.nama, '-');
-                $KawalService.handleHash(page.substr(1) + wilayah.tahun + '/' + wilayah.id.replace(wilayah.kpuid, '') + '/' + wilayah.kpuid + '/' + $KawalService.replaceSpecial(wilayah.nama, '-') + '/' + $KawalService.replaceSpecial(kandidat.nama, '-'), $scope);
+                $scope.selectedTemplate.hash = page + wilayah.tahun + '/' + wilayah.id.replace(wilayah.kpuid, '') + '/' + wilayah.kpuid + '/' + $KawalService.replaceSpecial(wilayah.nama, '-') + '/' + kandidat.urut + '/' + $KawalService.replaceSpecial(kandidat.nama, '-');
+                $KawalService.handleHash(page.substr(1) + wilayah.tahun + '/' + wilayah.id.replace(wilayah.kpuid, '') + '/' + wilayah.kpuid + '/' + $KawalService.replaceSpecial(wilayah.nama, '-') + '/' + kandidat.urut + '/' + $KawalService.replaceSpecial(kandidat.nama, '-'), $scope);
             };
             this.setPage = function(controlWilayah, $index) {
                 if (this.controlWilayahs.length > $index + 1 && this.controlWilayahs.length > 1) {
@@ -456,8 +456,8 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                                 if (data.length > 0) {
                                     context.wilayah = data[0];
                                     angular.forEach(context.wilayah.kandidat, function(value, key) {
-                                        if ($KawalService.replaceSpecial(value.nama, '-') === hashs[5]) {
-                                            context.kandidat=value;
+                                        if ($KawalService.replaceSpecial(value.nama, '-') === hashs[6]) {
+                                            context.kandidat = value;
                                         }
                                     });
                                 }
@@ -490,8 +490,8 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
             this.searchWilayah0 = "";
             this.openPage = function(page, kandidat, wilayah) {
                 $KawalService.setSelectedKandidat(kandidat, wilayah);
-                $scope.selectedTemplate.hash = page + wilayah.tahun + '/' + wilayah.id.replace(wilayah.kpuid, '') + '/' + wilayah.kpuid + '/' + $KawalService.replaceSpecial(wilayah.nama, '-') + '/' + $KawalService.replaceSpecial(kandidat.nama, '-');
-                $KawalService.handleHash(page.substr(1) + wilayah.tahun + '/' + wilayah.id.replace(wilayah.kpuid, '') + '/' + wilayah.kpuid + '/' + $KawalService.replaceSpecial(wilayah.nama, '-') + '/' + $KawalService.replaceSpecial(kandidat.nama, '-'), $scope);
+                $scope.selectedTemplate.hash = page + wilayah.tahun + '/' + wilayah.id.replace(wilayah.kpuid, '') + '/' + wilayah.kpuid + '/' + $KawalService.replaceSpecial(wilayah.nama, '-') + '/' + kandidat.urut + '/' + $KawalService.replaceSpecial(kandidat.nama, '-');
+                $KawalService.handleHash(page.substr(1) + wilayah.tahun + '/' + wilayah.id.replace(wilayah.kpuid, '') + '/' + wilayah.kpuid + '/' + $KawalService.replaceSpecial(wilayah.nama, '-') + '/' + kandidat.urut + '/' + $KawalService.replaceSpecial(kandidat.nama, '-'), $scope);
             };
             $('.dropdown-menu').click(function(event) {
                 var target = $(event.target);
@@ -1225,7 +1225,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
             this.setInitPesan = function() {
                 var hashs = window.location.hash.substr(2).split("/");
                 if (hashs.length >= 2) {
-                    this.pesan = hashs[1] + hashs[2] + hashs[3] + hashs[5];
+                    this.pesan = hashs[1] + hashs[2] + hashs[3] + '#' + hashs[5];
                 } else {
                     this.pesan = "Pesan Untuk Semua";
                 }
@@ -1324,11 +1324,11 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 pesan.tidakSetujuPesanShow = false;
                 $KawalService.itemyangsedangdiproses.setKomentar(true);
                 selected.data = ["#tanggapan#" + pesan.id, "", "", "", "", pesan.tanggapan, "", "", 1, 0, pesan.id, pesan.key.raw.name, []];
-                var callback = function(pesan) {
+                selected.callback = function(pesan) {
                     pesan.tanggapanPesanShow = false;
                     context.hideandshowTanggapan(pesan);
                 }
-                $KawalService.submitMsg($http, selected, $index, callback);
+                $KawalService.submitMsg($http, selected, $index);
                 this.init();
             }
             this.kirimSetuju = function(user, selected, pesan, $index) {
@@ -1341,10 +1341,10 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 pesan.tidakSetujuPesanShow = false;
                 $KawalService.itemyangsedangdiproses.setKomentar(true);
                 selected.data = ["#setuju#" + pesan.id, "", "", "", "", "Setuju", "", "", 1, 0, pesan.id, pesan.key.raw.name, []];
-                var callback = function(pesan) {
+                selected.callback = function(pesan) {
 
                 }
-                $KawalService.submitMsg($http, selected, $index, callback);
+                $KawalService.submitMsg($http, selected, $index);
                 pesan.blockbutton_active = "kirimSetuju";
             }
             this.kirimTidakSetuju = function(user, selected, pesan, $index) {
@@ -1357,10 +1357,10 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 pesan.setujuPesanShow = false;
                 $KawalService.itemyangsedangdiproses.setKomentar(true);
                 selected.data = ["#tidaksetuju#" + pesan.id, "", "", "", "", "Tidak Setuju", "", "", 1, 0, pesan.id, pesan.key.raw.name, []];
-                var callback = function(pesan) {
+                selected.callback = function(pesan) {
 
                 }
-                $KawalService.submitMsg($http, selected, $index, callback);
+                $KawalService.submitMsg($http, selected, $index);
                 pesan.blockbutton_active = "kirimTidakSetuju";
             }
             this.kirimHapus = function(user, selected, pesan, $index) {
@@ -1373,10 +1373,10 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 pesan.setujuPesanShow = false;
                 $KawalService.itemyangsedangdiproses.setKomentar(true);
                 selected.data = ["#hide#" + pesan.id, "", "", "", "", "", "", "", 1, 0, pesan.id, pesan.key.raw.name, []];
-                var callback = function(pesan) {
+                selected.callback = function(pesan) {
                     context.pesans.splice($index, 1);
                 };
-                $KawalService.submitMsg($http, selected, $index, callback);
+                $KawalService.submitMsg($http, selected, $index);
             };
             this.photoChange = function(selected) {
                 this.photos = selected.files;
@@ -1425,15 +1425,29 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                     return;
                 }
                 $KawalService.itemyangsedangdiproses.setKomentar(true);
-                this.data = [this.pesan, "", "", "", "", this.isi, "", "", 1, 0, "0", ""];
+                var hashs = window.location.hash.substr(2).split("/");
+                if (hashs.length > 2) {
+                    this.data = [this.pesan, "", "", "", "", this.isi, "", "", 1, 0, "0", "", hashs[1], hashs[2], hashs[3], hashs[5]];
+                } else {
+                    this.data = [this.pesan, "", "", "", "", this.isi, "", "", 1, 0, "0", "", "", "", "", ""];
+                }
+                this.callback = function(data) {
+                    try {
+                        angular.forEach(data.kandidatWilayah.kandidat, function(value, key) {
+                            if ($KawalService.replaceSpecial(value.nama, '-') === hashs[6]) {
+                                $KawalService.setSelectedKandidat(value, data.kandidatWilayah);
+                                $scope.$$prevSibling.profilKandidatCtrl.kandidat = $KawalService.getSelectedKandidat();
+                                $scope.$$prevSibling.profilKandidatCtrl.wilayah = $KawalService.getSelectedWilayah();
+                            }
+                        });
+                    } catch (e) {
+                    }
+                };
                 if (this.files.length > 0 || this.photos.length > 0) {
                     $KawalService.getUrlFile($http, this);
                 } else {
                     this.data.push([]);
-                    var callback = function(pesan) {
-
-                    }
-                    $KawalService.submitMsg($http, this, callback);
+                    $KawalService.submitMsg($http, this);
                 }
             };
             this.getMoredata = function() {
@@ -1441,10 +1455,10 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 this.data = [this.pesan, this.filter, this.filterBy, this.cursorStr, this.limit, this.offset];
                 $KawalService.getPesans($http, this);
                 $KawalService.sendToGa();
-            }
+            };
             this.login = function(url) {
                 var rurl = encodeURIComponent(window.location.hash.substr(1));
-                $KawalService.openPopupLogin($http, url + rurl + "&tahun=" + $scope.$parent.$parent.$tahun, $scope.$parent.$parent, $window)
+                $KawalService.openPopupLogin($http, url + rurl + "&tahun=" + $scope.$parent.$parent.$tahun, $scope.$parent.$parent, $window);
             };
             this.setInitPesan();
             this.data = [this.pesan, this.filter, this.filterBy, this.cursorStr, this.limit, this.offset];
