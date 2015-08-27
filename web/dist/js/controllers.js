@@ -52,7 +52,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                             dataSuara["errorAlertsHC"].push('Suara ' + dataSuara.suaraKandidat[value + ''].nama + ' tidak boleh kosong');
                         }
                     });
-                    if (dagetSelectedKandidattaSuara.suarasahHC.length === 0) {
+                    if (dataSuara.suarasahHC.length === 0) {
                         dataSuara["errorAlertsHC"].push('Suara Sah tidak boleh kosong');
                     }
                     if (dataSuara.suaratidaksahHC.length === 0) {
@@ -163,10 +163,11 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 } catch (e) {
                     parentkpuid = 0;
                 }
+                var currentPath = window.location.hash.substr(1).replace("/" + hashs[0] + "/", "");
                 if (hashs[1] === "Kabupaten-Kota" && parentkpuid > 0) {
-                    $KawalService.handleHash("/tabulasi.html" + "/" + hashs[1] + "/" + hashs[2] + "/" + kandidatWilayah.parentkpuid + "/" + kandidatWilayah.kpuid, $scope);
+                    $KawalService.handleHash("/tabulasi.html/" + "/" + currentPath + "/" + kandidatWilayah.parentkpuid + "/" + kandidatWilayah.kpuid, $scope);
                 } else {
-                    $KawalService.handleHash("/tabulasi.html" + "/" + hashs[1] + "/" + hashs[2] + "/" + kandidatWilayah.kpuid, $scope);
+                    $KawalService.handleHash("/tabulasi.html/" + "/" + currentPath + "/" + kandidatWilayah.kpuid, $scope);
                 }
             };
             this.showTable = function(data) {
@@ -998,7 +999,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 $KawalService.getDashboard($http, $scope);
 
             };
-            var context=this;
+            var context = this;
             this.getUser = function() {
                 if ($scope.user.userlevel >= 1000) {
                     $scope.panelproprerty.users = "...";

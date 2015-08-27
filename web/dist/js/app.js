@@ -645,11 +645,7 @@ var $forwardHTTPS = false;
                 }
             } catch (e) {
             }
-            this.showMenu = function() {
-                $("#navsidebar").show();
-                $("#pagewrapper").attr("style", "");
-                $("#menuBtn").hide();
-            }
+            
             $scope.handleHash = function(a) {
                 $KawalService.handleHash(a, $scope)
             }
