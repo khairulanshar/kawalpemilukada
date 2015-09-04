@@ -1,46 +1,51 @@
 
-<div ng-controller="profilKandidatController
-        as profilKandidatCtrl" >
+<div ng-controller="profilKandidatController as profilKandidatCtrl" >
     <div class="row">
         <div class="col-lg-12">
             <h1 class="page-header">Profil Kandidat {{profilKandidatCtrl.kandidat.nama}}</h1>
+            <button class="btn btn-blue1" type="button" ng-click="profilKandidatCtrl.kembali()"><i class="fa fa-angle-double-left" style="padding-right:5px;"></i> Kembali</button>
         </div>
     </div>
     <div class="row">
-        <center>
-            <div class="panel panel-default" style="border:0px;background-color:white;width: 280px;">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="panel panel-default">
                 <div class="panel-heading kandidat">
                     <div class="row">
-                        <div style="float:left;">
+                        <center>
                             <img ng-src="{{profilKandidatCtrl.kandidat.img_url}}" style="width:150px;height: 150px;" class="img-responsive attach-foto1">
-                        </div>
-                        <div class="text-right">
-                            <div class="huge"><i class="fa fa-comments-o"></i>{{profilKandidatCtrl.kandidat.jumlahKomentar}}</div>
-                        </div>
+                        </center>
+                        <div class="col-xs-12 text-center text-uppercase text-primary">{{profilKandidatCtrl.kandidat.nama}}</div>
+                        <div class="col-xs-12 text-center text-uppercase text-muted">{{profilKandidatCtrl.wilayah.nama}}</div>
+                        <div class="col-xs-12 text-uppercase"><b>No Urut</b>: <span class="text-primary">{{profilKandidatCtrl.kandidat.urut}}</span></div>
+                        <div class="col-xs-12 text-uppercase"><b>KPU Peserta ID</b>: <span class="text-primary">{{profilKandidatCtrl.kandidat.kpu_id_peserta}}</span></div>
+                        <div class="col-xs-12 text-uppercase"><b>JENIS DUKUNGAN</b>: <span class="text-primary">{{profilKandidatCtrl.kandidatJSON[7]}}</span></div>
+                        <div class="col-xs-12 text-uppercase"><b>PARTAI PENDUKUNG</b>: <span class="text-primary">{{profilKandidatCtrl.kandidatJSON[8]}}</span></div>
                     </div>
                     <div class="row">
-                        <div class="col-xs-12 text-center text-uppercase text-primary" style="padding-top: 10px;">{{profilKandidatCtrl.kandidat.nama}}</div>
-                        <div class="col-xs-12 text-center text-uppercase text-muted">No Urut {{profilKandidatCtrl.kandidat.urut}}</div>
-                        <span class="col-xs-12 text-center text-uppercase text-muted">{{profilKandidatCtrl.wilayah.nama}}</span>
+                        <div class="col-xs-12">
+                            <div id="example1" class="pull-right">
+                                <span class="sharrre" >
+                                    <div class="box">
+                                        <span class="count">{{profilKandidatCtrl.kandidat.jumlahKomentar}}</span>
+                                        <span class="share" style="color:#333;"><i class="fa fa-comments-o fa-2x"></i></span>                                
+                                    </div>
+                                </span>
+                                <div id="twitter" data-url="{{profilKandidatCtrl.url}}" data-text="Profil Kandidat" data-title="Tweet"></div>
+                                <div id="facebook" data-url="{{profilKandidatCtrl.url}}" data-text="Profil Kandidat" data-title="Like"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </center>
+        </div>
     </div>
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <div class="text-primary text-center"><strong>Profil Kandidat Kepala Daerah</strong></div>
-                    <div>Foto</div>
-                    <div>Nama:</div>
-                    <div>Umur:</div>
-                    <div>Riwayat Pendidikan:</div>
-                    <div>Pengalaman Kerja:</div>
-                    <div>Riwayat Organisasi:</div>
-                    <div>Isu-isu yang pernah jadi perhatian:</div>
-                    <div>Prestasi dan Penghargaan:</div>
-                    <div>Laporan Harta Kekayaan:</div>
+                    <div ng-bind-html="profilKandidatCtrl.kandidatHTML"></div>
+                    <div class="text-right text-muted" ng-show="profilKandidatCtrl.showSumber"><b>Dipersembahkan Oleh</b>: <a href="http://perludem.org/" target="perludem">perludem.org</a></div>
+                    <div class="text-right text-muted" ng-show="profilKandidatCtrl.showSumber"><b>Sumber</b>: <a ng-href="http://infopilkada.kpu.go.id/index.php?r=Dashboard/viewdetilparpol&id={{profilKandidatCtrl.kandidat.kpu_id_peserta}}" target="infopilkada">infopilkada.kpu.go.id</a></div>
                 </div>
                 <div class="panel-body">
                     <div class="text-primary text-center"><strong>Rekam Jejak di Media</strong></div>
@@ -49,47 +54,29 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div class="text-primary text-center"><strong>Profil Kandidat Wakil Kepala Daerah</strong></div>
-                    <div>Foto</div>
-                    <div>Nama:</div>
-                    <div>Umur:</div>
-                    <div>Riwayat Pendidikan:</div>
-                    <div>Pengalaman Kerja:</div>
-                    <div>Riwayat Organisasi:</div>
-                    <div>Isu-isu yang pernah jadi perhatian:</div>
-                    <div>Prestasi dan Penghargaan:</div>
-                    <div>Laporan Harta Kekayaan:</div>
-                </div>
-                <div class="panel-body">
-                    <div class="text-primary text-center"><strong>Rekam Jejak di Media</strong></div>
-                    <div>...</div>
-                    <div class="text-right text-muted small">Dipersembahkan Oleh: abc</div>
-                </div>
-            </div>
-        </div>
+
     </div>
+
 </div>
 <div class="row">
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-body text-center" >
-                <div class="text-primary text-center" style="min-height:300px;"><strong>Analytics Dashboard</strong></div>
+                <div style="min-height:300px;">
+                    <div class="form-group text-primary text-center"><strong>Analytics Dashboard</strong></div>
+                </div>
                 <div class="text-right text-muted small">Dipersembahkan Oleh: abc</div>
             </div>
-            
+
         </div>
     </div>
 </div>
 <div class="row" ng-controller="komentarController as komentarCtrl" ng-init="komentarCtrl.setfileisrequired(true)"  style="padding-bottom: 30px;">
     <div class="col-lg-12">
-
         <div class="panel-group">
             <center>
                 <div class="row" ng-show="(!user.logged)">
-                    <h4>Silahkan Login Terlebih dahulu untuk memberikan penilain.</h4>
+                    <h4>Silahkan Login Terlebih dahulu untuk memberikan penilaian Anda.</h4>
                     <div style="width: 197px;">
                         <a class="btn btn-block btn-social btn-twitter"  style="color: white;line-height: 24px;" ng-click="komentarCtrl.login('/login?form_action=logintwit&rurl=')">
                             <i class="fa fa-twitter"></i> Login dengan Twitter

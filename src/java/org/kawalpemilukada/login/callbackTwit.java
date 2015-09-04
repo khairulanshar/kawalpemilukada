@@ -57,7 +57,7 @@ public class callbackTwit extends HttpServlet {
         try {
             User u = twitter.showUser(twitter.getId());
             user = ofy().load().type(UserData.class).id("twit" + CommonServices.getVal(twitter.getId())).now();
-            if (user==null) {
+            if (user == null) {
                 user = new UserData("twit" + CommonServices.getVal(twitter.getId()));
                 user.imgurl = u.getBiggerProfileImageURL().replace("http://", "https://");
                 user.nama = CommonServices.getVal(u.getName());
@@ -68,13 +68,16 @@ public class callbackTwit extends HttpServlet {
                 dashboard.users = CommonServices.getuserSize() + "";
                 ofy().save().entity(dashboard).now();
             } else {
+                user.lastlogin = CommonServices.JakartaTime();
+                user.type = "twit";
+                user.imgurl = u.getBiggerProfileImageURL().replace("http://", "https://");
                 if (user.type.equalsIgnoreCase("twit") && user.nama.equalsIgnoreCase(CommonServices.getVal(u.getName()))) {
-                    user.lastlogin = CommonServices.JakartaTime();
-                    user.type = "twit";
-                    user.imgurl = u.getBiggerProfileImageURL().replace("http://", "https://");
                     if (user.terverifikasi.equalsIgnoreCase("Y")) {
                         errorMsg = "";
                     }
+                } else {
+                    user.nama = CommonServices.getVal(u.getName());
+                    user.terverifikasi = "N";
                 }
                 ofy().save().entity(user).now();
             }

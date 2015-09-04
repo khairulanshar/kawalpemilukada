@@ -7,13 +7,11 @@ package org.kawalpemilukada.login;
 
 import org.kawalpemilukada.web.controller.CommonServices;
 import com.google.gson.Gson;
-import com.googlecode.objectify.Key;
 import static com.googlecode.objectify.ObjectifyService.ofy;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +54,7 @@ public class callbackfb extends HttpServlet {
         try {
             facebook4j.User u = facebook.getMe();
             user = ofy().load().type(UserData.class).id("fb" + CommonServices.getVal(u.getId())).now();
-            if (user==null) {
+            if (user == null) {
                 user = new UserData("fb" + CommonServices.getVal(u.getId()));
                 user.imgurl = "https://graph.facebook.com/" + u.getId() + "/picture";
                 user.nama = CommonServices.getVal(u.getName());
@@ -67,14 +65,15 @@ public class callbackfb extends HttpServlet {
                 dashboard.users = CommonServices.getuserSize() + "";
                 ofy().save().entity(dashboard).now();
             } else {
+                user.lastlogin = CommonServices.JakartaTime();
+                user.type = "fb";
+                user.imgurl = "https://graph.facebook.com/" + u.getId() + "/picture";
                 if (user.type.equalsIgnoreCase("fb") && user.nama.equalsIgnoreCase(CommonServices.getVal(u.getName()))) {
-                    user.lastlogin = CommonServices.JakartaTime();
-                    user.type = "fb";
-                    user.imgurl = "https://graph.facebook.com/" + u.getId() + "/picture";
                     if (user.terverifikasi.equalsIgnoreCase("Y")) {
                         errorMsg = "";
                     }
                 } else {
+                    user.nama = CommonServices.getVal(u.getName());
                     user.terverifikasi = "N";
                 }
                 ofy().save().entity(user).now();

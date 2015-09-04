@@ -1,5 +1,8 @@
-/*versi 1.20 27-8-2015*/
-var $forwardHTTPS = false;
+/*versi 1.20 4-9-2015*/
+var $forwardHTTPS = true;
+if (window.location.protocol === "http:" && $forwardHTTPS) {
+    window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+}
 (function() {
     var app = angular.module('KawalPemiluKaDaApp', ['controllers', 'mainfooter-directives', 'mainheader-directives', 'mainside-directives']);
     app.service('$KawalService', function() {
@@ -15,9 +18,14 @@ var $forwardHTTPS = false;
             wilayah: false,
             komentar: false,
             kandidat: false,
+            profil: false,
             tabulasi: false,
             setScope: function(value) {
                 this.scope = value;
+            },
+            setProfil: function(value) {
+                this.profil = value;
+                this.scope.sedangDiproses = this.returnvalue();
             },
             setKandidat: function(value) {
                 this.kandidat = value;
@@ -44,7 +52,7 @@ var $forwardHTTPS = false;
                 this.scope.sedangDiproses = this.returnvalue();
             },
             returnvalue: function() {
-                return this.user || this.dashboard || this.wilayah || this.komentar || this.kandidat || this.tabulasi;
+                return this.user || this.dashboard || this.wilayah || this.komentar || this.kandidat || this.tabulasi || this.profil;
             }
         };
         var replaceSpecial = function(inp, t) {
@@ -551,11 +559,65 @@ var $forwardHTTPS = false;
         }
         var getSelectedWilayah = function() {
             return SelectedWilayah;
-        }
+        };
+        var getUrlFileProfil = function($http, $scope) {
+            itemyangsedangdiproses.setKomentar(true);
+            $http.get('/pesan/getUrlFile/').success(function(data) {
+                if (data.uploadurl.length > 0) {
+                    submitFileProfil($http, $scope, data.uploadurl);
+                }
+            }).error(function() {
+            });
+        };
+        var submitFileProfil = function($http, $scope, uploadurl) {
+            itemyangsedangdiproses.setKomentar(true);
+            var data = new FormData();
+            var files = $scope.photos;
+            var pI = 0;
+            for (var i = 0, f; f = files[i]; i++) {
+                if (!f.type.match('image.*')) {
+                    continue;
+                }
+                data.append("pN" + i, f.name);
+                data.append("pT" + i, f.type);
+                data.append("pF" + i, f);
+                pI = i + 1;
+            }
+            data.append("pI", pI);
+            var fI = 0;
+            var files2 = $scope.files;
+            for (var i = 0, f2; f2 = files2[i]; i++) {
+                if (!f2.type.match('application/pdf')) {
+                    continue;
+                }
+                data.append("fN" + i, f2.name);
+                data.append("fT" + i, f2.type);
+                data.append("fF" + i, f2);
+                fI = i + 1;
+            }
+            data.append("fI", fI);
+
+            $http.post(uploadurl, data, {
+                transformRequest: angular.identity,
+                headers: {'Content-Type': undefined}
+            })
+                    .success(function(data, status, headers, config) {
+                        if (data.success === "OK") {
+                            //$scope.data.push(data.retval);
+                            console.log(data)
+                            //submitMsg($http, $scope)
+                        }
+                    })
+                    .error(function(data, status, headers, config) {
+
+                    });
+        };
 
         return {
             roundToTwo: roundToTwo
             , setpercent: setpercent
+            , getUrlFileProfil: getUrlFileProfil
+            , submitFileProfil: submitFileProfil
             , setSelectedKandidat: setSelectedKandidat
             , getSelectedKandidat: getSelectedKandidat
             , getSelectedWilayah: getSelectedWilayah
@@ -590,15 +652,12 @@ var $forwardHTTPS = false;
 
 
     app.controller('KawalPemiluKaDaCtrl', ['$scope', '$KawalService', function($scope, $KawalService) {
-            if (window.location.protocol === "http:" && $forwardHTTPS) {
-                window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
-            }
             $KawalService.itemyangsedangdiproses.setScope($scope);
             $scope.sedangDiproses = $KawalService.itemyangsedangdiproses.returnvalue();
-            $scope.tahuns = [2014];
+            $scope.tahuns = [2014, 2015];
             $scope.jenisPesans = ["Pesan Untuk Semua"];
             $scope.$tahun = 2014;
-            $scope.$tingkat="Provinsi";
+            $scope.$tingkat = "Provinsi";
             $scope.user = {
                 logged: false,
                 userlevelDesc: "",
@@ -635,6 +694,13 @@ var $forwardHTTPS = false;
                     return false;
                 }
             }
+            $scope.isAdmin2 = function(user) {
+                if (user.userlevel >= 5000) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
             try {
                 if (window.location.hash.length === 0) {
                     setTimeout(function() {
@@ -645,7 +711,7 @@ var $forwardHTTPS = false;
                 }
             } catch (e) {
             }
-            
+
             $scope.handleHash = function(a) {
                 $KawalService.handleHash(a, $scope)
             }

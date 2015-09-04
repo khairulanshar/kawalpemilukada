@@ -15,14 +15,18 @@ import java.util.ArrayList;
 import org.json.simple.JSONObject;
 
 class Kandidat {
-    @Id public Long id;
+
+    @Id
+    public Long id;
     public Integer urut;
+    @Index
+    public String kpu_id_peserta;
     public String nama;
     public String img_url;
     public Integer jumlahKomentar;
 
     public Kandidat() {
-        this.jumlahKomentar=0;
+        this.jumlahKomentar = 0;
     }
 }
 
@@ -33,13 +37,18 @@ class Kandidat {
 @Entity
 public class KandidatWilayah {
 
-    @Parent public Key<StringKey> key;
-    @Id public String id;
-    @Index public String parentkpuid;
+    @Parent
+    public Key<StringKey> key;
+    @Id
+    public String id;
+    @Index
+    public String parentkpuid;
     public String parentNama;
     public String tahun;
-    @Index public String kpuid;
-    @Index public String nama;
+    @Index
+    public String kpuid;
+    @Index
+    public String nama;
     public String dikunci;
     public ArrayList<Kandidat> kandidat;
     public ArrayList<String> namas;
@@ -52,34 +61,54 @@ public class KandidatWilayah {
         this.uruts = new ArrayList();
     }
 
-    public KandidatWilayah(String id,String tahun) {
+    public KandidatWilayah(String id, String tahun) {
         this();
-        this.tahun=tahun;
+        this.tahun = tahun;
         this.key = Key.create(StringKey.class, id + "");
     }
 
     public void addkandidat(
             String nama,
             String img_url,
-            Integer urut
+            Integer urut,
+            String kpu_id_peserta
     ) throws ParseException {
-        Kandidat kandidatLocal = new Kandidat();
-        kandidatLocal.nama = nama;
-        kandidatLocal.img_url = img_url;
-        kandidatLocal.urut=urut;
-        this.kandidat.add(kandidatLocal);
-        this.namas.add(nama);
-        this.uruts.add(urut);
+        boolean found = false;
+        for (int i = 0; i < this.kandidat.size(); i++) {
+            if (this.kandidat.get(i).urut == urut) {
+                found = true;
+                if (nama.length() > 0) {
+                    this.kandidat.get(i).nama = nama;
+                }
+                if (img_url.length() > 0) {
+                    this.kandidat.get(i).img_url = img_url;
+                }
+                if (kpu_id_peserta.length() > 0) {
+                    this.kandidat.get(i).kpu_id_peserta = kpu_id_peserta;
+                }
+            }
+        }
+        if (!found) {
+            Kandidat kandidatLocal = new Kandidat();
+            kandidatLocal.nama = nama;
+            kandidatLocal.img_url = img_url;
+            kandidatLocal.urut = urut;
+            kandidatLocal.kpu_id_peserta = kpu_id_peserta;
+            this.kandidat.add(kandidatLocal);
+            this.namas.add(nama);
+            this.uruts.add(urut);
+        }
     }
-    
-    public JSONObject toJSONObject(int i){
-        Kandidat kandidatLocal=this.kandidat.get(i);
-        JSONObject kandidat=new JSONObject();
+
+    public JSONObject toJSONObject(int i) {
+        Kandidat kandidatLocal = this.kandidat.get(i);
+        JSONObject kandidat = new JSONObject();
         kandidat.put("nama", kandidatLocal.nama);
         kandidat.put("id", kandidatLocal.id);
         kandidat.put("img_url", kandidatLocal.img_url);
         kandidat.put("urut", kandidatLocal.urut);
         kandidat.put("jumlahKomentar", kandidatLocal.jumlahKomentar);
+        kandidat.put("kpu_id_peserta", kandidatLocal.kpu_id_peserta);
         return kandidat;
     }
 
@@ -87,10 +116,11 @@ public class KandidatWilayah {
             String nama,
             String img_url,
             Integer urut,
-            Integer jumlahKomentar
+            Integer jumlahKomentar,
+            String kpu_id_peserta
     ) throws ParseException {
         for (int i = 0; i < this.kandidat.size(); i++) {
-            if (this.kandidat.get(i).urut==urut) {
+            if (this.kandidat.get(i).urut == urut) {
                 if (nama.length() > 0) {
                     this.kandidat.get(i).nama = nama;
                 }
@@ -99,6 +129,9 @@ public class KandidatWilayah {
                 }
                 if (jumlahKomentar > -1) {
                     this.kandidat.get(i).jumlahKomentar = jumlahKomentar;
+                }
+                if (kpu_id_peserta.length() > 0) {
+                    this.kandidat.get(i).kpu_id_peserta = kpu_id_peserta;
                 }
             }
         }

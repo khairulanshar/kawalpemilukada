@@ -93,7 +93,6 @@ public class CommonServices {
     public static void addPoinToUser(UserData user, int point) {
         user.poin = user.poin + 10;
         ofy().save().entity(user).now();
-
     }
 
     public static void loopUpdateparent(JSONArray wilayah, DataSuara dataSuaraTPS, String type) {

@@ -9,8 +9,12 @@ import com.google.gson.Gson;
 import com.googlecode.objectify.Key;
 import static com.googlecode.objectify.ObjectifyService.ofy;
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
 import org.kawalpemilukada.model.KandidatWilayah;
 import org.kawalpemilukada.model.StringKey;
 import org.kawalpemilukada.model.UserData;
@@ -80,7 +85,7 @@ public class kandidat extends HttpServlet {
                         } else {
                             kandidatWilayah = kandidatWilayahs.get(0);
                         }
-                        kandidatWilayah.addkandidat(input.get("nama").toString(), input.get("img_url").toString(), Integer.parseInt(input.get("urut").toString()));
+                        kandidatWilayah.addkandidat(input.get("nama").toString(), input.get("img_url").toString(), Integer.parseInt(input.get("urut").toString()), input.get("kpu_id_peserta").toString());
                         ofy().save().entity(kandidatWilayah).now();
                         kandidats.add(JSONValue.parse(gson.toJson(kandidatWilayah)));
                     }
@@ -93,6 +98,79 @@ public class kandidat extends HttpServlet {
                 Key<KandidatWilayah> keyWithParent = Key.create(parentKey, KandidatWilayah.class, tingkat + tingkatId);
                 List<KandidatWilayah> kandidatWilayahs = ofy().load().type(KandidatWilayah.class).ancestor(keyWithParent).list();
                 kandidats.add(JSONValue.parse(gson.toJson(kandidatWilayahs)));
+            } else if (method.equalsIgnoreCase("get-profil")) {
+                String tingkatId = filters[3];
+                String urut = filters[4];
+                String id = tahun + tingkat + tingkatId + "#" + urut;
+                //ProfilKandidat profil = ofy().load().type(ProfilKandidat.class).id(id).now();
+                //kandidats.add(JSONValue.parse(gson.toJson(profil)));
+            } else if (method.equalsIgnoreCase("get-profil-from-json")) {
+                String tingkatId = filters[3];
+                JSONParser parser = new JSONParser();
+                Object obj = parser.parse(new FileReader("dist/data/" + tingkat + ".json"));
+                JSONObject jsonObject = (JSONObject) obj;
+                kandidats.add(jsonObject.get(tingkatId + ""));
+                HttpURLConnection conn = null;
+                URL url;
+                try {
+                    url = new URL("http://infopilkada.kpu.go.id/index.php?r=Dashboard/viewdetilparpol&id="+tingkatId);
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoOutput(true);
+                    conn.setUseCaches(false);
+                    conn.setDoInput(true);
+                    conn.setRequestMethod("GET");
+                    conn.connect();
+                    // handle the response
+                    int status = conn.getResponseCode();
+                    if (status != 200) {
+                    } else {
+                        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                        StringBuilder sb1 = new StringBuilder();
+                        String read = br.readLine();
+                        while (read != null) {
+                            sb1.append(read);
+                            read = br.readLine();
+                        }
+                        String text=sb1.toString();
+                        text=text.substring(text.indexOf("<h1>Data Paslon Dukungan Partai Politik"));
+                        text=text.substring(0,text.indexOf("<b>PARTAI PENDUKUNG :</b>"));
+                        kandidats.add(text);
+                    }
+                } finally {
+                    if (conn != null) {
+                        conn.disconnect();
+                    }
+                }
+            } else if (method.equalsIgnoreCase("post-profil")) {
+                String tingkatId = filters[3];
+                String urut = filters[4];
+                String id = tahun + tingkat + tingkatId + "#" + urut;
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+                BufferedReader reader = request.getReader();
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                JSONArray input = (JSONArray) JSONValue.parse(sb.toString());
+                try {
+                    UserData user = CommonServices.getUser(request);
+                    if (user.uid.toString().length() > 0 && user.userlevel >= 500) {
+                        /*ProfilKandidat profil = new ProfilKandidat();
+                        profil.id = id;
+                        profil.dibuat_oleh_id = user.uid;
+                        profil.dibuat_oleh_nama = user.nama;
+                        profil.dibuat_oleh_img = user.imgurl;
+                        profil.dibuat_oleh_link = user.link;
+                        for (Object jsonArray1 : input) {
+                            JSONArray profilArray = (JSONArray) jsonArray1;
+                            profil.addkandidat(profilArray.get(0).toString(), profilArray.get(1).toString(), profilArray.get(2).toString(), Integer.parseInt(profilArray.get(3).toString()), profilArray.get(4).toString(), profilArray.get(5).toString(), profilArray.get(6).toString(), profilArray.get(7).toString(), profilArray.get(8).toString(), profilArray.get(9).toString());
+                        }
+                        ofy().save().entity(profil).now();
+                        kandidats.add(JSONValue.parse(gson.toJson(profil)));*/
+                    }
+                } catch (Exception e) {
+                    System.out.println(e.toString());
+                }
             } else {
                 if (filters.length < 4) {
                     List<KandidatWilayah> kandidatWilayahs = CommonServices.filterKandidatWilayah(tahun, tingkat, "", "");

@@ -65,7 +65,7 @@ public class suara extends HttpServlet {
         if (type.equalsIgnoreCase("setup")) {
             try {
                 UserData user = CommonServices.getUser(request);
-                if (user.uid.toString().length() > 0 && user.userlevel >= 1000) {
+                if (user.uid.toString().length() > 0 && user.userlevel >= 5000) {
                     JSONArray input = (JSONArray) JSONValue.parse(sb.toString());
                     String tingkat = input.get(0).toString();
                     JSONObject wilayah = (JSONObject) input.get(1);

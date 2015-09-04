@@ -11,7 +11,6 @@ import com.google.gson.Gson;
 import com.googlecode.objectify.Key;
 import static com.googlecode.objectify.ObjectifyService.ofy;
 import com.googlecode.objectify.cmd.Query;
-import com.googlecode.objectify.cmd.QueryKeys;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -197,7 +196,7 @@ public class pesan extends HttpServlet {
                             Key<KandidatWilayah> keyWithParent = Key.create(parentKey, KandidatWilayah.class, tingkat + tingkatId);
                             List<KandidatWilayah> kandidatWilayahs = ofy().load().type(KandidatWilayah.class).ancestor(keyWithParent).list();
                             KandidatWilayah k = kandidatWilayahs.get(0);
-                            k.updatekandidat("", "", Integer.parseInt(urut), countpesan);
+                            k.updatekandidat("", "", Integer.parseInt(urut), countpesan, "");
                             ofy().save().entity(k).now();
                             records.put("kandidatWilayah", JSONValue.parse(gson.toJson(k)));
                         }

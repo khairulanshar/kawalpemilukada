@@ -8,8 +8,18 @@ package org.kawalpemilukada.web.controller;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.files.AppEngineFile;
+import com.google.appengine.api.files.FileService;
+import com.google.appengine.api.files.FileServiceFactory;
+import com.google.appengine.api.files.FileWriteChannel;
+import com.google.appengine.api.images.Image;
+import com.google.appengine.api.images.ImagesService;
+import com.google.appengine.api.images.ImagesServiceFactory;
+import com.google.appengine.api.images.OutputSettings;
+import com.google.appengine.api.images.Transform;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -56,8 +66,7 @@ public class upload extends HttpServlet {
             record.add(pN);
             record.add(pT);
             for (BlobKey blobKey : blobs.get("pF" + i)) {
-                record.add(blobKey.getKeyString());
-                record.add("/serve?blob-key=" + blobKey.getKeyString());
+
                 /*
                  try {
                  ImagesService imagesService = ImagesServiceFactory.getImagesService();
@@ -66,6 +75,27 @@ public class upload extends HttpServlet {
                  } catch (IllegalArgumentException ie) {
                  record.add("/serve?blob-key=" + blobKey.getKeyString());
                  }*/
+                try {
+                    ImagesService imagesService = ImagesServiceFactory.getImagesService();
+                    Image oldImage = ImagesServiceFactory.makeImageFromBlob(blobKey);
+                    OutputSettings settings = new OutputSettings(ImagesService.OutputEncoding.PNG);
+                    settings.setQuality(100);
+                    Transform transform = ImagesServiceFactory.makeResize(200, 300);
+                    Image newImage = imagesService.applyTransform(transform, oldImage, settings);
+                    byte[] blobData = newImage.getImageData();
+                    //save data to blobstore
+                    FileService fileService = FileServiceFactory.getFileService();
+                    AppEngineFile file = fileService.createNewBlobFile("image/png", pN);
+                    FileWriteChannel writeChannel = fileService.openWriteChannel(file, true);
+                    writeChannel.write(ByteBuffer.wrap(blobData));
+                    writeChannel.closeFinally();
+                    BlobKey blobKeyNew = fileService.getBlobKey(file);
+                    record.add(blobKeyNew.getKeyString());
+                    record.add("/serve?blob-key=" + blobKeyNew.getKeyString());
+                } catch (Exception ie) {
+                    record.add(blobKey.getKeyString());
+                    record.add("/serve?blob-key=" + blobKey.getKeyString());
+                }
             }
             retval.add(record);
         }
