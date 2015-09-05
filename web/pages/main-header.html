@@ -21,7 +21,7 @@
 
 <ul class="nav navbar-top-links navbar-right" id="main-header">
     <!-- /.dropdown -->
-    <!--<li class="dropdown">
+    <li class="dropdown" ng-show="user.logged">
         <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:">
             <i class="fa fa-tasks fa-fw font-white"></i>  <i class="fa fa-caret-down font-white"></i>
         </a>
@@ -29,8 +29,14 @@
 
             <li class="divider"></li>
             <li>
-                <a class="text-center" href="javascript:">
-                    <strong>Lihat Wilayah saya</strong>
+                <a class="text-left" href="javascript:" ng-click="mainHeader.setPage('#/tabulasi.html?Provinsi')">
+                    <strong>Kepala Daerah Provinsi</strong>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+            <li>
+                <a class="text-left" href="javascript:" ng-click="mainHeader.setPage('#/tabulasi.html?Kabupaten-Kota')">
+                    <strong>Kepala Daerah Kabupaten/ Kota</strong>
                     <i class="fa fa-angle-right"></i>
                 </a>
             </li>
@@ -38,7 +44,7 @@
         
     </li>
     
-    <li class="dropdown">
+    <!--<li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:">
             <i class="fa fa-bell fa-fw font-white"></i>  <i class="fa fa-caret-down font-white"></i>
         </a>

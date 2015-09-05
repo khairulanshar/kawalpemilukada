@@ -1,5 +1,5 @@
-/*versi 1.20 4-9-2015*/
-var $forwardHTTPS = true;
+/*versi 1.20 5-9-2015*/
+var $forwardHTTPS = false;
 if (window.location.protocol === "http:" && $forwardHTTPS) {
     window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
 }
@@ -206,9 +206,7 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
                             } else {
                                 $scope.callback(data);
                             }
-                        } catch (e) {
-                            console.log(e)
-                        }
+                        } catch (e) { }
                     })
                     .error(function(data, status, headers, config) {
 
@@ -397,6 +395,8 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
                 pI = i + 1;
             }
             data.append("pI", pI);
+            data.append("sizew", "200");
+            data.append("sizeh", "300");
             var fI = 0;
             var files2 = $scope.kandidatCtrl.files;
             for (var i = 0, f2; f2 = files2[i]; i++) {
@@ -604,7 +604,7 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
                     .success(function(data, status, headers, config) {
                         if (data.success === "OK") {
                             //$scope.data.push(data.retval);
-                            console.log(data)
+                            //console.log(data)
                             //submitMsg($http, $scope)
                         }
                     })

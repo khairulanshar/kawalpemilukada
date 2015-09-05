@@ -89,9 +89,7 @@ public class kandidat extends HttpServlet {
                         ofy().save().entity(kandidatWilayah).now();
                         kandidats.add(JSONValue.parse(gson.toJson(kandidatWilayah)));
                     }
-                } catch (Exception e) {
-                    System.out.println(e.toString());
-                }
+                } catch (Exception e) {}
             } else if (method.equalsIgnoreCase("single")) {
                 String tingkatId = filters[3];
                 Key<StringKey> parentKey = Key.create(StringKey.class, CommonServices.setParentId(tahun, tingkat));
@@ -109,11 +107,16 @@ public class kandidat extends HttpServlet {
                 JSONParser parser = new JSONParser();
                 Object obj = parser.parse(new FileReader("dist/data/" + tingkat + ".json"));
                 JSONObject jsonObject = (JSONObject) obj;
-                kandidats.add(jsonObject.get(tingkatId + ""));
+                JSONArray infoKandidat = (JSONArray) jsonObject.get(tingkatId + "");
+                kandidats.add(infoKandidat);
                 HttpURLConnection conn = null;
                 URL url;
                 try {
-                    url = new URL("http://infopilkada.kpu.go.id/index.php?r=Dashboard/viewdetilparpol&id="+tingkatId);
+                    String infokpu = "http://infopilkada.kpu.go.id/index.php?r=Dashboard/viewdetilparpol&id=";
+                    if (!infoKandidat.get(7).toString().equalsIgnoreCase("PARPOL")) {
+                        infokpu = "http://infopilkada.kpu.go.id/index.php?r=Dashboard/viewdetilorang&id=";
+                    }
+                    url = new URL(infokpu + tingkatId);
                     conn = (HttpURLConnection) url.openConnection();
                     conn.setDoOutput(true);
                     conn.setUseCaches(false);
@@ -131,11 +134,18 @@ public class kandidat extends HttpServlet {
                             sb1.append(read);
                             read = br.readLine();
                         }
-                        String text=sb1.toString();
-                        text=text.substring(text.indexOf("<h1>Data Paslon Dukungan Partai Politik"));
-                        text=text.substring(0,text.indexOf("<b>PARTAI PENDUKUNG :</b>"));
+                        String text = sb1.toString();
+                        if (infoKandidat.get(7).toString().equalsIgnoreCase("PARPOL")) {
+                            text = text.substring(text.indexOf("<h1>Data Paslon Dukungan Partai Politik"));
+                            text = text.substring(0, text.indexOf("<b>PARTAI PENDUKUNG :</b>"));
+                        } else {
+                            text = text.substring(text.indexOf("<h1>Data Paslon Dukungan Perorangan"));
+                            text = text.substring(0, text.indexOf("<div id=\"edit-form\"")-1);
+                        }
                         kandidats.add(text);
                     }
+                } catch (Exception e) {
+                    
                 } finally {
                     if (conn != null) {
                         conn.disconnect();
@@ -156,30 +166,26 @@ public class kandidat extends HttpServlet {
                     UserData user = CommonServices.getUser(request);
                     if (user.uid.toString().length() > 0 && user.userlevel >= 500) {
                         /*ProfilKandidat profil = new ProfilKandidat();
-                        profil.id = id;
-                        profil.dibuat_oleh_id = user.uid;
-                        profil.dibuat_oleh_nama = user.nama;
-                        profil.dibuat_oleh_img = user.imgurl;
-                        profil.dibuat_oleh_link = user.link;
-                        for (Object jsonArray1 : input) {
-                            JSONArray profilArray = (JSONArray) jsonArray1;
-                            profil.addkandidat(profilArray.get(0).toString(), profilArray.get(1).toString(), profilArray.get(2).toString(), Integer.parseInt(profilArray.get(3).toString()), profilArray.get(4).toString(), profilArray.get(5).toString(), profilArray.get(6).toString(), profilArray.get(7).toString(), profilArray.get(8).toString(), profilArray.get(9).toString());
-                        }
-                        ofy().save().entity(profil).now();
-                        kandidats.add(JSONValue.parse(gson.toJson(profil)));*/
+                         profil.id = id;
+                         profil.dibuat_oleh_id = user.uid;
+                         profil.dibuat_oleh_nama = user.nama;
+                         profil.dibuat_oleh_img = user.imgurl;
+                         profil.dibuat_oleh_link = user.link;
+                         for (Object jsonArray1 : input) {
+                         JSONArray profilArray = (JSONArray) jsonArray1;
+                         profil.addkandidat(profilArray.get(0).toString(), profilArray.get(1).toString(), profilArray.get(2).toString(), Integer.parseInt(profilArray.get(3).toString()), profilArray.get(4).toString(), profilArray.get(5).toString(), profilArray.get(6).toString(), profilArray.get(7).toString(), profilArray.get(8).toString(), profilArray.get(9).toString());
+                         }
+                         ofy().save().entity(profil).now();
+                         kandidats.add(JSONValue.parse(gson.toJson(profil)));*/
                     }
-                } catch (Exception e) {
-                    System.out.println(e.toString());
-                }
+                } catch (Exception e) {}
             } else {
                 if (filters.length < 4) {
                     List<KandidatWilayah> kandidatWilayahs = CommonServices.filterKandidatWilayah(tahun, tingkat, "", "");
                     kandidats.add(JSONValue.parse(gson.toJson(kandidatWilayahs)));
                 }
             }
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
+        } catch (Exception e) {}
         PrintWriter out = response.getWriter();
         response.setContentType("text/html;charset=UTF-8");
         out.print(JSONValue.toJSONString(kandidats));

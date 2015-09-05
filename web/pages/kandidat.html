@@ -20,6 +20,18 @@
             </div>
         </div>
     </div>
+    <div class="row" >
+        <div class="col-lg-5">
+            <div class="alert alert-info">
+                <div style="margin-left: 20px;">
+                    <ul style="margin:0px;">
+                        <li>Pilih Tahun  <b>2014</b> untuk latihan isi data.</li>
+                    </ul>
+                </div>
+                <div style="position: absolute;top:10px;"><i class="fa fa-info-circle fa-2x"></i></div>
+            </div>
+        </div>
+    </div>
     <div class="row" ng-show="isAdmin($parent.user)">
         <div class="col-lg-5">
             <div class="panel panel-blue">
@@ -172,7 +184,7 @@
                 <div class="panel-body">
                     <div class="row">
                         <div  class="col-lg-3 col-md-6"  ng-repeat="kandidat in kandidatCtrl.wilayah.kandidat| orderBy :'-jumlahKomentar'">                            
-                            <div class="panel panel-default" style="border:0px;cursor: pointer;" ng-click="kandidatCtrl.openPage('#/profilkandidat.html?', kandidat, kandidatCtrl.wilayah)">
+                            <div class="panel panel-default" style="border:0px;" >
                                 <div class="panel-heading kandidat">
                                     <div class="row">
                                         <div style="float:left;">
@@ -182,11 +194,14 @@
                                             <div class="huge"><i class="fa fa-comments-o"></i>{{kandidat.jumlahKomentar}}</div>
                                         </div>
                                     </div>
-                                    <div class="row">
+                                    <div class="row" style="cursor: pointer;" ng-click="kandidatCtrl.openPage('#/profilkandidat.html?', kandidat, kandidatCtrl.wilayah)">
                                         <div class="col-xs-12 text-center text-uppercase text-primary" style="padding-top: 10px;">{{kandidat.nama}}</div>
                                         <div class="col-xs-12 text-center text-uppercase text-muted">No Urut {{kandidat.urut}}</div>
                                         <div class="col-xs-12 text-center text-uppercase text-muted">KPU Peserta ID {{kandidat.kpu_id_peserta}}</div>
-                                    </div>    
+                                    </div>  
+                                    <div class="row" ng-show="isAdmin($parent.user)" style="cursor: pointer;" ng-click="kandidatCtrl.editKandiat(kandidat, kandidatCtrl.wilayah)">
+                                        <div class="col-xs-12 text-center text-uppercase text-primary" style="padding-top: 10px;"><i class="fa fa-pencil-square-o"></i> Rubah Data Kandidat</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

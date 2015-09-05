@@ -58,6 +58,14 @@ public class upload extends HttpServlet {
         if (fI == null) {
             fI = "0";
         }
+        String sizew = (String) request.getParameter("sizew");
+        if (sizew == null) {
+            sizew = "";
+        }
+        String sizeh = (String) request.getParameter("sizeh");
+        if (sizeh == null) {
+            sizeh = "";
+        }
         int pi = Integer.parseInt(pI);
         for (int i = 0; i < pi; i++) {
             JSONArray record = new JSONArray();
@@ -78,10 +86,18 @@ public class upload extends HttpServlet {
                 try {
                     ImagesService imagesService = ImagesServiceFactory.getImagesService();
                     Image oldImage = ImagesServiceFactory.makeImageFromBlob(blobKey);
-                    OutputSettings settings = new OutputSettings(ImagesService.OutputEncoding.PNG);
-                    settings.setQuality(100);
-                    Transform transform = ImagesServiceFactory.makeResize(200, 300);
-                    Image newImage = imagesService.applyTransform(transform, oldImage, settings);
+                    Image newImage = null;
+                    if (sizeh.length() > 0 && sizew.length() > 0) {
+                        OutputSettings settings = new OutputSettings(ImagesService.OutputEncoding.PNG);
+                        Transform transform = ImagesServiceFactory.makeResize(200, 300);
+                        newImage = imagesService.applyTransform(transform, oldImage, settings);
+                    } else {
+                        OutputSettings settings = new OutputSettings(ImagesService.OutputEncoding.PNG);
+                        settings.setQuality(50);
+                        Transform transform = ImagesServiceFactory.makeImFeelingLucky();
+                        newImage = imagesService.applyTransform(transform, oldImage, settings);
+                    }
+
                     byte[] blobData = newImage.getImageData();
                     //save data to blobstore
                     FileService fileService = FileServiceFactory.getFileService();

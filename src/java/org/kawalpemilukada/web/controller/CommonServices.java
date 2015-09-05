@@ -84,9 +84,7 @@ public class CommonServices {
             Properties prop = new Properties();
             prop.load(request.getSession().getServletContext().getResourceAsStream("/WEB-INF/" + propFileName));
             result = prop.getProperty(property);
-        } catch (Exception e) {
-            System.out.println("Exception: " + e);
-        }
+        } catch (Exception e) {}
         return result;
     }
 

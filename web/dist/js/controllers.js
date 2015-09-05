@@ -177,16 +177,19 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                     return false;
                 }
             };
-            this.showTextBox = function(admin, user, dataSuara, attributeName, val, type) {
+            this.showTextBox = function(userlevel, user, dataSuara, attributeName, val, type) {
                 if (user.logged && dataSuara[attributeName] === val && user.terverifikasi === "Y") {
-                    if (user.userlevel >= 500
-                            || (type === 'HC' && admin === "Y" && user.userlevel >= 200)
-                            || (user.userlevel === 100 && type === 'HC' && admin === "N")
-                            || (user.userlevel === 200 && type !== 'HC')
-                            ) {
+                    if (user.userlevel >= 1000) {
                         return true;
                     } else {
-                        return false;
+                        if ((type === 'HC' && user.userlevel === userlevel)
+                                || (type === 'HC' && user.userlevel === userlevel)
+                                || (type === 'C1' && user.userlevel === userlevel)
+                                || (type === 'C1' && user.userlevel === userlevel)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
                     }
                 } else {
                     return false;
@@ -449,6 +452,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
 
             }
             this.getFromJSON = function() {
+                $KawalService.itemyangsedangdiproses.setKandidat(true);
                 var hashs = window.location.hash.substr(2).split("/");
                 $http.get('/kandidat/get-profil-from-json/' + hashs[1] + '/dataKandidat/' + context.kandidat.kpu_id_peserta).
                         success(function(data, status, headers, config) {
@@ -481,6 +485,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                                     api.openPopup('facebook');
                                 }
                             });
+                            $KawalService.itemyangsedangdiproses.setKandidat(false);
                         }).
                         error(function(data, status, headers, config) {
 
@@ -544,6 +549,26 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
             this.searchWilayah = "";
             this.searchWilayah1 = "";
             this.searchWilayah0 = "";
+            var context = this;
+            this.editKandiat = function(kandidat, wilayah) {
+                context.showForm(context);
+                context.showAddNewCandidate = true;
+                if ($scope.$parent.$parent.user.userlevel >= 1000 && context.kandidat.tingkat.toLowerCase() === "kabupaten-kota") {
+                    $KawalService.getWilayahDropdown($http, $scope.$parent.$parent, wilayah.parentkpuid, context.callback, "kabkotas");
+                }
+                context.kandidat.nama = kandidat.nama;
+                context.kandidat.kpu_id_peserta = kandidat.kpu_id_peserta;
+                context.kandidat.urut = kandidat.urut + "";
+                if (context.kandidat.tingkat === "Provinsi") {
+                    context.kandidat.provinsi = wilayah.nama;
+                    context.kandidat.provinsiId = wilayah.kpuid;
+                } else {
+                    context.kandidat.kabupaten = wilayah.nama;
+                    context.kandidat.kabupatenId = wilayah.kpuid;
+                    context.kandidat.provinsi = wilayah.parentNama;
+                    context.kandidat.provinsiId = wilayah.parentkpuid;
+                }
+            };
             this.openPage = function(page, kandidat, wilayah) {
                 $KawalService.setSelectedKandidat(kandidat, wilayah);
                 $scope.selectedTemplate.hash = page + wilayah.tahun + '/' + wilayah.id.replace(wilayah.kpuid, '') + '/' + wilayah.kpuid + '/' + $KawalService.replaceSpecial(wilayah.nama, '-') + '/' + kandidat.urut + '/' + $KawalService.replaceSpecial(kandidat.nama, '-');
@@ -555,7 +580,6 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                     event.stopPropagation();
                 }
             });
-            var context = this;
             this.photoChange = function(selected) {
                 this.photos = selected.files;
                 for (var i = 0, f; f = this.photos[i]; i++) {
@@ -576,7 +600,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 }
             };
 
-            var callback = function(data, levelName) {
+            this.callback = function(data, levelName) {
                 context[levelName] = data[0];
             };
             this.kandidat = {
@@ -611,6 +635,9 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                     kpu_id_peserta: ""
                 }
                 selected.showAddNewCandidate = !selected.showAddNewCandidate;
+                if ($scope.$parent.$parent.user.userlevel >= 1000 && context["provinsis"].length === 0) {
+                    $KawalService.getWilayahDropdown($http, $scope.$parent.$parent, "0", context.callback, "provinsis");
+                }
             }
             this.provinsis = [];
             this.fromSetWilayah = false;
@@ -680,7 +707,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                     $KawalService.getWilayah($http, this, urlFilter, callback, id);
                 }
             };
-            this.resetup = function(kandidatCtrl, wilayah, $index,user) {
+            this.resetup = function(kandidatCtrl, wilayah, $index, user) {
                 var hashs = window.location.hash.substr(2).split("/");
                 if (hashs[1] === 'Provinsi') {
                     if (wilayah.sudahDisetup1 === "Y" || wilayah.sudahDisetup1 === "P") {
@@ -751,6 +778,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                     window.location.hash = window.location.hash.substr(0, window.location.hash.length - 1);
                 }
                 var hashs = window.location.hash.substr(2).split("/");
+
                 if (hashs[0] !== "kandidat.html") {
                     return;
                 }
@@ -783,10 +811,9 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 this.wilayahs = [];
                 this.wilayah = {nama: "", kandidat: [], kpuid: "", dikunci: ""};
                 if ($scope.$parent.$parent.user.userlevel >= 1000) {
-                    $KawalService.getWilayahDropdown($http, $scope.$parent.$parent, "0", callback, "provinsis");
+                    $KawalService.getWilayahDropdown($http, $scope.$parent.$parent, "0", context.callback, "provinsis");
                 }
                 $KawalService.itemyangsedangdiproses.setKandidat(true);
-                var context = this;
                 $http.get('/kandidat/get/' + hashs[2] + '/' + context.kandidat.tingkat).
                         success(function(data, status, headers, config) {
                             if (data.length > 0) {
@@ -820,7 +847,12 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                     selected.errorAlerts.push({"text": "Silahakan Isi Nama Kandidat"});
                     return;
                 }
-                if (selected.kandidat.kpu_id_peserta.replace(" ", "") === "") {
+                try {
+                    if (selected.kandidat.kpu_id_peserta.replace(" ", "") === "") {
+                        selected.errorAlerts.push({"text": "Silahakan Isi KPU Peserta ID"});
+                        return;
+                    }
+                } catch (e) {
                     selected.errorAlerts.push({"text": "Silahakan Isi KPU Peserta ID"});
                     return;
                 }
@@ -848,7 +880,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 this.kandidat.provinsiId = selected.kpuid;
                 this.kandidat.provinsi = selected.nama;
                 if (this.kandidat.tingkat.toLowerCase() === "kabupaten-kota") {
-                    $KawalService.getWilayahDropdown($http, $scope.$parent.$parent, selected.kpuid, callback, "kabkotas");
+                    $KawalService.getWilayahDropdown($http, $scope.$parent.$parent, selected.kpuid, context.callback, "kabkotas");
                 }
             }
             this.setKabupaten = function(selected) {
@@ -856,7 +888,6 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 this.kandidat.kabupaten = selected.nama;
             }
 
-            var context = this;
             $scope.$watch(function() {
                 return location.hash;
             }, function(value) {

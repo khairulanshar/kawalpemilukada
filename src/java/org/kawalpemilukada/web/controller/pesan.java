@@ -202,16 +202,8 @@ public class pesan extends HttpServlet {
                         }
 
                     }
-
-                    if (key.equalsIgnoreCase("Pesan Untuk Semua") || key.equalsIgnoreCase("Pesan Untuk Saya")) {
-
-                    } else {
-
-                    }
                 }
-            } catch (Exception e) {
-                System.out.println(e.toString());
-            }
+            } catch (Exception e) {}
         } else if (type.equalsIgnoreCase("getUrlFile")) {
             records.put("uploadurl", "");
             try {

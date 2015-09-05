@@ -40,10 +40,22 @@
         </div>
     </div>
     <div class="row" >
+        <div class="col-lg-5">
+            <div class="alert alert-info">
+                <div style="margin-left: 20px;">
+                    <ul style="margin:0px;">
+                        <li>Pilih Tahun  <b>2014</b> untuk latihan isi data.</li>
+                    </ul>
+                </div>
+                <div style="position: absolute;top:10px;"><i class="fa fa-info-circle fa-2x"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="row" >
         <div class="col-lg-12" style="padding:20px 5px;" ng-show="tabulasiCtrl.showTable(tabulasiCtrl.DataSuaras) || tabulasiCtrl.showTable(tabulasiCtrl.DataSuarasTPS)">
             <span style="white-space: nowrap;"><input type="checkbox" ng-model="tabulasiCtrl.showHitungCepat">&nbsp;Tampilkan Hitung Cepat</span>
             <span style="color:#999">&nbsp;|&nbsp;</span>
-            <span style="white-space: nowrap;"><input type="checkbox" ng-model="tabulasiCtrl.showC1">&nbsp;Tampilkan C1</span>
+            <span style="white-space: nowrap;"><input type="checkbox" ng-model="tabulasiCtrl.showC1">&nbsp;Tampilkan Hitung C1 KPU</span>
             <span style="color:#999">&nbsp;|&nbsp;</span>
             <span style="white-space: nowrap;"><input type="number" ng-model="tabulasiCtrl.numberDecimal" style="width:20px;text-align: right;">
                 <span>&nbsp;Angka Di belakang koma</span></span>
@@ -245,7 +257,7 @@
                                     <th>No {{tabulasiCtrl.DataSuarasTPS[0].tingkat}}</th>
                                     <th ng-show="tabulasiCtrl.showHitungCepat" >Hitung Cepat di TPS</th>
                                     <th ng-show="tabulasiCtrl.showC1" style="width: 200px;">Dokumen C1 KPU</th>
-                                    <th ng-show="tabulasiCtrl.showC1" style="max-width: 200px;">Perolehan Suara Berdasar Dokumen C1 KPU</th>
+                                    <th ng-show="tabulasiCtrl.showC1" style="max-width: 200px;">Hitung C1 KPU</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -253,8 +265,8 @@
                                     <td class="td_right">#{{dataSuara.nama}}</td>
                                     <td class="td_right2" ng-show="tabulasiCtrl.showHitungCepat">
                                         <div class="form-group">
-                                            <label ng-show="tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilockHC', 'N', 'HC')">Upload Foto C1: </label>
-                                            <div class="input" style="width:100%;" ng-show="tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilockHC', 'N', 'HC')">
+                                            <label ng-show="tabulasiCtrl.showTextBox(100, user, dataSuara, 'dilockHC', 'N', 'HC')">Upload Foto C1: </label>
+                                            <div class="input" style="width:100%;" ng-show="tabulasiCtrl.showTextBox(100, user, dataSuara, 'dilockHC', 'N', 'HC')">
                                                 <label for="photo{{$index}}" class="btn btn-default btn-circle btn-lg"><i class="fa fa-camera-retro"></i></label>
                                                 <input type="file" id="photo{{$index}}" accept="image/*" class="hidden" ng-model="dataSuara.photosrc" onchange="angular.element(this).scope().tabulasiCtrl.photoChange(this)" >
                                             </div>
@@ -271,27 +283,27 @@
                                             </center>
                                         </div>
                                         <div class="row" ng-repeat="urut in tabulasiCtrl.uruts" ng-init="tabulasiCtrl.init2(tabulasiCtrl, dataSuara, urut, $index)">
-                                            <input type="number" class="form-control number" ng-model="dataSuara.suaraKandidat[urut + ''].suaraTPS" placeholder="{{dataSuara.suaraKandidat[urut + ''].nama}}" ng-show="tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilockHC', 'N', 'HC')">
-                                            <span ng-show="!tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilockHC', 'N', 'HC')">{{dataSuara.suaraKandidat[urut + ''].nama}}: <b> {{dataSuara.suaraKandidat[urut + ''].suaraTPS}}</b></span>
+                                            <input type="number" class="form-control number" ng-model="dataSuara.suaraKandidat[urut + ''].suaraTPS" placeholder="{{dataSuara.suaraKandidat[urut + ''].nama}}" ng-show="tabulasiCtrl.showTextBox(100, user, dataSuara, 'dilockHC', 'N', 'HC')">
+                                            <span ng-show="!tabulasiCtrl.showTextBox(100, user, dataSuara, 'dilockHC', 'N', 'HC')">{{dataSuara.suaraKandidat[urut + ''].nama}}: <b> {{dataSuara.suaraKandidat[urut + ''].suaraTPS}}</b></span>
                                         </div>
                                         <div class="row">
-                                            <input type="number" class="form-control number" ng-model="dataSuara.suarasahHC" placeholder="Suara Sah Hitung Cepat" ng-show="tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilockHC', 'N', 'HC')">
-                                            <span ng-show="!tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilockHC', 'N', 'HC')">Suara Sah Hitung Cepat: <b> {{dataSuara.suarasahHC}}</b></span>
+                                            <input type="number" class="form-control number" ng-model="dataSuara.suarasahHC" placeholder="Suara Sah Hitung Cepat" ng-show="tabulasiCtrl.showTextBox(100, user, dataSuara, 'dilockHC', 'N', 'HC')">
+                                            <span ng-show="!tabulasiCtrl.showTextBox(100, user, dataSuara, 'dilockHC', 'N', 'HC')">Suara Sah: <b> {{dataSuara.suarasahHC}}</b></span>
                                         </div>
                                         <div class="row">
-                                            <input type="number" class="form-control number" ng-model="dataSuara.suaratidaksahHC" placeholder="Suara Tidak Sah Hitung Cepat" ng-show="tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilockHC', 'N', 'HC')">
-                                            <span ng-show="!tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilockHC', 'N', 'HC')">Suara Tidak Sah Hitung Cepat: <b> {{dataSuara.suaratidaksahHC}}</b></span>
+                                            <input type="number" class="form-control number" ng-model="dataSuara.suaratidaksahHC" placeholder="Suara Tidak Sah Hitung Cepat" ng-show="tabulasiCtrl.showTextBox(100, user, dataSuara, 'dilockHC', 'N', 'HC')">
+                                            <span ng-show="!tabulasiCtrl.showTextBox(100, user, dataSuara, 'dilockHC', 'N', 'HC')">Suara Tidak Sah: <b> {{dataSuara.suaratidaksahHC}}</b></span>
                                         </div>
                                         <div class="row" style='padding-top:10px;text-align: left;'>
                                             <div class="alert alert-danger" ng-repeat="errorAlert in dataSuara.errorAlertsHC">{{errorAlert}}</div>
                                             <div class="alert alert-success" ng-repeat="successAlert in dataSuara.successAlertsHC">{{successAlert}}</div>
                                         </div>
-                                        <div ng-show="tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilockHC', 'N', 'HC')" style="text-align: center;width: 100%;padding:20px 0px;">
+                                        <div ng-show="tabulasiCtrl.showTextBox(100, user, dataSuara, 'dilockHC', 'N', 'HC')" style="text-align: center;width: 100%;padding:20px 0px;">
                                             <button ng-show="!dataSuara.sedangdisaveHC" type="button" class="btn btn-default btn-circle btn-xl" ng-click="tabulasiCtrl.save(dataSuara, 'HC', $index)"><i class="fa fa-floppy-o"></i></button>
                                         </div>
-                                        <div ng-show="tabulasiCtrl.showTextBox('Y', user, dataSuara, 'statusHC', 'R', 'HC') || tabulasiCtrl.showTextBox('Y', user, dataSuara, 'dilockHC', 'Y', 'HC')" style="text-align: center;width: 100%;padding:20px 0px;">
-                                            <button ng-show="tabulasiCtrl.showTextBox('Y', user, dataSuara, 'dilockHC', 'Y', 'HC') && !dataSuara.sedangdisaveHC" type="button" class="btn btn-success btn-xl" ng-click="tabulasiCtrl.save1(dataSuara, 'BukaDataHC', $index)"><i class="fa fa-flag-o"></i> Buka</button>
-                                            <button ng-show="tabulasiCtrl.showTextBox('Y', user, dataSuara, 'statusHC', 'R', 'HC') && !dataSuara.sedangdisaveHC" type="button" class="btn btn-default btn-circle btn-xl" ng-click="tabulasiCtrl.save1(dataSuara, 'SetstatusHC', $index)"><i class="fa fa-check"></i></button>
+                                        <div ng-show="tabulasiCtrl.showTextBox(200, user, dataSuara, 'statusHC', 'R', 'HC') || tabulasiCtrl.showTextBox(200, user, dataSuara, 'dilockHC', 'Y', 'HC')" style="text-align: center;width: 100%;padding:20px 0px;">
+                                            <button ng-show="tabulasiCtrl.showTextBox(200, user, dataSuara, 'dilockHC', 'Y', 'HC') && !dataSuara.sedangdisaveHC" type="button" class="btn btn-success btn-xl" ng-click="tabulasiCtrl.save1(dataSuara, 'BukaDataHC', $index)"><i class="fa fa-flag-o"></i> Buka</button>
+                                            <button ng-show="tabulasiCtrl.showTextBox(200, user, dataSuara, 'statusHC', 'R', 'HC') && !dataSuara.sedangdisaveHC" type="button" class="btn btn-default btn-circle btn-xl" ng-click="tabulasiCtrl.save1(dataSuara, 'SetstatusHC', $index)"><i class="fa fa-check"></i></button>
                                         </div>
                                         <div class="row">
                                             <div style="float:left">Diisi Oleh: <a ng-href="{{dataSuara.tps_diupdate_link}}" target="_user">{{dataSuara.tps_diupdate_nama}}</a></div>
@@ -334,28 +346,28 @@
                                     </td>
                                     <td class="td_right2" ng-show="tabulasiCtrl.showC1">
                                         <div class="row"  ng-repeat="urut in tabulasiCtrl.uruts" ng-init="tabulasiCtrl.init2(tabulasiCtrl, dataSuara, urut, $index)">
-                                            <input type="number" class="form-control number" ng-model="dataSuara.suaraKandidat[urut + ''].suaraVerifikasiC1" placeholder="{{dataSuara.suaraKandidat[urut + ''].nama}}" ng-show="tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilock', 'N', 'C1')">
-                                            <span ng-show="!tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilock', 'N', 'C1')">{{dataSuara.suaraKandidat[urut + ''].nama}}: <b> {{dataSuara.suaraKandidat[urut + ''].suaraVerifikasiC1}}</b></span>
+                                            <input type="number" class="form-control number" ng-model="dataSuara.suaraKandidat[urut + ''].suaraVerifikasiC1" placeholder="{{dataSuara.suaraKandidat[urut + ''].nama}}" ng-show="tabulasiCtrl.showTextBox(200, user, dataSuara, 'dilock', 'N', 'C1')">
+                                            <span ng-show="!tabulasiCtrl.showTextBox(200, user, dataSuara, 'dilock', 'N', 'C1')">{{dataSuara.suaraKandidat[urut + ''].nama}}: <b> {{dataSuara.suaraKandidat[urut + ''].suaraVerifikasiC1}}</b></span>
                                         </div>
                                         <div class="row">
-                                            <input type="number" class="form-control number" ng-model="dataSuara.suarasah" placeholder="Suara Sah C1" ng-show="tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilock', 'N', 'C1')">
-                                            <span ng-show="!tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilock', 'N', 'C1')">Suara Sah C1: <b> {{dataSuara.suarasah}}</b></span>
+                                            <input type="number" class="form-control number" ng-model="dataSuara.suarasah" placeholder="Suara Sah C1" ng-show="tabulasiCtrl.showTextBox(200, user, dataSuara, 'dilock', 'N', 'C1')">
+                                            <span ng-show="!tabulasiCtrl.showTextBox(200, user, dataSuara, 'dilock', 'N', 'C1')">Suara Sah C1: <b> {{dataSuara.suarasah}}</b></span>
                                         </div>
                                         <div class="row">
-                                            <input type="number" class="form-control number" ng-model="dataSuara.suaratidaksah" placeholder="Suara Tidak Sah C1" ng-show="tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilock', 'N', 'C1')">
-                                            <span ng-show="!tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilock', 'N', 'C1')">Suara Tidak Sah C1: <b> {{dataSuara.suaratidaksah}}</b></span>
+                                            <input type="number" class="form-control number" ng-model="dataSuara.suaratidaksah" placeholder="Suara Tidak Sah C1" ng-show="tabulasiCtrl.showTextBox(200, user, dataSuara, 'dilock', 'N', 'C1')">
+                                            <span ng-show="!tabulasiCtrl.showTextBox(200, user, dataSuara, 'dilock', 'N', 'C1')">Suara Tidak Sah C1: <b> {{dataSuara.suaratidaksah}}</b></span>
                                         </div>
                                         <div class="row" style='padding-top:10px;text-align: left;'>
                                             <div class="alert alert-danger" ng-repeat="errorAlert in dataSuara.errorAlerts">{{errorAlert}}</div>
                                             <div class="alert alert-success" ng-repeat="successAlert in dataSuara.successAlerts">{{successAlert}}</div>
                                         </div>
-                                        <div ng-show="tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilock', 'N', 'C1')" style="text-align: center;width: 100%;padding:20px 0px;">
-                                            <button ng-show="(!dataSuara.sedangdisave) && tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilockHC', 'Y', 'C1')" type="button" class="btn btn-success btn-xl" ng-click="tabulasiCtrl.save(dataSuara, 'C1/Transfer', $index)">Duplikat data Hitung Cepat</button>
+                                        <div ng-show="tabulasiCtrl.showTextBox(200, user, dataSuara, 'dilock', 'N', 'C1')" style="text-align: center;width: 100%;padding:20px 0px;">
+                                            <button ng-show="(!dataSuara.sedangdisave) && tabulasiCtrl.showTextBox(200, user, dataSuara, 'dilockHC', 'Y', 'C1')" type="button" class="btn btn-success btn-xl" ng-click="tabulasiCtrl.save(dataSuara, 'C1/Transfer', $index)">Duplikat data Hitung Cepat</button>
                                             <button ng-show="!dataSuara.sedangdisave" type="button" class="btn btn-default btn-circle btn-xl" ng-click="tabulasiCtrl.save(dataSuara, 'C1', $index)"><i class="fa fa-floppy-o"></i></button>
                                         </div>
-                                        <div ng-show="tabulasiCtrl.showTextBox('N', user, dataSuara, 'dilock', 'Y', 'C1')" style="text-align: center;width: 100%;padding:20px 0px;">
-                                            <button ng-show="tabulasiCtrl.showTextBox('N', user, dataSuara, 'tandaiSalah', 'N', 'C1')" type="button" class="btn btn-danger btn-xl" ng-click="tabulasiCtrl.save1(dataSuara, 'TandaiSalah', $index)"><i class="fa fa-flag-o"></i> Laporkan Data Entry Salah</button>
-                                            <button ng-show="tabulasiCtrl.showTextBox('Y', user, dataSuara, 'tandaiSalah', 'Y', 'C1')" type="button" class="btn btn-success btn-xl" ng-click="tabulasiCtrl.save1(dataSuara, 'BukaDataC1', $index)"><i class="fa fa-flag-o"></i> Buka</button>
+                                        <div ng-show="tabulasiCtrl.showTextBox(200, user, dataSuara, 'dilock', 'Y', 'C1')" style="text-align: center;width: 100%;padding:20px 0px;">
+                                            <button ng-show="tabulasiCtrl.showTextBox(200, user, dataSuara, 'tandaiSalah', 'N', 'C1')" type="button" class="btn btn-danger btn-xl" ng-click="tabulasiCtrl.save1(dataSuara, 'TandaiSalah', $index)"><i class="fa fa-flag-o"></i> Laporkan Data Entry Salah</button>
+                                            <button ng-show="tabulasiCtrl.showTextBox(300, user, dataSuara, 'tandaiSalah', 'Y', 'C1')" type="button" class="btn btn-success btn-xl" ng-click="tabulasiCtrl.save1(dataSuara, 'BukaDataC1', $index)"><i class="fa fa-flag-o"></i> Buka</button>
                                         </div>
                                         <div class="row">
                                             <div style="float:left">Diisi Oleh: <a ng-href="{{dataSuara.c1_direview_link}}" target="_user">{{dataSuara.c1_direview_nama}}</a></div>

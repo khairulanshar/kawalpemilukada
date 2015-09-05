@@ -41,6 +41,15 @@ body {
 #yw1{
     margin-bottom: 3px!important;
 }
+#bawaslu,#bawaslu.active,#bawaslu:visited,
+#side-menu li #bawaslu:visited, #side-menu li #bawaslu.active
+{
+    color: #337ab7;
+    background-color: transparent;
+}
+#side-menu li #bawaslu:hover{
+    color: #eee;
+}
 
 a {
     word-wrap: break-word;
