@@ -399,7 +399,6 @@ public class CommonServices {
             dashboard.kecamatan = i + "";
             ofy().save().entity(dashboard).now();
         } catch (Exception e) {
-            System.out.println(e.toString());
         }
     }
 
@@ -432,7 +431,6 @@ public class CommonServices {
             dashboard.desa = i + "";
             ofy().save().entity(dashboard).now();
         } catch (Exception e) {
-            System.out.println(e.toString());
         }
     }
 
@@ -468,7 +466,6 @@ public class CommonServices {
             }
             ofy().save().entity(dashboard).now();
         } catch (Exception e) {
-            System.out.println(e.toString());
         }
     }
 
@@ -557,6 +554,18 @@ public class CommonServices {
         return query.list().size();
 
     }
+    public static int getKandidatSize() {
+        QueryKeys<KandidatWilayah> query = ofy()
+                .load()
+                .type(KandidatWilayah.class).keys();
+        return query.list().size();
+    }
+    public static int getPesanSize() {
+        QueryKeys<Pesan> query = ofy()
+                .load()
+                .type(Pesan.class).keys();
+        return query.list().size();
+    }
 
     public static String getVal(Object u) {
         String retval = "";
@@ -623,5 +632,13 @@ public class CommonServices {
         SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
         //Time in JakartaTime
         return dateFormatLocal.parse(dateFormatGmt.format(new Date()));
+    }
+    public static Date JakartaTime(Date date) throws ParseException {
+        SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+        dateFormatGmt.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
+        //Local time zone   
+        SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+        //Time in JakartaTime
+        return dateFormatLocal.parse(dateFormatGmt.format(date));
     }
 }

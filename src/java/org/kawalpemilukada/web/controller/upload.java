@@ -86,18 +86,16 @@ public class upload extends HttpServlet {
                 try {
                     ImagesService imagesService = ImagesServiceFactory.getImagesService();
                     Image oldImage = ImagesServiceFactory.makeImageFromBlob(blobKey);
-                    Image newImage = null;
+                    OutputSettings settings = new OutputSettings(ImagesService.OutputEncoding.PNG);
+                    settings.setQuality(60);
+                    int w = 300;
+                    int h = 400;
                     if (sizeh.length() > 0 && sizew.length() > 0) {
-                        OutputSettings settings = new OutputSettings(ImagesService.OutputEncoding.PNG);
-                        Transform transform = ImagesServiceFactory.makeResize(200, 300);
-                        newImage = imagesService.applyTransform(transform, oldImage, settings);
-                    } else {
-                        OutputSettings settings = new OutputSettings(ImagesService.OutputEncoding.PNG);
-                        settings.setQuality(50);
-                        Transform transform = ImagesServiceFactory.makeImFeelingLucky();
-                        newImage = imagesService.applyTransform(transform, oldImage, settings);
+                        w = Integer.parseInt(sizew);
+                        h = Integer.parseInt(sizeh);
                     }
-
+                    Transform transform = ImagesServiceFactory.makeResize(w, h);
+                    Image newImage = imagesService.applyTransform(transform, oldImage, settings);
                     byte[] blobData = newImage.getImageData();
                     //save data to blobstore
                     FileService fileService = FileServiceFactory.getFileService();

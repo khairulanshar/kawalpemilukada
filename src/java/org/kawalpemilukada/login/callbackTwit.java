@@ -51,7 +51,8 @@ public class callbackTwit extends HttpServlet {
         request.getSession().setAttribute("twitter", twitter);
         String errorMsg = "Data Anda belum terverifikasi.";
         String tahun = (String) request.getSession().getAttribute("tahun");
-        Dashboard dashboard = CommonServices.getDashboard(CommonServices.setParentId(tahun, "0"));
+        Dashboard dashboard = CommonServices.getDashboard(CommonServices.setParentId("2015", "0"));
+        Dashboard dashboard2014 = CommonServices.getDashboard(CommonServices.setParentId("2014", "0"));
         request.getSession().removeAttribute("tahun");
         UserData user = null;
         try {
@@ -59,7 +60,7 @@ public class callbackTwit extends HttpServlet {
             user = ofy().load().type(UserData.class).id("twit" + CommonServices.getVal(twitter.getId())).now();
             if (user == null) {
                 user = new UserData("twit" + CommonServices.getVal(twitter.getId()));
-                user.imgurl = u.getBiggerProfileImageURL().replace("http://", "https://");
+                user.imgurl = u.getBiggerProfileImageURLHttps().replace("http://", "https://");
                 user.nama = CommonServices.getVal(u.getName());
                 user.link = "https://twitter.com/" + CommonServices.getVal(twitter.getScreenName());
                 user.email = "";
@@ -67,6 +68,8 @@ public class callbackTwit extends HttpServlet {
                 ofy().save().entity(user).now();
                 dashboard.users = CommonServices.getuserSize() + "";
                 ofy().save().entity(dashboard).now();
+                dashboard2014.users = CommonServices.getuserSize() + "";
+                ofy().save().entity(dashboard2014).now();
             } else {
                 user.lastlogin = CommonServices.JakartaTime();
                 user.type = "twit";
@@ -85,7 +88,6 @@ public class callbackTwit extends HttpServlet {
             request.getSession().setAttribute("UserData", JSONValue.parse(gson.toJson(user)));
         } catch (Exception e) {
             errorMsg = "callbackTwit [processRequest] ==> " + e.toString();
-            System.out.println("callbackTwit [processRequest] ==> " + e.toString());
         }
         response.setContentType("text/html;charset=UTF-8");
         Gson gson = new Gson();

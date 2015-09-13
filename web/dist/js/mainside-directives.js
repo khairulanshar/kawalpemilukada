@@ -23,6 +23,10 @@
                 });
                 $KawalService.setWindowResize($scope, $window);
                 this.setPage = function(page) {
+                    var width = ($window.innerWidth > 0) ? $window.innerWidth : screen.width;
+                    if (width < 768) {
+                        $('div.navbar-collapse').removeClass('in');
+                    }
                     $scope.selectedTemplate.hash = page;
                     $KawalService.handleHash(page.substr(1), $scope);
                 };

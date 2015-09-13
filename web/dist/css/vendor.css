@@ -26,6 +26,7 @@ body {
     display: none;
 }
 
+
 .navbar-brand{
     float:none;
     color:white;
@@ -38,9 +39,7 @@ body {
     padding:0px;
     color:white;
 }
-#yw1{
-    margin-bottom: 3px!important;
-}
+
 #bawaslu,#bawaslu.active,#bawaslu:visited,
 #side-menu li #bawaslu:visited, #side-menu li #bawaslu.active
 {
@@ -413,6 +412,13 @@ table.dataTable thead .sorting:after {
     padding: 5px;
 }
 
+.detail-view>tbody>tr>th:first-child{
+    width:260px;
+}
+#yw1{
+    margin-bottom: 3px!important;
+}
+
 .btn-circle {
     width: 30px;
     height: 30px;
@@ -684,30 +690,37 @@ table.dataTable thead .sorting:after {
 
 
 .dropdown-display div, .dropdown-display-inverse div {
-    border: 1px solid #ccc;
-    padding: 8px;
-    min-height: 34px;
-    border-radius:4px;
+    border: 1px solid transparent;
     text-decoration: none;
     font-size: 14px;
     color: #555;
     width: 100%;
     cursor: pointer;
+    min-height: 25px;
+}
+.dropdown-display div:hover{
+    border-bottom: 1px solid #ccc;
 }
 
 .dropdown-display-inverse div{
-    border: 1px solid white;
+    border:0px;
+    
     color: white;
     cursor: pointer;
     display: inline-block;
     width:auto;
 }
+.dropdown-display-inverse div:hover{
+    border-bottom: 1px solid white;
+}
 .dropdown-display div span,.dropdown-display-inverse div span {
     text-align: left;
 }
 .dropdown-display div i,.dropdown-display-inverse div i {
-    float:right;
-    margin-top: 3px;
+    float: right;
+    bottom: 8px;
+    position: absolute;
+    padding-left: 20px;
 }
 .dropdown-display ul,.dropdown-display-inverse ul{
     padding: 0px;
@@ -716,28 +729,87 @@ table.dataTable thead .sorting:after {
 .dropdown-display ul{
     width: 100%;
 }
-.dropdown-menu div label{
+.custom-search-form{
+    padding-bottom: 10px;
+    width: 100%;
+}
+.dropdown-menu div label,.custom-search-form label{
     position: absolute;
     left: 20px;
     z-index: 1;
-    color: #555;
+    color: #9197a3;
     padding-top:8px;
-    font-size: 16px;
+    font-size: 14px;
 }
-.dropdown-menu div input{
-    text-decoration: none;
+.tabulasi-nav{
+    text-transform: uppercase;
+    color: #9197a3;
     font-size: 16px;
-    color: #555;
+    font-weight: bold;
+    padding-left: 5px;
+}
+
+
+.tabulasi-nav .tabulasi-nav-span{
+    padding:15px;
+    padding-left: 0px;
+    cursor: pointer;
+}
+
+.tps-nav{
+    padding: 10px 5px;
+    background-color: rgba(242,242,242,0.6);
+    color:#337ab7;
+    border-radius: 4px;
+    margin: 15px 0px;
+}
+.tps-nav a,.tps-nav .dropdown-display div{
+    color:#337ab7;
+    font-weight: bold;
+}
+.tps-nav .dropdown-display div{
+    text-align: center;
+}
+
+.form-group label{
+    color: #9197a3;
+    width:150px;
+}
+.custom-search-form label{
+    left: 2px;
+}
+
+.dropdown-menu div input,.custom-search-form input{
+    text-decoration: none;
+    font-size: 14px;
+    color: rgb(20, 24, 35);
     word-wrap: break-word;
     white-space:normal;
     padding: 5px;
-    border: 1px solid #555;
+    border: 1px solid transparent;
+    border-radius: 0px;
     box-shadow: none;
     transition: none;
     width:100%;
     position: relative;
     padding-left: 30px;
-    border-radius: 4px;
+    z-index: 1000;
+    background-color: transparent;
+}
+.form-group input{
+    border: 1px solid transparent;
+    border-radius: 0px;
+    box-shadow: none;
+    transition: none;
+    width:200px;
+    color: rgb(20, 24, 35);
+}
+
+.dropdown-menu div input:focus,.dropdown-menu div input:hover,
+.custom-search-form input:focus,.custom-search-form input:hover,
+.form-group input:focus, .form-group input:hover{
+    outline: none; 
+    border-bottom: 1px solid #ccc;
 }
 .dropdown-display ul li a,.dropdown-display-inverse ul li a, .dropdown-display ul div li, .dropdown-display-inverse ul div li {
     padding: 15px;
@@ -819,19 +891,19 @@ table.dataTable thead .sorting:after {
     color:rgba(0,122,255,1);
 }
 .tr-pointer-inverse,.tr-pointer-inverse .divtd{
-    background-color: rgb(51, 122, 183);/*rgb(0, 122, 255);/*#FF69B4;/*rgba(255,19,0,1);*/
+    background-color: #0066cc;/*rgb(0, 122, 255);/*#FF69B4;/*rgba(255,19,0,1);*/
     color:white;
 }
 .tr-pointer{
     cursor: pointer;
-    color:rgba(0,122,255,1);
+    color:#0066cc;
 }
 .tr-pointer2{
     cursor: pointer;
-    color:rgba(0,122,255,1);
+    color:#0066cc;
 }
 .div-img:hover>a,.table-striped>tbody>.tr-red:hover, .table-striped>tbody>.tr-pointer:hover, .table-striped>tbody>.tr-pointer:hover .divtd,.table-striped>tbody>.tr-pointer:hover a{
-    background-color: rgb(51, 122, 183);/*rgb(0, 122, 255);/*#FF69B4;/*rgba(255,19,0,1);*/
+    background-color: #0066cc;/*rgb(0, 122, 255);/*#FF69B4;/*rgba(255,19,0,1);*/
     color:white;
 }
 .div-img{
@@ -967,6 +1039,7 @@ table.dataTable thead .sorting:after {
         margin: 0 0 0 250px;
         padding: 0 30px;
         border-left: 1px solid #e7e7e7;
+        padding-bottom: 100px;
     }
     .dataTable_wrapper{
         max-height: 500px;
@@ -991,6 +1064,9 @@ table.dataTable thead .sorting:after {
     }
     #menuBtn{
         display:none;
+    }
+    .detail-view>tbody>tr>th:first-child{
+        width:160px;
     }
 
 }

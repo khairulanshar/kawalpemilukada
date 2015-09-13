@@ -28,6 +28,7 @@ public class DataSuara {
     @Index public String kpuid;
     @Index public String nama;
     @Index public String tingkat;
+    @Index public String tingkatPilkada;
     @Index public String tahun;
     @Index public String dilock;
     @Index public String dilockHC;
@@ -56,18 +57,17 @@ public class DataSuara {
     public String tps_direview_link;
     public Date tps_direview_date;
     public ArrayList<filePesan> tps_file;
-
     @Index public String c1_direview_id;
     public String c1_direview_nama;
     public String c1_direview_img;
     public String c1_direview_link;
     public Date c1_direview_date;
-    public String tidakadaC1;
+    @Index public String tidakadaC1;
     public int jumlahTPStidakadaC1;
     
     public int jumlahEntryC1Salah;
     
-    public String urllink;
+    @Index public String urllink;
     public String kpugambar1;
     public String kpugambar2;
     public String kpugambar3;
@@ -98,6 +98,7 @@ public class DataSuara {
         this.kpugambar3="";
         this.kpugambar4="";
         this.kpugambar5="";
+        this.tingkatPilkada="";
     }
 
     public void addFile(

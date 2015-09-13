@@ -24,6 +24,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
+import org.kawalpemilukada.model.Dashboard;
 import org.kawalpemilukada.model.KandidatWilayah;
 import org.kawalpemilukada.model.StringKey;
 import org.kawalpemilukada.model.UserData;
@@ -45,7 +46,7 @@ public class kandidat extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        JSONArray kandidats = new JSONArray();
+        JSONArray returnVal = new JSONArray();
         try {
             String[] filters = request.getRequestURI().replace("/kandidat/", "").split("/");
             String method = filters[0];
@@ -87,7 +88,10 @@ public class kandidat extends HttpServlet {
                         }
                         kandidatWilayah.addkandidat(input.get("nama").toString(), input.get("img_url").toString(), Integer.parseInt(input.get("urut").toString()), input.get("kpu_id_peserta").toString());
                         ofy().save().entity(kandidatWilayah).now();
-                        kandidats.add(JSONValue.parse(gson.toJson(kandidatWilayah)));
+                        Dashboard dashboard = CommonServices.getDashboard(CommonServices.setParentId("2015", "0"));
+                        dashboard.kandidat=CommonServices.getKandidatSize()+"";
+                        ofy().save().entity(dashboard).now();
+                        returnVal.add(JSONValue.parse(gson.toJson(kandidatWilayah)));
                     }
                 } catch (Exception e) {}
             } else if (method.equalsIgnoreCase("single")) {
@@ -95,7 +99,7 @@ public class kandidat extends HttpServlet {
                 Key<StringKey> parentKey = Key.create(StringKey.class, CommonServices.setParentId(tahun, tingkat));
                 Key<KandidatWilayah> keyWithParent = Key.create(parentKey, KandidatWilayah.class, tingkat + tingkatId);
                 List<KandidatWilayah> kandidatWilayahs = ofy().load().type(KandidatWilayah.class).ancestor(keyWithParent).list();
-                kandidats.add(JSONValue.parse(gson.toJson(kandidatWilayahs)));
+                returnVal.add(JSONValue.parse(gson.toJson(kandidatWilayahs)));
             } else if (method.equalsIgnoreCase("get-profil")) {
                 String tingkatId = filters[3];
                 String urut = filters[4];
@@ -108,7 +112,7 @@ public class kandidat extends HttpServlet {
                 Object obj = parser.parse(new FileReader("dist/data/" + tingkat + ".json"));
                 JSONObject jsonObject = (JSONObject) obj;
                 JSONArray infoKandidat = (JSONArray) jsonObject.get(tingkatId + "");
-                kandidats.add(infoKandidat);
+                returnVal.add(infoKandidat);
                 HttpURLConnection conn = null;
                 URL url;
                 try {
@@ -142,7 +146,7 @@ public class kandidat extends HttpServlet {
                             text = text.substring(text.indexOf("<h1>Data Paslon Dukungan Perorangan"));
                             text = text.substring(0, text.indexOf("<div id=\"edit-form\"")-1);
                         }
-                        kandidats.add(text);
+                        returnVal.add(text);
                     }
                 } catch (Exception e) {
                     
@@ -182,13 +186,13 @@ public class kandidat extends HttpServlet {
             } else {
                 if (filters.length < 4) {
                     List<KandidatWilayah> kandidatWilayahs = CommonServices.filterKandidatWilayah(tahun, tingkat, "", "");
-                    kandidats.add(JSONValue.parse(gson.toJson(kandidatWilayahs)));
+                    returnVal.add(JSONValue.parse(gson.toJson(kandidatWilayahs)));
                 }
             }
         } catch (Exception e) {}
         PrintWriter out = response.getWriter();
         response.setContentType("text/html;charset=UTF-8");
-        out.print(JSONValue.toJSONString(kandidats));
+        out.print(JSONValue.toJSONString(returnVal));
         out.flush();
         out.close();
     }

@@ -61,7 +61,7 @@ public class suara extends HttpServlet {
         while ((line = reader.readLine()) != null) {
             sb.append(line);
         }
-        
+
         if (type.equalsIgnoreCase("setup")) {
             try {
                 UserData user = CommonServices.getUser(request);
@@ -129,7 +129,10 @@ public class suara extends HttpServlet {
         if (type.equalsIgnoreCase("save")) {
             try {
                 UserData user = CommonServices.getUser(request);
-                if (user.uid.toString().length() > 0 && user.terverifikasi.equalsIgnoreCase("Y")) {
+                String from = filters[1];
+                if (user.uid.toString().length() > 0 && user.terverifikasi.equalsIgnoreCase("Y")
+                        && ((from.equalsIgnoreCase("HC") && user.userlevel == 100)
+                        || (from.equalsIgnoreCase("C1") && user.userlevel >= 200))) {
                     Gson gson = new Gson();
                     JSONArray input = (JSONArray) JSONValue.parse(sb.toString());
                     JSONObject datasuara = (JSONObject) input.get(0);
@@ -140,7 +143,7 @@ public class suara extends HttpServlet {
                     Key<StringKey> parentKey = Key.create(StringKey.class, raw.get("name").toString());
                     Key<DataSuara> keyWithParent = Key.create(parentKey, DataSuara.class, datasuara.get("id").toString());
                     DataSuara dataSuara = ofy().load().type(DataSuara.class).ancestor(keyWithParent).first().now();
-                    String from = filters[1];
+
                     String Transfer = "";
                     try {
                         Transfer = filters[2];
@@ -190,6 +193,7 @@ public class suara extends HttpServlet {
                         }
                     }
                     dataSuara.urllink = input.get(2).toString();
+                    dataSuara.tingkatPilkada = dataSuara.id.split(CommonServices.delimeter)[0];
                     dataSuara.kpugambar1 = datasuara.get("kpugambar1").toString();
                     dataSuara.kpugambar2 = datasuara.get("kpugambar2").toString();
                     dataSuara.kpugambar3 = datasuara.get("kpugambar3").toString();
@@ -223,7 +227,7 @@ public class suara extends HttpServlet {
                     Key<StringKey> parentKey = Key.create(StringKey.class, raw.get("name").toString());
                     Key<DataSuara> keyWithParent = Key.create(parentKey, DataSuara.class, datasuara.get("id").toString());
                     DataSuara dataSuara = ofy().load().type(DataSuara.class).ancestor(keyWithParent).first().now();
-                    if (type.equalsIgnoreCase("tiakadac1")) {
+                    if (type.equalsIgnoreCase("tiakadac1") && user.userlevel >= 200) {
                         dataSuara.tidakadaC1 = "Y";
                         dataSuara.jumlahTPStidakadaC1 = 1;
                     }
@@ -237,7 +241,7 @@ public class suara extends HttpServlet {
                         dataSuara.tps_direview_nama = user.nama;
                         addPoinToUser(user, 90);
                     }
-                    if (type.equalsIgnoreCase("TandaiSalah")) {
+                    if (type.equalsIgnoreCase("TandaiSalah") && user.userlevel >= 300) {
                         dataSuara.tandaiSalah = "Y";
                         dataSuara.jumlahEntryC1Salah = 1;
                     }
@@ -246,7 +250,7 @@ public class suara extends HttpServlet {
                         dataSuara.statusHC = "N";
                         dataSuara.jumlahTPSdilockHC = 0;
                     }
-                    if (type.equalsIgnoreCase("BukaDataC1") && user.userlevel >= 200) {
+                    if (type.equalsIgnoreCase("BukaDataC1") && user.userlevel >= 300) {
                         dataSuara.tandaiSalah = "N";
                         dataSuara.jumlahEntryC1Salah = 0;
                         dataSuara.dilock = "N";
@@ -254,7 +258,7 @@ public class suara extends HttpServlet {
                     }
                     dataSuara.urllink = input.get(2).toString();
                     ofy().save().entity(dataSuara).now();
-                    if (type.equalsIgnoreCase("SetstatusHC")|| type.equalsIgnoreCase("BukaDataHC")) {
+                    if (type.equalsIgnoreCase("SetstatusHC") || type.equalsIgnoreCase("BukaDataHC")) {
                         loopUpdateparent(wilayah, dataSuara, "HC");
                     } else {
                         loopUpdateparent(wilayah, dataSuara, "C1");

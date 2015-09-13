@@ -49,7 +49,8 @@ public class callbackfb extends HttpServlet {
         String errorMsg = "Data Anda belum terverifikasi.";
         UserData user = null;
         String tahun = (String) request.getSession().getAttribute("tahun");
-        Dashboard dashboard = CommonServices.getDashboard(CommonServices.setParentId(tahun, "0"));
+        Dashboard dashboard = CommonServices.getDashboard(CommonServices.setParentId("2015", "0"));
+        Dashboard dashboard2014 = CommonServices.getDashboard(CommonServices.setParentId("2014", "0"));
         request.getSession().removeAttribute("tahun");
         try {
             facebook4j.User u = facebook.getMe();
@@ -64,6 +65,8 @@ public class callbackfb extends HttpServlet {
                 ofy().save().entity(user).now();
                 dashboard.users = CommonServices.getuserSize() + "";
                 ofy().save().entity(dashboard).now();
+                dashboard2014.users = CommonServices.getuserSize() + "";
+                ofy().save().entity(dashboard2014).now();
             } else {
                 user.lastlogin = CommonServices.JakartaTime();
                 user.type = "fb";
@@ -82,7 +85,6 @@ public class callbackfb extends HttpServlet {
             request.getSession().setAttribute("UserData", JSONValue.parse(gson.toJson(user)));
         } catch (Exception e) {
             errorMsg = "callbackfb [processRequest] ==> " + e.toString();
-            System.out.println("callbackfb [processRequest] ==> " + e.toString());
         }
         response.setContentType("text/html;charset=UTF-8");
         Gson gson = new Gson();

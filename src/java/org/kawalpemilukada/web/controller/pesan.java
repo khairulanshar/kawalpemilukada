@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
+import org.kawalpemilukada.model.Dashboard;
 import org.kawalpemilukada.model.KandidatWilayah;
 import org.kawalpemilukada.model.Pesan;
 import org.kawalpemilukada.model.StringKey;
@@ -200,8 +201,10 @@ public class pesan extends HttpServlet {
                             ofy().save().entity(k).now();
                             records.put("kandidatWilayah", JSONValue.parse(gson.toJson(k)));
                         }
-
                     }
+                    Dashboard dashboard = CommonServices.getDashboard(CommonServices.setParentId("2015", "0"));
+                    dashboard.comments=CommonServices.getPesanSize()+"";
+                    ofy().save().entity(dashboard).now();
                 }
             } catch (Exception e) {}
         } else if (type.equalsIgnoreCase("getUrlFile")) {

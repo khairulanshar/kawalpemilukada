@@ -11,7 +11,7 @@
                     if (!$scope.user.logged) {
                         return;
                     }
-                    page=page+'/'+$scope.$tahun+'/'+$scope.user.provinsiId+'/'+$scope.user.kabkotaId+'/'+$scope.user.kecamatanId+'/'+$scope.user.desaId;
+                    page=page+'/'+$scope.tahun+'/'+$scope.user.provinsiId+'/'+$scope.user.kabkotaId+'/'+$scope.user.kecamatanId+'/'+$scope.user.desaId;
                     $scope.selectedTemplate.hash = page;
                     $KawalService.handleHash(page.substr(1), $scope);
                 };

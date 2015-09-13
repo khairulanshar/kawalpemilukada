@@ -22,95 +22,69 @@
             <!-- /.col-lg-4 -->
         </div>
     </div>
-    <div ng-show="user.logged">
+    <div ng-show="user.logged" ng-init="userProfileCtrl.setLevelDesc(user)">
         <div class="row"  >
-            <div class="col-md-6">
+            <div class="col-md-6" style="padding-bottom: 30px;">
                 <div class="form-group">
-                    <label>Nama: </label>
+                    <div class="text-uppercase" style="color: #9197a3;border-bottom: 1px solid #e9eaed;padding-bottom: 15px;font-size: 16px;font-weight: bold;">
+                        <i class="fa fa-user fa-fw"></i> Informasi Anda
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nama</label>
                     <a href="{{user.link}}" target="{{user.type}}">{{user.nama}}</a>
                 </div>
                 <div class="form-group">
-                    <label>Anda Login Menggunakan: </label>
-                    <a href="{{user.link}}" target="{{user.type}}">{{user.link}}</a>
+                    <label>Foto</label>
+                    <a href="{{user.link}}" target="{{user.type}}"><img ng-src="{{user.imgurl}}" style="width: 50px;height: 50px;"></a>
                 </div>
                 <div class="form-group">
-                    <label>Foto: </label>
-                    <img ng-src="{{user.imgurl}}" style="width: 80px;height: 80px;">
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>Email: </label>
-                    <input type="email" class="form-control" ng-model="user.email">
-                    (<small class="text-muted"><i>hanya bisa dilihat oleh Anda dan Admin </i></small>)
+                    <label>Poin (Nilai Keaktifan)</label>
+                    {{user.poin}}
                 </div>
                 <div class="form-group">
-                    <label>No Kontak: </label>
-                    <input class="form-control" ng-model="user.nokontak">
-                    (<small class="text-muted"><i>hanya bisa dilihat oleh Anda dan Admin </i></small>)
-                </div>
-            </div>
-        </div>
-        <br>
-        <div class="row"  >
-            <div class="col-md-12">
-                <div class="form-group">
-                    <label>Poin (Nilai Keaktifan): </label>
-                    <b>{{user.poin}}</b>
-                    (<small class="text-muted"><i>Poin Anda akan bertambah setiap kali anda bantu mengisi data dari TPS atau memverifikasi data dengan C1 milik KPU. 100 poin untuk satu TPS</i></small>)
-                </div> 
-
-                <div class="form-group" ng-init="userProfileCtrl.setLevelDesc(user)">
-                    <label>User Level: </label>
-                    <b>{{user.userlevel}}</b> (<small class="text-muted"><i>hanya bisa dilihat oleh Anda dan Admin </i></small>)
+                    <label>Terakhir Kali Login</label>
+                    {{user.lastlogin}} <b>WIB</b> 
                 </div>
                 <div class="form-group">
-                    <label>Terakhir Kali Login: </label>
-                    {{user.lastlogin}} <b>WIB</b> (<small class="text-muted"><i>hanya bisa dilihat oleh Anda dan Admin </i></small>)
+                    <label>Email</label>
+                    <input type="email" ng-model="user.email">
                 </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-black1">
-                    <div class="panel-heading">
-                        Saya ingin berpartisipasi untuk: 
+                <div class="form-group">
+                    <label>No Kontak</label>
+                    <input ng-model="user.nokontak">
+                </div>
+                <div class="form-group">
+                    <div class="dropdown dropdown-display">
+                        <div class="dropdown-toggle" data-toggle="dropdown" >
+                            <label>Saya ingin berpartisipasi untuk:</label> <span>{{user.userlevelDesc}}</span>  <i class="fa fa-caret-down"></i>
+                        </div>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="userlevelSelection in userlevelSelection" >
+                                <a href="javascript:" ng-click="setUserlevelSelection(userlevelSelection)">{{userlevelSelection[1]}}</a>
+                            </li>
+                        </ul>
                     </div>
-                    <div class="panel-body">
-                        <div class="form-group">
-                            <div class="dropdown dropdown-display">
-                                <div class="dropdown-toggle" data-toggle="dropdown" >
-                                    <span>{{user.userlevelDesc}}</span>  <i class="fa fa-caret-down"></i>
-                                </div>
-                                <ul class="dropdown-menu">
-                                    <li ng-repeat="userlevelSelection in userProfileCtrl.userlevelSelection" >
-                                        <a href="javascript:" ng-click="userProfileCtrl.setUserlevelSelection(userlevelSelection)">{{userlevelSelection[1]}}</a>
-                                    </li>
-                                </ul>
-                            </div>
+                </div>
+            </div>
+            <div class="col-md-6"  style="padding-bottom: 30px;">
+                <div class="form-group">
+                    <div class="form-group">
+                        <div class="text-uppercase" style="color: #9197a3;border-bottom: 1px solid #e9eaed;padding-bottom: 15px;font-size: 16px;font-weight: bold;">
+                            <i class="fa fa-bookmark fa-fw"></i> Buatkan Tautan Pintas untuk wilayah:
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-black1">
-                    <div class="panel-heading">
-                        Saya ingin berpartisipasi {{user.userlevelDesc}} di wilayah:
-                    </div>
-                    <div class="panel-body">
+                    <div>
                         <div class="form-group">
-                            <label>Provinsi: </label>
                             <div class="dropdown dropdown-display">
                                 <div class="dropdown-toggle" data-toggle="dropdown" >
-                                    <span>{{user.provinsi}}</span>  <i class="fa fa-caret-down"></i>
+                                    <label>Provinsi:</label> <span>{{user.provinsi}}</span>  <i class="fa fa-caret-down"></i>
                                 </div>
                                 <ul class="dropdown-menu">
                                     <li class="row" style="padding:10px;">
                                         <div style="border: 0px;width:100%;">
                                             <label class="fa fa-search"></label>
-                                            <input type="text" ng-model="userProfileCtrl.searchWilayah0">
+                                            <input type="text" ng-model="userProfileCtrl.searchWilayah0" placeholder="Cari Wilayah">
                                         </div>
                                     </li>
                                     <div style="border: 0px;">
@@ -121,19 +95,16 @@
                                 </ul>
                             </div>
                         </div>
-                    </div>
-                    <div class="panel-body">
                         <div class="form-group">
-                            <label>Kabupaten / Kota: </label>
                             <div class="dropdown dropdown-display">
                                 <div class="dropdown-toggle" data-toggle="dropdown">
-                                    <span>{{user.kabkota}}</span>  <i class="fa fa-caret-down"></i>
+                                    <label>Kabupaten / Kota:</label> <span>{{user.kabkota}}</span>  <i class="fa fa-caret-down"></i>
                                 </div>
                                 <ul class="dropdown-menu">
                                     <li class="row" style="padding:10px;">
                                         <div style="border: 0px;width:100%;">
                                             <label class="fa fa-search"></label>
-                                            <input type="text" ng-model="userProfileCtrl.searchWilayah1">
+                                            <input type="text" ng-model="userProfileCtrl.searchWilayah1" placeholder="Cari Wilayah">
                                         </div>
                                     </li>
                                     <div style="border: 0px;">
@@ -144,19 +115,16 @@
                                 </ul>
                             </div>
                         </div>
-                    </div>
-                    <div class="panel-body">
                         <div class="form-group">
-                            <label>Kecamatan: </label>
                             <div class="dropdown dropdown-display">
                                 <div class="dropdown-toggle" data-toggle="dropdown">
-                                    <span>{{user.kecamatan}}</span>  <i class="fa fa-caret-down"></i>
+                                    <label>Kecamatan:</label> <span>{{user.kecamatan}}</span>  <i class="fa fa-caret-down"></i>
                                 </div>
                                 <ul class="dropdown-menu">
                                     <li class="row" style="padding:10px;">
                                         <div style="border: 0px;width:100%;">
                                             <label class="fa fa-search"></label>
-                                            <input type="text" ng-model="userProfileCtrl.searchWilayah2">
+                                            <input type="text" ng-model="userProfileCtrl.searchWilayah2" placeholder="Cari Wilayah">
                                         </div>
                                     </li>
                                     <div style="border: 0px;">
@@ -167,19 +135,16 @@
                                 </ul>
                             </div>
                         </div>
-                    </div>
-                    <div class="panel-body">
                         <div class="form-group">
-                            <label>Kelurahan/ Desa: </label>
                             <div class="dropdown dropdown-display">
                                 <div class="dropdown-toggle" data-toggle="dropdown">
-                                    <span>{{user.desa}}</span>  <i class="fa fa-caret-down"></i>
+                                    <label>Kelurahan/ Desa:</label> <span>{{user.desa}}</span>  <i class="fa fa-caret-down"></i>
                                 </div>
                                 <ul class="dropdown-menu">
                                     <li class="row" style="padding:10px;">
                                         <div style="border: 0px;width:100%;">
                                             <label class="fa fa-search"></label>
-                                            <input type="text" ng-model="userProfileCtrl.searchWilayah3">
+                                            <input type="text" ng-model="userProfileCtrl.searchWilayah3" placeholder="Cari Wilayah">
                                         </div>
                                     </li>
                                     <div style="border: 0px;">
@@ -193,7 +158,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
         <div class="row">
             <div class="col-lg-12">
@@ -203,13 +167,13 @@
                         <div class="alert alert-success" ng-repeat="successAlert in userProfileCtrl.successAlerts">{{successAlert.text}}</div>
                     </fieldset>
                     <div class="text-center">
-                        <button type="submit" class="btn btn-blue1 btn-circle btn-xl" ng-show="userProfileCtrl.submitShow" value=""><i class="fa fa-floppy-o"></i></button>
+                        <button type="submit" class="btn btn-primary" ng-show="userProfileCtrl.submitShow" value=""><i class="fa fa-floppy-o"></i> Simpan</button>
                         <span style="width:20px;">&nbsp;</span>
-                        <button type="button" class="btn btn-warning btn-circle btn-xl" ng-show="userProfileCtrl.submitShow" value="" ng-click="userProfileCtrl.reset()"><i class="fa fa-times"></i></button>
+                        <button type="button" class="btn btn-danger" ng-show="userProfileCtrl.submitShow" value="" ng-click="userProfileCtrl.reset()"><i class="fa fa-times"></i> Batalkan Perubahan</button>
                     </div>
                 </div>
             </div>
         </div>
-        <br/><br/>
+
     </div>
 </form>

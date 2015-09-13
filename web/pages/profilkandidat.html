@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-lg-12">
             <h1 class="page-header">Profil Kandidat {{profilKandidatCtrl.kandidat.nama}}</h1>
-            <button class="btn btn-blue1" type="button" ng-click="profilKandidatCtrl.kembali()"><i class="fa fa-angle-double-left" style="padding-right:5px;"></i> Kembali</button>
+            <button class="btn btn-blue1" type="button" ng-click="kembali()"><i class="fa fa-angle-double-left" style="padding-right:5px;"></i> Kembali</button>
         </div>
     </div>
     <div class="row">
@@ -47,23 +47,39 @@
                     <div class="text-right text-muted" ng-show="profilKandidatCtrl.showSumber"><b>Dipersembahkan Oleh</b>: <a href="http://perludem.org/" target="perludem">perludem.org</a> dan beberapa relawan</div>
                     <div class="text-right text-muted" ng-show="profilKandidatCtrl.showSumber"><b>Sumber</b>: <a ng-href="http://infopilkada.kpu.go.id/index.php?r=Dashboard/viewdetilparpol&id={{profilKandidatCtrl.kandidat.kpu_id_peserta}}" target="infopilkada">infopilkada.kpu.go.id</a></div>
                 </div>
-                <div class="panel-body">
-                    <div class="text-primary text-center"><strong>Rekam Jejak di Media</strong></div>
-                    <div>...</div>
-                    <div class="text-right text-muted small">Dipersembahkan Oleh: abc</div>
-                </div>
+
             </div>
         </div>
 
     </div>
+    <div class="row" ng-show="profilKandidatCtrl.dataCari.length > 0">
+        <div class="text-center" style="padding:20px 0px;"><h4>Rekam Jejak di Media</h4></div>
+        <div class="col-md-4" ng-repeat="cari in profilKandidatCtrl.dataCari" ng-init="profilKandidatCtrl.trustAsHtml($index)">
+            <div class="panel panel-default" >
+                <div class="panel-body" style="padding-bottom: 15px">
+                    <div style="height: 200px;overflow-y: auto;">
+                        <div class="text-primary"><a ng-href="{{cari.url}}" target="web"><strong ng-bind-html="cari.titleNoFormatting"></strong> <i class="fa fa-arrow-circle-right"></i></a></div>
+                        <div><a ng-href="http://{{cari.visibleUrl}}" target="web" class="text-muted">{{cari.visibleUrl}}</a></div>
+                        <div ng-bind-html="cari.content" style="padding:10px 3px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="text-right">
+                <a ng-href="{{profilKandidatCtrl.moreResult.moreResultsUrl}}" target="web">Hasil Lainnya <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+    </div>
 
 </div>
-<div class="row">
+<div class="row" style="display:none;">
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-body text-center" >
                 <div style="min-height:300px;">
-                    <div class="form-group text-primary text-center"><strong>Analytics Dashboard</strong></div>
+                    <div class="form-group text-primary text-center"><strong>Analytics Dashboard</strong>
+                    </div>
                 </div>
                 <div class="text-right text-muted small">Dipersembahkan Oleh: abc</div>
             </div>
@@ -71,7 +87,7 @@
         </div>
     </div>
 </div>
-<div class="row" ng-controller="komentarController as komentarCtrl" ng-init="komentarCtrl.setfileisrequired(true)"  style="padding-bottom: 30px;">
+<div style="padding-top:50px;" class="row" ng-controller="komentarController as komentarCtrl" ng-init="komentarCtrl.setfileisrequired(true)"  style="padding-bottom: 30px;">
     <div class="col-lg-12">
         <div class="panel-group">
             <center>
@@ -88,8 +104,7 @@
                 </div>
             </center>
             <div class="row" ng-show="user.logged">
-
-                <div class="col-md-12" style="padding-left: 20px;padding-right: 20px;">
+                <div class="col-md-12" style="padding-left: 0px;padding-right: 0px;">
                     <form role="form" ng-submit="komentarCtrl.kirimPesan()">
                         <div class="panel panel-default">
                             <div class="panel-body">
@@ -121,7 +136,7 @@
 
                 </div>
             </div>
-            <ul class="timeline">
+            <ul class="timeline" ng-show="komentarCtrl.pesans.length > 0">
                 <li  ng-repeat="pesan in komentarCtrl.pesans| filter:{ status: 'Y' }" ng-class-odd="''" ng-class-even="'timeline-inverted'"  ng-init="komentarCtrl.pesanInitialization(komentarCtrl, pesan, $index, user)">
 
                     <div class="timeline-badge">
@@ -139,7 +154,7 @@
                                     <a href="{{pesan.fileUrl}}" target="fileattachment">{{pesan.fileName}}</a>
                                 </div>
                                 <div style="padding-top: 20px;" ng-show="pesan.foundImageUrl">
-                                    <a href="{{pesan.imageUrl}}" target="fileattachment"><img ng-src="{{pesan.imageUrl}}" class="img-responsive" style="width:100%;"></a>
+                                    <a href="{{pesan.imageUrl}}" target="fileattachment"><img ng-src="{{pesan.imageUrl}}" class="img-responsive" style="height:200px;"></a>
                                 </div>
                             </div>
                         </div>

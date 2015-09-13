@@ -43,7 +43,6 @@ public class wilayah extends HttpServlet {
                         wilayahs.add("Completed");
                     }
                 } catch (Exception e) {
-                    System.out.println(e.toString());
                 }
             } else if (filterby.equalsIgnoreCase("loadProvinsi")) {
                 try {
@@ -54,7 +53,6 @@ public class wilayah extends HttpServlet {
                         wilayahs.add("Completed");
                     }
                 } catch (Exception e) {
-                    System.out.println(e.toString());
                 }
             } else if (filterby.equalsIgnoreCase("loadKabupaten")) {
                 try {
@@ -65,7 +63,6 @@ public class wilayah extends HttpServlet {
                         wilayahs.add("Completed");
                     }
                 } catch (Exception e) {
-                    System.out.println(e.toString());
                 }
             } else if (filterby.equalsIgnoreCase("setKecamatan")) {
                 try {
@@ -76,7 +73,6 @@ public class wilayah extends HttpServlet {
                         wilayahs.add("Completed");
                     }
                 } catch (Exception e) {
-                    System.out.println(e.toString());
                 }
             } else if (filterby.equalsIgnoreCase("setKelurahan")) {
                 try {
@@ -87,7 +83,6 @@ public class wilayah extends HttpServlet {
                         wilayahs.add("Completed");
                     }
                 } catch (Exception e) {
-                    System.out.println(e.toString());
                 }
             } else if (filterby.equalsIgnoreCase("setTPS")) {
                 try {
@@ -99,7 +94,6 @@ public class wilayah extends HttpServlet {
                         wilayahs.add("Completed");
                     }
                 } catch (Exception e) {
-                    System.out.println(e.toString());
                 }
             } else if (filterby.equalsIgnoreCase("hitung")) {
                 try {
@@ -131,7 +125,6 @@ public class wilayah extends HttpServlet {
                         wilayahs.add("Completed jumlah:" + jumlah);
                     }
                 } catch (Exception e) {
-                    System.out.println(e.toString());
                 }
             } else {
                 Gson gson = new Gson();

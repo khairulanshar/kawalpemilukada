@@ -191,7 +191,7 @@
     width: 80px;
 }
 
-@media(max-width:767px) {
+/*@media(max-width:2560px) {*/
     ul.timeline:before {
         left: 40px;
     }
@@ -225,9 +225,9 @@
         border-right-width: 14px;
         border-left-width: 0;
     }
-    .block-button{
+    /*.block-button{
         display: block;
         float: none;
         padding-top: 10px;
     }
-}
+}*/
