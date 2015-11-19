@@ -16,11 +16,9 @@ import org.json.simple.JSONObject;
 
 class Kandidat {
 
-    @Id
-    public Long id;
+    @Id public Long id;
     public Integer urut;
-    @Index
-    public String kpu_id_peserta;
+    @Index public String kpu_id_peserta;
     public String nama;
     public String img_url;
     public Integer jumlahKomentar;
@@ -37,18 +35,13 @@ class Kandidat {
 @Entity
 public class KandidatWilayah {
 
-    @Parent
-    public Key<StringKey> key;
-    @Id
-    public String id;
-    @Index
-    public String parentkpuid;
+    @Parent public Key<StringKey> key;
+    @Id public String id;
+    @Index public String parentkpuid;
     public String parentNama;
     public String tahun;
-    @Index
-    public String kpuid;
-    @Index
-    public String nama;
+    @Index public String kpuid;
+    @Index public String nama;
     public String dikunci;
     public ArrayList<Kandidat> kandidat;
     public ArrayList<String> namas;

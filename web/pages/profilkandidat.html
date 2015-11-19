@@ -1,11 +1,6 @@
 
 <div ng-controller="profilKandidatController as profilKandidatCtrl" >
-    <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Profil Kandidat {{profilKandidatCtrl.kandidat.nama}}</h1>
-            <button class="btn btn-blue1" type="button" ng-click="kembali()"><i class="fa fa-angle-double-left" style="padding-right:5px;"></i> Kembali</button>
-        </div>
-    </div>
+    <button class="btn btn-blue1" type="button" ng-click="kembali()"><i class="fa fa-angle-double-left" style="padding-right:5px;"></i> Kembali</button>
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
             <div class="panel panel-default">
@@ -20,6 +15,7 @@
                         <div class="col-xs-12 text-uppercase"><b>KPU Peserta ID</b>: <span class="text-primary">{{profilKandidatCtrl.kandidat.kpu_id_peserta}}</span></div>
                         <div class="col-xs-12 text-uppercase"><b>JENIS DUKUNGAN</b>: <span class="text-primary">{{profilKandidatCtrl.kandidatJSON[7]}}</span></div>
                         <div class="col-xs-12 text-uppercase"><b>PARTAI PENDUKUNG</b>: <span class="text-primary">{{profilKandidatCtrl.kandidatJSON[8]}}</span></div>
+                        <div class="col-xs-12 text-center  text-uppercase" ng-show='profilKandidatCtrl.kandidatJSON[9].length > 0'><a ng-href='{{profilKandidatCtrl.kandidatJSON[9]}}' target="kpu">Laporan Awal Dana Kampanye</a></div>
                     </div>
                     <div class="row">
                         <div class="col-xs-12">
@@ -35,22 +31,80 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div ng-bind-html="profilKandidatCtrl.kandidatHTML"></div>
-                    <div class="text-right text-muted" ng-show="profilKandidatCtrl.showSumber"><b>Dipersembahkan Oleh</b>: <a href="http://perludem.org/" target="perludem">perludem.org</a> dan beberapa relawan</div>
-                    <div class="text-right text-muted" ng-show="profilKandidatCtrl.showSumber"><b>Sumber</b>: <a ng-href="http://infopilkada.kpu.go.id/index.php?r=Dashboard/viewdetilparpol&id={{profilKandidatCtrl.kandidat.kpu_id_peserta}}" target="infopilkada">infopilkada.kpu.go.id</a></div>
-                </div>
-
-            </div>
+        <div class="col-xs-12">
+            <div ng-bind-html="profilKandidatCtrl.kandidatHTML"></div>
+            <div class="text-right text-muted" ng-show="profilKandidatCtrl.showSumber" style='padding-bottom:30px;margin-top:-20px;'><b>Sumber</b>: <a ng-href="http://infopilkada.kpu.go.id/index.php?r=Dashboard/viewdetilparpol&id={{profilKandidatCtrl.kandidat.kpu_id_peserta}}" target="infopilkada">infopilkada.kpu.go.id</a></div>
         </div>
-
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h1 style="display: inline-block;margin-right:10px;padding-bottom:15px;">Data Paslon dari CrowdSourcing</h1> <button type="button" ng-show="profilKandidatCtrl.showBtnEdit(user)" class="btn btn-warning" ng-click="profilKandidatCtrl.setcrowdEdit(true)" style="display: inline-block;margin-top: -20px;margin-right:10px;">Edit data</button><button type="button" class="btn btn-default" ng-click="profilKandidatCtrl.getFromCrowd()" style="display: inline-block;margin-top: -20px;"><i class="fa fa-refresh"></i></button>
+            <div class="alert alert-danger" role="alert" ng-show="profilKandidatCtrl.errorMsgNotAuthorize.length>0">{{profilKandidatCtrl.errorMsgNotAuthorize}}</div>
+            <div class="alert alert-info" role="alert" ng-show="profilKandidatCtrl.crowdEdit"><strong><a href="https://youtu.be/14KZY_DaOCE" target="ytb">Petunjuk Cara Mengisi data Pasangan Calon</a></strong><br><strong>Cari putusan yang telah berkekuatan hukum dengan mengetikkan nama kandidat di <a href="http://putusan.mahkamahagung.go.id/pengadilan/mahkamah-agung" target="ytb">putusan.mahkamahagung.go.id</a></strong></div>
+            <table class="detail-view table table-striped table-bordered" ng-show="!profilKandidatCtrl.crowdEdit">
+                <tbody>
+                    <tr><td style="border-top:1px solid white;border-left:1px solid white;background-color: white;">&nbsp;</td><th>{{profilKandidatCtrl.CrowdProfilData["ketua"].nama}}</th><th>{{profilKandidatCtrl.CrowdProfilData["wakil"].nama}}</th></tr>
+                    <tr class="even"><td colspan="3"><h4>Riwayat Pendidikan:</h4></td></tr>
+                    <tr class="odd"><th>SD</th><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].SD'></p></td><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].SD'></p></td></tr>
+                    <tr class="even"><th>SMP</th><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].SMP'></p></td><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].SMP'></p></td></tr>
+                    <tr class="odd"><th>SMA</th><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].SMA'></p></td><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].SMA'></p></td></tr>
+                    <tr class="even"><th>Diploma / Sarjana (S1)</th><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].S1'></p></td><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].S1'></p></td></tr>
+                    <tr class="odd"><th>Pascasarjana (S2)</th><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].S2'></p></td><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].S2'></p></td></tr>
+                    <tr class="even"><th>Doktor (S3)</th><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].S3'></p></td><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].S3'></p></td></tr>
+                    <tr class="odd"><th><h4>Jejak Karir Politik / Birokrasi:</h4>
+                Contoh:
+                <br>2000 - 2003 Ketua DPW Partai X
+                <br>2003 - 2005 Caleg DPRD Partai X
+                <br>2005 - 2009 Anggota DPRD</th><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].Karir_Politik_Birokrasi'></p></td><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].Karir_Politik_Birokrasi'></p></td></tr>
+                <tr class="odd"><th><h4>Jejak Bisnis:</h4></th><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].Jejak_Bisnis'></p></td><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].Jejak_Bisnis'></p></td></tr>
+                <tr class="odd"><th><h4>Riwayat Kasus Kriminal:</h4></th><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].Riwayat_Kasus'></p></td><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].Riwayat_Kasus'></p></td></tr>
+                <tr class="odd"><th><h4>Jejaring Keluarga di Pemerintahan:</h4></th><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].Jejaring_Keluarga'></p></td><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].Jejaring_Keluarga'></p></td></tr>
+                <tr class="odd"><th><h4>Aktivitas Sosial:</h4></th><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].Aktivitas_Sosial'></p></td><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].Aktivitas_Sosial'></p></td></tr>
+                <tr class="odd"><th><h4>Prestasi:</h4></th><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].Prestasi_Karya'></p></td><td><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].Prestasi_Karya'></p></td></tr>
+                <tr class="odd"><th><h4>Visi:</h4></th><td colspan="2"><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["main"].visi'></p></td></tr>
+                <tr class="odd"><th><h4>Misi:</h4></th><td colspan="2"><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["main"].misi'></p></td></tr>
+                <tr class="odd"><th><h4>Program Pendidikan:</h4></th><td colspan="2"><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["main"].program_pendidikan'></p></td></tr>
+                <tr class="odd"><th><h4>Program Hukum:</h4></th><td colspan="2"><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["main"].program_hukum'></p></td></tr>
+                <tr class="odd"><th><h4>Program Ekonomi:</h4></th><td colspan="2"><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["main"].program_ekonomi'></p></td></tr>
+                <tr class="odd"><th><h4>Dana Kampanye:</h4></th><td colspan="2"><p parse-url="profilKandidatCtrl.props" ng-model='profilKandidatCtrl.CrowdProfilData["main"].dana_kampanye'></p></td></tr>
+                </tbody>  
+            </table>
+            <table class="detail-view table table-striped table-bordered" ng-show="profilKandidatCtrl.crowdEdit">
+                <tbody>
+                    <tr><td>Nama Pasangan Calon</td><th><input type="text" class="form-control" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].nama'></th><th><input type="text" class="form-control" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].nama'></th></tr>
+                    <tr class="even"><td colspan="3"><h4>Riwayat Pendidikan:</h4></td></tr>
+                    <tr class="odd"><th>SD</th><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].SD'></textarea></td><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].SD'></textarea></td></tr>
+                    <tr class="even"><th>SMP</th><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].SMP'></textarea></td><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].SMP'></textarea></td></tr>
+                    <tr class="odd"><th>SMA</th><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].SMA'></textarea></td><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].SMA'></textarea></td></tr>
+                    <tr class="even"><th>Diploma / Sarjana (S1)</th><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].S1'></textarea></td><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].S1'></textarea></td></tr>
+                    <tr class="odd"><th>Pascasarjana (S2)</th><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].S2'></textarea></td><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].S2'></textarea></td></tr>
+                    <tr class="even"><th>Doktor (S3)</th><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].S3'></textarea></td><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].S3'></textarea></td></tr>
+                    <tr class="odd"><th><h4>Jejak Karir Politik / Birokrasi:</h4>
+                Contoh:
+                <br>2000 - 2003 Ketua DPW Partai X
+                <br>2003 - 2005 Caleg DPRD Partai X
+                <br>2005 - 2009 Anggota DPRD</th><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].Karir_Politik_Birokrasi'></textarea></td><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].Karir_Politik_Birokrasi'></textarea></td></tr>
+                <tr class="even"><th><h4>Jejak Bisnis:</h4></th><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].Jejak_Bisnis'></textarea></td><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].Jejak_Bisnis'></textarea></td></tr>
+                <tr class="odd"><th><h4>Riwayat Kasus Kriminal:</h4></th><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].Riwayat_Kasus'></textarea></td><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].Riwayat_Kasus'></textarea></td></tr>
+                <tr class="even"><th><h4>Jejaring Keluarga di Pemerintahan:</h4></th><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].Jejaring_Keluarga'></textarea></td><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].Jejaring_Keluarga'></textarea></td></tr>
+                <tr class="odd"><th><h4>Aktivitas Sosial:</h4></th><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].Aktivitas_Sosial'></textarea></td><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].Aktivitas_Sosial'></textarea></td></tr>
+                <tr class="even"><th><h4>Prestasi:</h4></th><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["ketua"].Prestasi_Karya'></textarea></td><td><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["wakil"].Prestasi_Karya'></textarea></td></tr>
+                <tr class="odd"><th><h4>Visi:</h4></th><td colspan="2"><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["main"].visi'></textarea></td></tr>
+                <tr class="odd"><th><h4>Misi:</h4></th><td colspan="2"><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["main"].misi'></textarea></td></tr>
+                <tr class="odd"><th><h4>Program Pendidikan:</h4></th><td colspan="2"><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["main"].program_pendidikan'></textarea></td></tr>
+                <tr class="odd"><th><h4>Program Hukum:</h4></th><td colspan="2"><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["main"].program_hukum'></textarea></td></tr>
+                <tr class="odd"><th><h4>Program Ekonomi:</h4></th><td colspan="2"><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["main"].program_ekonomi'></textarea></td></tr>
+                <tr class="odd"><th><h4>Dana Kampanye:</h4></th><td colspan="2"><textarea class="form-control" rows="5" ng-model='profilKandidatCtrl.CrowdProfilData["main"].dana_kampanye'></textarea></td></tr>
+                </tbody>  
+            </table>
+        </div>
+        <div class="col-xs-12 text-center" ng-show="profilKandidatCtrl.crowdEdit"><button type="button" class="btn btn-primary" ng-click="profilKandidatCtrl.saveit($event)"><i class="fa fa-floppy-o"></i> Simpan Perubahan</button>&nbsp;&nbsp;<button type="reset" class="btn btn-danger" ng-click="profilKandidatCtrl.setcrowdEdit(false)"><i class="fa fa-times"></i> Batalkan Perubahan</button></div>
     </div>
     <div class="row" ng-show="profilKandidatCtrl.dataCari.length > 0">
         <div class="text-center" style="padding:20px 0px;"><h4>Rekam Jejak di Media</h4></div>
@@ -133,12 +187,10 @@
                             </div>
                         </div>
                     </form>
-
                 </div>
             </div>
             <ul class="timeline" ng-show="komentarCtrl.pesans.length > 0">
                 <li  ng-repeat="pesan in komentarCtrl.pesans| filter:{ status: 'Y' }" ng-class-odd="''" ng-class-even="'timeline-inverted'"  ng-init="komentarCtrl.pesanInitialization(komentarCtrl, pesan, $index, user)">
-
                     <div class="timeline-badge">
                         <img ng-src="{{pesan.dari_img}}" class="img-circle-50">
                         <div class="time-text-center"><small class="text-muted"><i class="fa fa-clock-o"></i> {{pesan.creationDate}} WIB</small></div>

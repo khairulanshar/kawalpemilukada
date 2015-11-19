@@ -1,22 +1,52 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="KawalPemiluKaDaApp">
     <head>
+        <title>Kawal Pemilu Kepala Daerah</title>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-        <meta itemprop="name" content="Kawal Pilkada #Mengawal Suara Rakyat - Membangun Partisipasi Public">
-        <meta itemprop="image" content="../dist/img/iconKPILKADA.png">
-        <meta name="description" content="">
-        <meta name="keywords" content="Kawal Pilkada #Mengawal Suara Rakyat - Membangun Partisipasi Public">
-        <link href="../dist/img/iconKPILKADA.png" rel="shortcut icon" type="image/x-icon" />
+        <link rel="apple-touch-icon" sizes="57x57" href="https://www.kawalpilkada.id/apple-icon-57x57.png">
+        <link rel="apple-touch-icon" sizes="60x60" href="https://www.kawalpilkada.id/apple-icon-60x60.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="https://www.kawalpilkada.id/apple-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="76x76" href="https://www.kawalpilkada.id/apple-icon-76x76.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="https://www.kawalpilkada.id/apple-icon-114x114.png">
+        <link rel="apple-touch-icon" sizes="120x120" href="https://www.kawalpilkada.id/apple-icon-120x120.png">
+        <link rel="apple-touch-icon" sizes="144x144" href="https://www.kawalpilkada.id/apple-icon-144x144.png">
+        <link rel="apple-touch-icon" sizes="152x152" href="https://www.kawalpilkada.id/apple-icon-152x152.png">
+        <link rel="apple-touch-icon" sizes="180x180" href="https://www.kawalpilkada.id/apple-icon-180x180.png">
+        <link rel="icon" type="image/png" sizes="192x192"  href="https://www.kawalpilkada.id/android-icon-192x192.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="https://www.kawalpilkada.id/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="96x96" href="https://www.kawalpilkada.id/favicon-96x96.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="https://www.kawalpilkada.id/favicon-16x16.png">
+        <link rel="manifest" href="/manifest.json">
+        <meta name="msapplication-TileColor" content="#ffffff">
+        <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+        <meta name="theme-color" content="#ffffff">
+        <meta name="keywords" content="Kawal Pilkada #Mengawal Suara Rakyat - Membangun Partisipasi Publik">
         <meta name="author" content="halo@kawalpilkada.id">
-        <title>Kawal Pemilu Kepala Daerah</title>
+        <meta itemprop="name" content="Sebuah media partisipasi publik yang terbuka, transparan dan akuntabel untuk #PILKADABERSIH">
+        <meta itemprop="image" content="https://www.kawalpilkada.id/dist/img/iconKPILKADA.png">
+        <meta name="description" content="Sebuah media partisipasi publik yang terbuka, transparan dan akuntabel untuk #PILKADABERSIH">
+        <link href="https://www.kawalpilkada.id" rel="canonical"/>
+        <meta property="og:title" content="Sebuah media partisipasi publik yang terbuka, transparan dan akuntabel untuk #PILKADABERSIH" />
+        <meta property="og:type" content="website" />
+        <meta property="og:description" content="Sebuah media partisipasi publik yang terbuka, transparan dan akuntabel untuk #PILKADABERSIH" />
+        <meta property="og:url" content="https://www.kawalpilkada.id" />
+        <meta property="og:image" content="https://www.kawalpilkada.id/dist/img/iconKPILKADA.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@kawalpilkada" />
+        <meta name="twitter:title" content="KAWAL PILKADA #PILKADABERSIH" />
+        <meta name="twitter:description" content="Sebuah media partisipasi publik yang terbuka, transparan dan akuntabel untuk #PILKADABERSIH" />
+        <meta name="twitter:image" content="https://www.kawalpilkada.id/dist/img/iconKPILKADA.png" />
+        <meta name="twitter:url" content="https://www.kawalpilkada.id" />
+        <meta name="author" content="halo@kawalpilkada.id">
+
+
         <link href="../bower_components/leaflet/leaflet.css" rel="stylesheet">
         <!-- Bootstrap Core CSS -->
         <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../bower_components/jasny-bootstrap/css/jasny-bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="../bower_components/bootstrap-social/bootstrap-social.css" rel="stylesheet">
-        <!-- MetisMenu CSS -->
-        <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
         <!-- Timeline CSS -->
         <link href="../dist/css/timeline.css" rel="stylesheet">
         <!-- Custom CSS -->
@@ -30,29 +60,83 @@
                 <center>Sedang memproses data...</center>
             </div>        
         </div>
-        <div id="wrapper">
-            <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-                <main-header></main-header>
-                <div class="navbar-default sidebar" id="navsidebar" role="navigation">
-                    <main-side></main-side>
-                </div>
-            </nav>
+        <div id="myMenu" class="navmenu navmenu-default navmenu-fixed-left">
+            <a class="navmenu-brand" href="javascript:" ng-click="handleHash('/tabulasi.html?Provinsi')">Kawal Pilkada</a>
+            <ul class="nav navmenu-nav" style="padding-bottom: 50px;">
+                <li ng-class="{active : isSelected2('#/dashboard.html')}" ng-show="user.userlevel >= 1000">
+                    <a shref="javascript:" ng-click="setPageMenu('#/dashboard.html?Provinsi')">Dashboard</a>
+                </li>
+                <li ng-class="{active : isSelected2('#/crowdprofildata.html')}" ng-show="user.userlevel >= 1000">
+                    <a shref="javascript:" ng-click="setPageMenu('#/crowdprofildata.html')">CrowData </a>
+                </li>
+                <li  ng-class="{active : isSelected('#/user-profile.html')}"><a href="javascript:" ng-click="setPageMenu('#/user-profile.html')">Pendaftaran</a></li>
+                <li ng-class="{active : isSelected2('#/tabulasi.html/Provinsi')}"><a href="javascript:"  ng-click="setPageMenu('#/tabulasi.html?Provinsi')">Tabulasi Suara Provinsi</a></li>
+                <li ng-class="{active : isSelected2('#/tabulasi.html/Kabupaten-Kota')}"><a href="javascript:" ng-click="setPageMenu('#/tabulasi.html?Kabupaten-Kota')" >Tabulasi Suara Kabupaten/ Kota</a></li>
+                <li ng-class="{active : isSelected2('#/kandidat.html/Provinsi')}" ng-show="user.userlevel >= 1000"><a href="javascript:"  ng-click="setPageMenu('#/kandidat.html?Provinsi')">PASLON Provinsi</a></li>
+                <li ng-class="{active : isSelected2('#/kandidat.html/Kabupaten-Kota')}" ng-show="user.userlevel >= 1000"><a href="javascript:" ng-click="setPageMenu('#/kandidat.html?Kabupaten-Kota')" >PASLON Kabupaten/ Kota</a></li>
+                <li>
+                    <a href="http://bawaslu.go.id/laporan-pelanggaran-pemilu" target="bawaslu" id="bawaslu">Laporkan Pelanggaran</a>
+                </li>
+                <li  ng-class="{active : isSelected('#/privasi.html')}"><a href="javascript:" ng-click="setPageMenu('#/privasi.html')">Privasi</a></li>
+
+            </ul>
+        </div>
+
+
+        <div id="wrapper" class="canvas">
+            <main-header></main-header>
             <div style="background-color: #f8f8f8;">
                 <div class="page-wrapper" id="pagewrapper" ng-include="selectedTemplate.path" ></div>
             </div>
             <main-footer></main-footer>
         </div>
-        <script>
-                    (function(i, s, o, g, r, a, m){i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function(){
-                    (i[r].q = i[r].q || []).push(arguments)}, i[r].l = 1 * new Date(); a = s.createElement(o),
-                            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
-                    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-                    ga('create', 'UA-64266228-1', 'auto');
-                    ga('send', 'pageview');        </script>
+        <div class="modal fade" id="idandoirdmodal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Aplikasi Android Kawal Pilkada</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            Aplikasi Android Kawal Pilkada sudah bisa didownload di&nbsp;&nbsp;<a href="https://play.google.com/store/apps/details?id=id.kawalpilkada.android" target="android" style="text-decoration: none;text-shadow: 0 1px 2px rgba(0,0,0,.6);color: white;word-break: normal;background-color: rgb(104, 159, 56);padding:10px 10px;font-size:18px;border-radius: 3px;"><i class="fa fa-android"></i>&nbsp;&nbsp;Aplikasi Android</a>
+                            <br><br>Dengan aplikasi ini anda sudah bisa:
+                        </p>
+                        <ul>
+                            <li>mengecek NO TPS anda untuk PILKADA 2015.</li>
+                            <li>melihat Profil Pasangan Calon Peserta PILKADA 2015.</li>
+                        </ul>
+                        <br>
+                        <div class="alert alert-info" role="alert">Ikuti terus informasi tentang fitur-fitur yang akan segera kami release di <a href="https://www.facebook.com/kawalpilkada" target="fb" class="btn btn-primary btn-sm" style='margin-top:5px;text-decoration: none;text-shadow: 0 1px 2px rgba(0,0,0,.6);'><i class="fa fa-facebook-square"></i> Facebook Page Kawal Pilkada</a> atau <a href="https://twitter.com/kawalpilkada" target="twit" class="btn btn-info btn-sm" style='margin-top:5px;text-decoration: none;text-shadow: 0 1px 2px rgba(0,0,0,.6);'><i class="fa fa-twitter-square"></i> Twitter @kawalpilkada</a></div>
 
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        <script>
+                (function(i, s, o, g, r, a, m) {
+                    i['GoogleAnalyticsObject'] = r;
+                    i[r] = i[r] || function() {
+                        (i[r].q = i[r].q || []).push(arguments)
+                    }, i[r].l = 1 * new Date();
+                    a = s.createElement(o),
+                            m = s.getElementsByTagName(o)[0];
+                    a.async = 1;
+                    a.src = g;
+                    m.parentNode.insertBefore(a, m)
+                })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+                ga('create', 'UA-64266228-1', 'auto');
+                ga('send', 'pageview');</script>
+        <div>
+
+        </div>
         <script src="../bower_components/jquery/dist/jquery.min.js"></script>
         <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-        <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
+        <script src="../bower_components/jasny-bootstrap/js/jasny-bootstrap.min.js"></script>
         <script src="../bower_components/leaflet/leaflet.js"></script>
         <script src="../bower_components/angular/angular.min.js"></script>
         <script src="../bower_components/autolinker/Autolinker.min.js"></script>
@@ -61,7 +145,6 @@
         <script src="../dist/js/app.js"></script>
         <script src="../dist/js/controllers.js"></script>
         <script src="../dist/js/mainheader-directives.js"></script>
-        <script src="../dist/js/mainside-directives.js"></script>
         <script src="../dist/js/mainfooter-directives.js"></script>
     </body>
 </html>

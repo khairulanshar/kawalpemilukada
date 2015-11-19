@@ -1,0 +1,246 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Sep 28, 2015, 7:50:02 PM
+    Author     : khairulanshar
+*/
+body {
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -moz-font-feature-settings: 'liga', 'kern';
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+nav{
+    
+}
+.blur{
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    height:122px;
+    
+    overflow: hidden;
+    z-index: 1000;
+}
+#canvas{
+    opacity:1;
+    z-index: 100;
+    position: absolute;
+    display: block;
+    top: 3px;
+}
+.navbar-default{
+    background-color: transparent;
+    border:0px;
+}
+.bg-black{
+    background-color: rgba(0,0,0,0.8);
+    color: white;
+}
+.bg-grey{
+    background-color: rgba(248,248,248,0.9);
+}
+.c4n {
+    padding: 40px 0;
+    color: #999;
+    text-align: center;
+    font-size:24px;
+}
+.nav-icon{
+    color: rgba(0,0,0,0.8);
+    border-bottom:2px solid #e7e7e7;
+}
+.active{
+    color: rgba(0,122,255,1);
+    border-bottom: 2px solid rgba(0,122,255,1);
+}
+.text-nav-icon{
+    display: block;
+    font-size: 40px;
+    padding: 5px;
+    cursor: pointer;
+    padding-top:10px;
+}
+.text-nav{
+    display: block;
+    cursor: pointer;
+    font-size: 8px;
+    padding-bottom: 4px;
+}
+
+.info-li{
+    list-style: none;
+    padding:5px;
+    display: inline-block;
+}
+.info-li a{
+    padding:5px;
+    border:1px solid #337ab7;
+    border-radius: 50%;
+    -webkit-transition: all 2s; /* Safari */
+    transition: all 2s;
+}
+.info-li a:hover{
+    background-color: rgba(0,0,0,0.8);
+    border:1px solid rgba(0,0,0,0.9);
+    color:white;
+}
+.info-li a i{
+    width:30px;    
+}
+.dropdown,.dropdown-toggle,.dropdown-menu{
+    width:100%;
+    padding:0px;
+    margin:0px;
+    font-size: 18px;
+    color: rgba(0,0,0,0.8);
+}
+.dropdown-menu{
+    
+}
+.dropdown-menu>li{
+    cursor: pointer;
+    font-size: 18px;
+    padding:15px;
+}
+.nav-icon .dropdown-menu>li{
+    white-space: nowrap;
+}
+.dropdown-menu li:hover{
+    background-color: rgba(0,122,255,1);
+    color: white;
+    border-radius: 4px;
+}
+.dropdown-menu i{
+    color:#e7e7e7;
+}
+.input-group .form-control, input{
+    outline: none;
+    width:100%;
+    text-align: center;
+    box-shadow: none;
+    transition: none;
+    border: 1px solid transparent;
+    border-bottom:1px solid #e7e7e7;
+    border-radius: 0px;
+}
+.no-border-btn{
+    border:0px;
+    outline: none;
+    background-color: transparent;
+}
+.no-border-btn:hover,.no-border-btn:active,.no-border-btn:focus{
+    background-color: transparent;
+    outline: none;
+}
+.dropdown-menu input{
+    background-color: transparent;
+}
+
+.kandidat h4{
+    margin: 0px;
+    padding: 15px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.kandidat h3{
+    cursor: pointer;
+    color: rgba(0,122,255,1);
+    text-transform: uppercase;
+    font-size: 15px;
+}
+.kandidat h3 a{
+    color: rgba(0,122,255,1);
+    text-decoration: none;
+}
+.kandidat .thumbnail{
+    padding:0px;
+    border:0px;
+}
+.kandidat .thumbnail>img{
+    width:100%;
+    border:1px solid ;
+    border-bottom:0px;
+    border-color: #e9eaed #e9eaed #d1d1d1;
+}
+.kandidat .thumbnail .caption {
+    text-align: center;
+    border:1px solid ;
+    border-top:0px;
+    border-color: #e9eaed #e9eaed #d1d1d1;
+}
+
+.panel-kandidat .panel-heading{
+    cursor: pointer;
+}
+.panel-kandidat .panel+.panel {
+    margin-top: -1px;
+}
+.panel-kandidat .panel-body{
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+.kandidat .detail-view>tbody>tr>th:first-child {
+    width: 40%;
+}
+.kandidat h1{
+    font-size: 20px;
+}
+.kandidat a{
+    word-wrap: break-word;
+    word-break: break-all;
+}
+.boxkandidat{
+    color: white;
+    padding:0px;
+    margin:0px;
+    cursor: pointer;
+    background-color: #eee;
+    border: 1px solid #ddd;
+}
+
+.boxkandidat h3{
+    background-color: #eee;
+    text-align: left;
+    padding: 20px;
+    margin-top: 0px;
+    text-transform: capitalize;
+    font-size: 20px;
+}
+
+.boxkandidat div{
+    height:80px;
+}
+
+.boxkandidat h3 span {
+    display: block;
+    color: #fff;
+    background: rgba(1,135,196,0.9);
+    letter-spacing: 3px;
+    border: 5px solid #fff;
+    height: 100px;
+    width: 100px;
+    margin: 10px auto -65px;
+    -moz-border-radius: 100px;
+    -webkit-border-radius: 100px;
+    font-size: 40px;
+    padding-top: 20px;
+    text-align: center;
+}
+.boxkandidat div span{
+    display: block;
+    color:#777;
+    padding-top:30px;
+    padding-bottom:30px;
+    font-size: 16px;
+}

@@ -7,13 +7,13 @@
                     Sedang diverifikasi...
                 </p>
                 <p ng-show="verifiaksiCtrl.submitShow">
-                    Data Anda belum terverifikasi. Silahkan Isi NIK dan Nama Lengkap sesuai dengan KTP Anda.
+                    Silahkan Isi NIK dan Nama Lengkap sesuai dengan KTP Anda.
                 </p>
-                <div class="form-group" ng-show="verifiaksiCtrl.submitShow">
-                    <input class="form-control" placeholder="NIK sesuai di KTP" name="nikKTP" type="input" autofocus="" ng-model="verifiaksiCtrl.verifiaksi.NIK">
+                <div class="form-group" ng-show="verifiaksiCtrl.submitShow" style="width:100%;">
+                    <input class="input-lg" placeholder="Isi NIK Anda sesuai di KTP" style="width:100%;text-align:center;" name="nikKTP" type="input" autofocus="" ng-model="verifiaksiCtrl.verifiaksi.NIK">
                 </div>
-                <div class="form-group" ng-show="verifiaksiCtrl.submitShow">
-                    <input class="form-control" placeholder="Nama sesuai di KTP" name="namaKTP" type="input" autofocus="" ng-model="verifiaksiCtrl.verifiaksi.NAMA">
+                <div class="form-group" ng-show="verifiaksiCtrl.submitShow" style="width:100%;">
+                    <input class="input-lg" placeholder="Isi Nama Anda sesuai di KTP" style="width:100%;text-align:center;" name="namaKTP" type="input" autofocus="" ng-model="verifiaksiCtrl.verifiaksi.NAMA">
                 </div>
                 <div class="alert alert-success" ng-repeat="successAlert in verifiaksiCtrl.successAlerts">{{successAlert.text}}</div>
                 <div class="alert alert-danger" ng-repeat="errorAlert in verifiaksiCtrl.errorAlerts">{{errorAlert.text}}</div>
@@ -23,14 +23,14 @@
     <div class="row">
         <div style="padding-bottom: 20px;">
             <center>
-                <a href="https://seal.godaddy.com/verifySeal?sealID=UUO2XzFeiz6qTifdOauokC7gip3moNoCRYoZVCvgxBQ1i1wsLYVNwbgbySs2" target="signed"><img style="cursor:pointer;cursor:hand" src="https://seal.godaddy.com/images/3/en/siteseal_gd_3_h_l_m.gif" alt="SSL site seal - click to verify"></a>
+                <a href="https://seal.godaddy.com/verifySeal?sealID=UUO2XzFeiz6qTifdOauokC7gip3moNoCRYoZVCvgxBQ1i1wsLYVNwbgbySs2" target="signed"><img style="cursor:pointer;cursor:hand" src="../dist/img/siteseal_gd_3_h_l_m.gif" alt="SSL site seal - click to verify"></a>
             </center>
         </div>
     </div>
     <div class="row">
         <div class="alert alert-warning" ng-show="verifiaksiCtrl.submitShow">
             <ul>
-                <li>Verifikasi ini terjadi secara real-time dengan website Lembaga Negara dan cukup diverifikasi satu kali.</li>
+                <li>Verifikasi cukup diverifikasi satu kali.</li>
                 <li>Data NIK Anda <b>TIDAK</b> akan disimpan dalam Sistem KawalPilkada.id</li>
                 <li>Nama yang tertera di KTP akan dibandingkan dengan nama di <b>{{verifiaksiCtrl.sosial}}</b> Anda.</li> 
             </ul>
@@ -41,13 +41,14 @@
             </center>
             <br/>
 
-            <p><b>Terimakasih Atas Kerjasamanya</b>.</p>
+            <center><b>Terimakasih Atas Kerjasamanya</b>.</center>
         </div>
 
         <div class="modal-footer">
-            <input type="submit" class="btn btn-primary" value="Verfikasi" ng-show="verifiaksiCtrl.submitShow">
-            <a href="/logout" class="btn btn-danger" ng-show="verifiaksiCtrl.submitShow"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
-            <div ng-include="selectedTemplate.closeModal"></div>
+            <button type="submit" class="btn btn-primary" value="Verfikasi" ng-show="verifiaksiCtrl.submitShow"><i class="fa fa-check"></i> Verfikasi</button>
+            <!--<a href="/logout" class="btn btn-danger" ng-show="verifiaksiCtrl.submitShow"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+            <div ng-include="selectedTemplate.closeModal"></div>-->
+            <button type="button" class="btn btn-danger" ng-show="verifiaksiCtrl.submitShow" data-dismiss="modal" ng-click="verifiaksiCtrl.close('#/user-profile.html')"><i class="fa fa-times"></i> Tutup</button>
         </div>
     </div>
 

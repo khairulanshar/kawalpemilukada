@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import static com.googlecode.objectify.ObjectifyService.ofy;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
+import facebook4j.FacebookFactory;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -48,7 +49,6 @@ public class callbackfb extends HttpServlet {
         request.getSession().setAttribute("facebook", facebook);
         String errorMsg = "Data Anda belum terverifikasi.";
         UserData user = null;
-        String tahun = (String) request.getSession().getAttribute("tahun");
         Dashboard dashboard = CommonServices.getDashboard(CommonServices.setParentId("2015", "0"));
         Dashboard dashboard2014 = CommonServices.getDashboard(CommonServices.setParentId("2014", "0"));
         request.getSession().removeAttribute("tahun");
@@ -65,7 +65,7 @@ public class callbackfb extends HttpServlet {
                 ofy().save().entity(user).now();
                 dashboard.users = CommonServices.getuserSize() + "";
                 ofy().save().entity(dashboard).now();
-                dashboard2014.users = CommonServices.getuserSize() + "";
+                dashboard2014.users = dashboard.users + "";
                 ofy().save().entity(dashboard2014).now();
             } else {
                 user.lastlogin = CommonServices.JakartaTime();

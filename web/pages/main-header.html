@@ -1,71 +1,74 @@
-<div class="navbar-header">
-    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-    </button>
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="margin-bottom: 0px;border: 0px;">
 
-    <button type="button" class="navbar-toggle" id="menuBtn">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-    </button>
-
-    <div class="navbar-brand-div">
-        <a class="navbar-brand" href="javascript:" ng-click="handleHash('/tabulasi.html?Provinsi')">Kawal Pilkada<img src="../dist/img/iconKPILKADA.png" style="height: 50px;display: inline-block;"></a>
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-recalc="false" data-target=".navmenu" data-canvas=".canvas">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <div class="navbar-brand-div">
+            <a class="navbar-brand" href="javascript:" ng-click="handleHash('/tabulasi.html?Provinsi')"><img src="../dist/img/iconKPILKADA.png" style="height: 50px;display: inline-block;"></a>
+        </div>
     </div>
-</div>
-<!-- /.navbar-header -->
+    <ul class="nav navbar-top-links navbar-right">
+        <!-- /.dropdown -->
+        <li class="dropdown" ng-show="user.logged">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:">
+                <i class="fa fa-bookmark fa-fw"></i>  <i class="fa fa-caret-down"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-tasks">
+                <li>
+                    <a class="text-left" href="javascript:" ng-click="setPage0('#/tabulasi.html?Provinsi')">
+                        <strong>Kepala Daerah Provinsi</strong>
+                        <i class="fa fa-angle-right pull-right"></i>
+                    </a>
+                </li>
+                <li>
+                    <a class="text-left" href="javascript:" ng-click="setPage0('#/tabulasi.html?Kabupaten-Kota')">
+                        <strong>Kepala Daerah Kabupaten/ Kota</strong>
+                        <i class="fa fa-angle-right pull-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:">
+                <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-user" ng-include="selectedTemplate.dropdownuser" ng-controller="UserController as userCtrl"></ul>
+        </li>
+    </ul>
+    <!-- /.navbar-header -->
+        <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
+            <ul class="nav navbar-nav">
+                <li ng-class="{active : isSelected2('#/dashboard.html')}" ng-show="user.userlevel > 1000">
+                    <a shref="javascript:" ng-click="setPage('#/dashboard.html?Provinsi')">Dashboard</a>
+                </li>
+                <li ng-class="{active : isSelected2('#/crowdprofildata.html')}" ng-show="user.userlevel > 1000">
+                    <a shref="javascript:" ng-click="setPage('#/crowdprofildata.html')">CrowData </a>
+                </li>
+                <li  ng-class="{active : isSelected('#/user-profile.html')}"><a href="javascript:" ng-click="setPage('#/user-profile.html')">Pendaftaran</a></li>
+                <li class="dropdown" ng-class="{active : isSelected2('#/tabulasi.html')}">
+                    <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true">Tabulasi Suara <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li ng-class="{active : isSelected2('#/tabulasi.html/Provinsi')}"><a href="javascript:"  ng-click="setPage('#/tabulasi.html?Provinsi')">Provinsi</a></li>
+                        <li ng-class="{active : isSelected2('#/tabulasi.html/Kabupaten-Kota')}"><a href="javascript:" ng-click="setPage('#/tabulasi.html?Kabupaten-Kota')" >Kabupaten/ Kota</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown" ng-class="{active : isSelected2('#/kandidat.html')}" ng-show="user.userlevel > 1000">
+                    <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true">Pasangan Calon <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li ng-class="{active : isSelected2('#/kandidat.html/Provinsi')}"><a href="javascript:"  ng-click="setPage('#/kandidat.html?Provinsi')">Provinsi</a></li>
+                        <li ng-class="{active : isSelected2('#/kandidat.html/Kabupaten-Kota')}"><a href="javascript:" ng-click="setPage('#/kandidat.html?Kabupaten-Kota')" >Kabupaten/ Kota</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="http://bawaslu.go.id/laporan-pelanggaran-pemilu" target="bawaslu" id="bawaslu">Laporkan Pelanggaran</a>
+                </li>
+                <li  ng-class="{active : isSelected('#/privasi.html')}"><a href="javascript:" ng-click="setPage('#/privasi.html')">Privasi</a></li>
 
-<ul class="nav navbar-top-links navbar-right" id="main-header">
-    <!-- /.dropdown -->
-    <li class="dropdown" ng-show="user.logged">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:">
-            <i class="fa fa-bookmark fa-fw font-white"></i>  <i class="fa fa-caret-down font-white"></i>
-        </a>
-        <ul class="dropdown-menu dropdown-tasks">
+            </ul>
 
-            <li class="divider"></li>
-            <li>
-                <a class="text-left" href="javascript:" ng-click="mainHeader.setPage('#/tabulasi.html?Provinsi')">
-                    <strong>Kepala Daerah Provinsi</strong>
-                    <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-            <li>
-                <a class="text-left" href="javascript:" ng-click="mainHeader.setPage('#/tabulasi.html?Kabupaten-Kota')">
-                    <strong>Kepala Daerah Kabupaten/ Kota</strong>
-                    <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-        </ul>
-        
-    </li>
-    
-    <!--<li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:">
-            <i class="fa fa-bell fa-fw font-white"></i>  <i class="fa fa-caret-down font-white"></i>
-        </a>
-        <ul class="dropdown-menu dropdown-alerts">
-            <li class="divider"></li>
-            <li>
-                <a class="text-center" href="javascript:">
-                    <strong>Lihat Semua <i>Alerts</i></strong>
-                    <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-        </ul>
-    </li>-->
-    <!-- /.dropdown -->
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:">
-            <i class="fa fa-user fa-fw font-white"></i>  <i class="fa fa-caret-down font-white"></i>
-        </a>
-        <ul class="dropdown-menu dropdown-user" ng-include="selectedTemplate.dropdownuser" ng-controller="UserController as userCtrl"></ul>
-
-    </li>
-    <!-- /.dropdown -->
-</ul>
-<!-- /.navbar-top-links -->
+        </div>
+</nav>

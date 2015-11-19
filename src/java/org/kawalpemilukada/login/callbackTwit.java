@@ -19,6 +19,7 @@ import org.kawalpemilukada.model.UserData;
 import org.kawalpemilukada.web.controller.CommonServices;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
 import twitter4j.User;
 import twitter4j.auth.RequestToken;
 
@@ -50,7 +51,6 @@ public class callbackTwit extends HttpServlet {
         }
         request.getSession().setAttribute("twitter", twitter);
         String errorMsg = "Data Anda belum terverifikasi.";
-        String tahun = (String) request.getSession().getAttribute("tahun");
         Dashboard dashboard = CommonServices.getDashboard(CommonServices.setParentId("2015", "0"));
         Dashboard dashboard2014 = CommonServices.getDashboard(CommonServices.setParentId("2014", "0"));
         request.getSession().removeAttribute("tahun");
@@ -68,7 +68,7 @@ public class callbackTwit extends HttpServlet {
                 ofy().save().entity(user).now();
                 dashboard.users = CommonServices.getuserSize() + "";
                 ofy().save().entity(dashboard).now();
-                dashboard2014.users = CommonServices.getuserSize() + "";
+                dashboard2014.users = dashboard.users + "";
                 ofy().save().entity(dashboard2014).now();
             } else {
                 user.lastlogin = CommonServices.JakartaTime();

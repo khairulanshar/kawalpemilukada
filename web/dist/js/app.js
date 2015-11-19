@@ -1,11 +1,12 @@
-/*versi 1.20 12-9-2015*/
+/*versi 1.20 05-10-2015*/
 var $forwardHTTPS = true;
 if (window.location.protocol === "http:" && $forwardHTTPS) {
     window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
 }
 (function() {
-    var app = angular.module('KawalPemiluKaDaApp', ['controllers', 'mainfooter-directives', 'mainheader-directives', 'mainside-directives']);
+    var app = angular.module('KawalPemiluKaDaApp', ['controllers', 'mainfooter-directives', 'mainheader-directives']);
     app.service('$KawalService', function() {
+
         var sendToGa = function() {
             ga('send', 'screenview', {
                 'screenName': window.location.hash
@@ -59,41 +60,7 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
             var val = inp.replace(/\ /g, t).replace(/\,/g, t).replace(/\`/g, t).replace(/\~/g, t).replace(/\!/g, t).replace(/\@/g, t).replace(/\#/g, t).replace(/\$/g, t).replace(/\%/g, t).replace(/\^/g, t).replace(/\&/g, t).replace(/\*/g, t).replace(/\(/g, t).replace(/\)/g, t).replace(/\+/g, t).replace(/\|/g, t).replace(/\{/g, t).replace(/\}/g, t).replace(/\[/g, t).replace(/\]/g, t).replace(/\:/g, t).replace(/\;/g, t).replace(/\"/g, t).replace(/\'/g, t).replace(/\?/g, t);
             return val;
         };
-        var setWindowResize = function($scope, $window) {
-            var topOffset = 50;
-            var width = ($window.innerWidth > 0) ? $window.innerWidth : screen.width;
-            if (width < 768) {
-                $('div.navbar-collapse').addClass('collapse');
-                try {
-                    $('#menuBtn').hide();
-                    $(".sidebar-search").attr("style", "display:none;");
-                } catch (e) {
-                }
-                topOffset = 100; // 2-row-menu
-            } else {
-                try {
-                    $("#navsidebar").show();
-                    $("#pagewrapper").attr("style", "");
-                    $("#menuBtn").hide();
-                    $(".sidebar-search").attr("style", "text-align: center;");
-                } catch (e) {
-                }
-                $('div.navbar-collapse').removeClass('collapse');
-            }
-            var height = (($window.innerHeight > 0) ? $window.innerHeight : screen.height) - 1;
-            height = height - topOffset;
-            if (height < 1)
-                height = 1;
 
-            if (height > topOffset) {
-                if (height > 750) {
-                    $scope.minHeight = height;
-                } else {
-                    $scope.minHeight = 750;
-                }
-            }
-            return height;
-        };
         var setloged = function($http, user, errorMsg, $scope) {
             var verified = function(user) {
                 $scope.user = user;
@@ -118,13 +85,14 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
                     getWilayahDropdown($http, $scope, user.kecamatanId, callback, "desas");
                 }
             };
-            if (errorMsg === "Data Anda belum terverifikasi.") {
-                $scope.user = user;
-                $scope.selectedTemplate.pathmodal = "/pages/verifikasi.html";
-                $('#myModal').modal({backdrop: 'static'});
-            } else {
-                verified(user);
-            }
+            /*if (errorMsg === "Data Anda belum terverifikasi.") {
+             $scope.user = user;
+             $scope.selectedTemplate.pathmodal = "/pages/verifikasi.html";
+             $('#myModal').modal({backdrop: 'static'});
+             } else {
+             verified(user);
+             }*/
+            verified(user);
         };
 
         var openPopupLogin = function($http, url, $scope, $window) {
@@ -264,8 +232,7 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
 
                     });
         };
-        var submitKandidat = function($http, $scope, file) {
-            itemyangsedangdiproses.setKandidat(true);
+        var submitKandidat = function($http, $scope, file, callback) {
             $scope.kandidatCtrl.kandidat.img_url = file[0][3];
             $http.post('/kandidat/post/' + $scope.$parent.$parent.tahun + '/' + $scope.kandidatCtrl.kandidat.tingkat + '/' + $scope.kandidatCtrl.kandidat.tingkatId, $scope.kandidatCtrl.kandidat).
                     success(function(data, status, headers, config) {
@@ -291,7 +258,6 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
                         $scope.kandidatCtrl.showPhoto = false;
                         $scope.kandidatCtrl.submitShow = true;
                         $scope.kandidatCtrl.successAlerts.push({"text": "Perubahan Data sudah berhasil disimpan, terima kasih atas kerjasamanya."});
-                        itemyangsedangdiproses.setKandidat(false);
                         $scope.kandidatCtrl.kandidat = {
                             nama: "",
                             tingkatId: "",
@@ -302,22 +268,23 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
                             kabupaten: "",
                             img_url: ""
                         }
+                        callback();
                     }).
                     error(function(data, status, headers, config) {
                         $scope.kandidatCtrl.submitShow = true;
+                        callback();
                     });
         };
-        var getUrlFileSuaraTPS = function($http, $scope, $dataSuara, $type, $index) {
-            itemyangsedangdiproses.setTabulasi(true);
+        var getUrlFileSuaraTPS = function($http, $scope, $dataSuara, $type, $index, callback) {
             $http.get('/pesan/getUrlFile/').success(function(data) {
                 if (data.uploadurl.length > 0) {
-                    submitFileSuaraTPS($http, $scope, data.uploadurl, $dataSuara, $type, $index);
+                    submitFileSuaraTPS($http, $scope, data.uploadurl, $dataSuara, $type, $index, callback);
                 }
             }).error(function() {
+                callback();
             });
         };
-        var submitFileSuaraTPS = function($http, $scope, uploadurl, $dataSuara, $type, $index) {
-            itemyangsedangdiproses.setTabulasi(true);
+        var submitFileSuaraTPS = function($http, $scope, uploadurl, $dataSuara, $type, $index, callback) {
             var data = new FormData();
             var files = $dataSuara.photos;
             var pI = 0;
@@ -351,38 +318,36 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
                     .success(function(data, status, headers, config) {
                         if (data.success === "OK") {
                             $dataSuara["tps_file"] = data.retval[0];
-                            submitSuara($http, $scope, $dataSuara, $type, $index);
+                            submitSuara($http, $scope, $dataSuara, $type, $index, callback);
                         }
                     })
                     .error(function(data, status, headers, config) {
-
+                        callback();
                     });
         };
-        var submitSuara = function($http, $scope, $dataSuara, $type, $index) {
-            itemyangsedangdiproses.setTabulasi(true);
+        var submitSuara = function($http, $scope, $dataSuara, $type, $index, callback) {
             $dataSuara.photosrc = '';
             $http.post('/suara/' + $type, [$dataSuara, $scope.tabulasiCtrl.controlWilayahs, window.location.hash]).
                     success(function(data, status, headers, config) {
                         if (data[0] === "OK") {
                             $scope.tabulasiCtrl.DataSuarasTPS[$index] = data[1];
                         }
-                        itemyangsedangdiproses.setTabulasi(false);
+                        callback();
                     }).
                     error(function(data, status, headers, config) {
-                        itemyangsedangdiproses.setTabulasi(false);
+                        callback();
                     });
         };
-        var getUrlFileKandidat = function($http, $scope) {
-            itemyangsedangdiproses.setKandidat(true);
+        var getUrlFileKandidat = function($http, $scope, callback) {
             $http.get('/pesan/getUrlFile/').success(function(data) {
                 if (data.uploadurl.length > 0) {
-                    submitFileKandidat($http, $scope, data.uploadurl);
+                    submitFileKandidat($http, $scope, data.uploadurl, callback);
                 }
             }).error(function() {
+                callback();
             });
         };
-        var submitFileKandidat = function($http, $scope, uploadurl) {
-            itemyangsedangdiproses.setKandidat(true);
+        var submitFileKandidat = function($http, $scope, uploadurl, callback) {
             var data = new FormData();
             var files = $scope.kandidatCtrl.photos;
             var pI = 0;
@@ -417,11 +382,11 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
             })
                     .success(function(data, status, headers, config) {
                         if (data.success === "OK") {
-                            submitKandidat($http, $scope, data.retval);
+                            submitKandidat($http, $scope, data.retval, callback);
                         }
                     })
                     .error(function(data, status, headers, config) {
-
+                        callback();
                     });
         };
         var getDashboard = function($http, $scope) {
@@ -606,18 +571,18 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
 
                     });
         };
-        var prevPage="";
-        var getPrevPage=function(){
+        var prevPage = "";
+        var getPrevPage = function() {
             return prevPage;
         };
-        var setPrevPage=function(){
-            prevPage=window.location.hash;
+        var setPrevPage = function() {
+            prevPage = window.location.hash;
         };
 
         return {
             roundToTwo: roundToTwo
-            ,getPrevPage:getPrevPage
-            ,setPrevPage:setPrevPage
+            , getPrevPage: getPrevPage
+            , setPrevPage: setPrevPage
             , getSentimentAnalysis: getSentimentAnalysis
             , setpercent: setpercent
             , getUrlFileProfil: getUrlFileProfil
@@ -627,7 +592,6 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
             , getSelectedWilayah: getSelectedWilayah
             , openPopupLogin: openPopupLogin
             , setloged: setloged
-            , setWindowResize: setWindowResize
             , getDashboard: getDashboard
             , cekauth: cekauth
             , replaceSpecial: replaceSpecial
@@ -658,6 +622,16 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
     app.controller('KawalPemiluKaDaCtrl', ['$scope', '$KawalService', function($scope, $KawalService) {
             $KawalService.itemyangsedangdiproses.setScope($scope);
             $scope.sedangDiproses = $KawalService.itemyangsedangdiproses.returnvalue();
+            $scope.popupandroid = "";
+            try {
+                $scope.popupandroid = localStorage.getItem("popupandroid");
+            } catch (e) {
+                $scope.popupandroid = "N";
+            }
+            if ($scope.popupandroid === null) {
+                $('#idandoirdmodal').modal('show');
+                localStorage.setItem("popupandroid", "Y");
+            }
             $scope.tahuns = [2015, 2014];
             $scope.jenisPesans = ["Pesan Untuk Semua"];
             $scope.tahun = 2015;
@@ -686,7 +660,7 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
                 "tabulasi.html",
                 /*"komentar.html",
                  "grafik.html",
-                 "task.html","users.html",*/  "privasi.html"];
+                 "task.html","users.html",*/  "privasi.html", "crowdprofildata.html"];
             $scope.selectedTemplate = {
                 "hash": '#/tabulasi.html',
                 "path": "pages/tabulasi.html",
@@ -714,14 +688,26 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
                 $scope.selectedTemplate.hash = page + wilayah.tahun + '/' + wilayah.id.replace(wilayah.kpuid, '') + '/' + wilayah.kpuid + '/' + $KawalService.replaceSpecial(wilayah.nama, '-') + '/' + kandidat.urut + '/' + $KawalService.replaceSpecial(kandidat.nama, '-');
                 $KawalService.handleHash(page.substr(1) + wilayah.tahun + '/' + wilayah.id.replace(wilayah.kpuid, '') + '/' + wilayah.kpuid + '/' + $KawalService.replaceSpecial(wilayah.nama, '-') + '/' + kandidat.urut + '/' + $KawalService.replaceSpecial(kandidat.nama, '-'), $scope);
             };
+            $scope.showMenu = function() {
+                $("#navsidebar").show();
+                $("#pagewrapper").attr("style", "");
+                $("#menuBtn").hide();
+            }
+
             $scope.kembali = function() {
+                $scope.showMenu();
                 var page = $KawalService.getPrevPage();
-                if (page.length===0){
+                if (page.length === 0) {
                     var hashs = window.location.hash.substr(2).split("/");
-                    page='#/kandidat.html/'+hashs[2]+'/' + hashs[1]+'/' + hashs[3];
+                    page = '#/kandidat.html/' + hashs[2] + '/' + hashs[1] + '/' + hashs[3];
                 }
                 $scope.selectedTemplate.hash = page;
                 $KawalService.handleHash(page.substr(1), $scope);
+            };
+            $scope.hideMenu = function() {
+                $("#navsidebar").hide();
+                $("#pagewrapper").css("margin", "0px");
+                $("#menuBtn").show();
             };
             $scope.panelproprerty = {
                 users: 0,
@@ -748,21 +734,39 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
                     return false;
                 }
             };
-            try {
-                if (window.location.hash.length === 0) {
-                    setTimeout(function() {
-                        $scope.selectedTemplate.hash = '#/tabulasi.html/'+$scope.tingkat+'/' + $scope.tahun;
-                        $KawalService.handleHash($scope.selectedTemplate.hash.substr(1), $scope);
-                    }, 500);
-                    return;
-                } else {
-                    var hashs = window.location.hash.substr(2).split("/");
-                    if (hashs.length >= 3) {
-                        $scope.tahun = hashs[2];
-                    }
-                }
-            } catch (e) {
+            $scope.isSelected = function(page) {
+                return $scope.selectedTemplate.hash === page;
             }
+            $scope.isSelected2 = function(page) {
+                return $scope.selectedTemplate.hash.indexOf(page) >= 0;
+            }
+            $scope.setPage0 = function(page) {
+                if (!$scope.user.logged) {
+                    return;
+                }
+                page = page + '/' + $scope.tahun + '/' + $scope.user.provinsiId + '/' + $scope.user.kabkotaId + '/' + $scope.user.kecamatanId + '/' + $scope.user.desaId;
+                $scope.selectedTemplate.hash = page;
+                $KawalService.handleHash(page.substr(1), $scope);
+                try {
+                    if ($("#myMenu").hasClass("in")) {
+                        $("#myMenu").offcanvas('hide');
+                    }
+                } catch (e) {
+                }
+            };
+            $scope.setPageMenu = function(page) {
+                $scope.selectedTemplate.hash = page;
+                $KawalService.handleHash(page.substr(1), $scope);
+                try {
+                    if ($("#myMenu").hasClass("in")) {
+                        $("#myMenu").offcanvas('hide');
+                    }
+                } catch (e) {
+                }
+            };
+            $scope.setPage = function(page) {
+                $scope.setPageMenu(page);
+            };
             $scope.prevPage = "";
             $scope.handleHash = function(a) {
                 $KawalService.handleHash(a, $scope)
@@ -774,6 +778,20 @@ if (window.location.protocol === "http:" && $forwardHTTPS) {
                 $KawalService.handleHash(value.substr(1), $scope);
                 $KawalService.sendToGa();
             });
+            try {
+                if (window.location.hash.length === 0) {
+                    setTimeout(function() {
+                        $scope.selectedTemplate.hash = '#/tabulasi.html/' + $scope.tingkat + '/' + $scope.tahun;
+                        $KawalService.handleHash($scope.selectedTemplate.hash.substr(1), $scope);
+                    }, 500);
+                } else {
+                    var hashs = window.location.hash.substr(2).split("/");
+                    if (hashs.length >= 3) {
+                        $scope.tahun = hashs[2];
+                    }
+                }
+            } catch (e) {
+            }
         }]);
 })();
 

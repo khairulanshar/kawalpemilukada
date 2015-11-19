@@ -1,11 +1,6 @@
 <div ng-controller="dashboardController as dashboardCtrl">
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Dashboard</h1>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12">
             <div class="form-group">
                 <div class="text-uppercase" style="color: #9197a3;border-bottom: 1px solid #e9eaed;padding-bottom: 15px;font-size: 16px;font-weight: bold;">
                     <i class="fa fa-table fa-fw"></i> Tabulasi
@@ -25,8 +20,8 @@
                 <div style="position: absolute;top:20px;"><i class="fa fa-info-circle fa-2x"></i></div>
             </div>
         </div>
-        <div class="col-md-4 col-md-offset-2 text-right">
-            <div  class="text-left" style="width:270px">
+        <div class="col-md-4 col-md-offset-2 text-left">
+            <div  class="pull-right" style="width:270px">
                 <div class="form-group" ng-include="selectedTemplate.tahun"></div>
                 <div class="form-group">
                     <div class="dropdown dropdown-display">
@@ -35,10 +30,10 @@
                         </div>
                         <ul class="dropdown-menu">
                             <li>
-                                <a href="javascript:" ng-click="setTingkat('Provinsi')">Kepala Daerah Tingkat Provinsi</a>
+                                <a href="javascript:" ng-click="setTingkat('Provinsi')">Provinsi</a>
                             </li>
                             <li>
-                                <a href="javascript:" ng-click="setTingkat('Kabupaten-Kota')">Kepala Daerah Tingkat Kabupaten/ Kota</a>
+                                <a href="javascript:" ng-click="setTingkat('Kabupaten-Kota')">Kabupaten/ Kota</a>
                             </li>
                         </ul>
                     </div>
@@ -51,42 +46,35 @@
         </div>
     </div>
 
-    <div ng-controller="tabulasiController
-                        as tabulasiCtrl">
+    <div ng-controller="tabulasiController as tabulasiCtrl">
 
         <div class="row" >
             <div class="col-lg-12">
 
                 <div ng-show="tabulasiCtrl.showTable(tabulasiCtrl.KandidatWilayahs)" style="overflow-x: auto;font-size: 9pt;">
                     <table class="table table-striped table-bordered table-hover">
-                        <thead>
+                        <thead ng-init="tabulasiCtrl.DataSuaras.total = {};">
                             <tr>
                                 <th>Nama</th>
                                 <th>Kandidat</th>
                             </tr>
+                            <tr>
+                                <th>Total Jumlah Wilayah: {{tabulasiCtrl.KandidatWilayahs.length}}</th>
+                                <th>Total Jumlah Kandidat: {{tabulasiCtrl.jumlahTotalKandidat}}</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="kandidatWilayah in tabulasiCtrl.KandidatWilayahs| orderBy :'nama' | filter: $parent.KandidatWilayah0">
+                            <tr ng-repeat="kandidatWilayah in tabulasiCtrl.KandidatWilayahs| orderBy :'nama' | filter: $parent.KandidatWilayah0" ng-init="tabulasiCtrl.countKandidat($index, tabulasiCtrl.DataSuaras); tabulasiCtrl.DataSuaras.total.jumlahKandidat = tabulasiCtrl.DataSuaras.total.jumlahKandidat + kandidatWilayah.kandidat.length">
                                 <td ng-click="tabulasiCtrl.getChild(kandidatWilayah)"><a href="javascript:">{{kandidatWilayah.nama}}</a></td>
                                 <td>
-                                    <div class="row" >
-                                        <div class="col-md-4" ng-repeat="kandidat in kandidatWilayah.kandidat| orderBy :'-jumlahKomentar'">
-                                            <div class="panel panel-default" style="border:0px;cursor: pointer;" ng-click="openPage('#/profilkandidat.html/', kandidat, kandidatWilayah)">
-                                                <div class="panel-body kandidat" style="height:162px;">
-                                                    <div class="row" >
-                                                        <div style="float:left;">
-                                                            <img ng-src="{{kandidat.img_url}}" class="img-responsive attach-foto1">
-                                                        </div>
-                                                        <div class="text-right">
-                                                            <div class="huge"><i class="fa fa-comments-o"></i>{{kandidat.jumlahKomentar}}</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-xs-12 text-center text-uppercase text-primary" style="padding-top: 10px;">{{kandidat.nama}}</div>
-                                                        <div class="col-xs-12 text-center text-uppercase text-muted">No Urut {{kandidat.urut}}</div>
-                                                        <div class="col-xs-12 text-center text-uppercase text-muted">KPU Peserta ID {{kandidat.kpu_id_peserta}}</div>
-                                                    </div>    
-                                                </div>
+                                    <div class="row">
+                                        <div class="col-sm-6 col-md-5 col-lg-4" ng-repeat="kandidat in kandidatWilayah.kandidat| orderBy :'urut'" style="padding:20px;">
+                                            <div class="boxkandidat text-cente" ng-click="openPage('#/profilkandidat.html?', kandidat, kandidatWilayah)">
+                                                <h3>{{kandidat.nama}}</h3>
+                                                <center>
+                                                    <div class="urut" data-toggle="tooltip" data-placement="bottom" title="No Urut" ng-init="tabulasiCtrl.setTooltip()">{{kandidat.urut}}</div>
+                                                    <span>ID Peserta: {{kandidat.kpu_id_peserta}}</span>
+                                                </center>
                                             </div>
                                         </div>
                                     </div>
@@ -94,6 +82,12 @@
                             </tr>
                             <tr ng-show="tabulasiCtrl.blmadaData"><td colspan="3">Belum ada data...</td></tr>
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Total Jumlah Wilayah: {{tabulasiCtrl.KandidatWilayahs.length}}</th>
+                                <th>Total Jumlah Kandidat: {{tabulasiCtrl.jumlahTotalKandidat}}</th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>

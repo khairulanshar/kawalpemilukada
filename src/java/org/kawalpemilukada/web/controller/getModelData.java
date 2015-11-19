@@ -79,24 +79,37 @@ public class getModelData extends HttpServlet {
             JSONObject input = (JSONObject) JSONValue.parse(sb.toString());
             try {
                 UserData user = CommonServices.getUser(request);
-                if (user.uid.toString().length() > 0 && user.terverifikasi.equalsIgnoreCase("Y")) {
+                if (user.uid.toString().length() > 0) {
                     if (input.get("uid").toString().equalsIgnoreCase(user.uid.toString())) {
-                        if (input.get("kabkota").toString().length() > 0) {
-                            user.kabkota = input.get("kabkota").toString();
-                            user.kabkotaId = input.get("kabkotaId").toString();
+                        try {
+                            if (input.get("kabkota").toString().length() > 0) {
+                                user.kabkota = input.get("kabkota").toString();
+                                user.kabkotaId = input.get("kabkotaId").toString();
+                            }
+                        } catch (Exception e) {
                         }
-                        if (input.get("desa").toString().length() > 0) {
-                            user.desa = input.get("desa").toString();
-                            user.desaId = input.get("desaId").toString();
+                        try {
+                            if (input.get("desa").toString().length() > 0) {
+                                user.desa = input.get("desa").toString();
+                                user.desaId = input.get("desaId").toString();
+                            }
+                        } catch (Exception e) {
                         }
-                        if (input.get("kecamatan").toString().length() > 0) {
-                            user.kecamatan = input.get("kecamatan").toString();
-                            user.kecamatanId = input.get("kecamatanId").toString();
+                        try {
+                            if (input.get("kecamatan").toString().length() > 0) {
+                                user.kecamatan = input.get("kecamatan").toString();
+                                user.kecamatanId = input.get("kecamatanId").toString();
+                            }
+                        } catch (Exception e) {
                         }
-                        if (input.get("provinsi").toString().length() > 0) {
-                            user.provinsi = input.get("provinsi").toString();
-                            user.provinsiId = input.get("provinsiId").toString();
+                        try {
+                            if (input.get("provinsi").toString().length() > 0) {
+                                user.provinsi = input.get("provinsi").toString();
+                                user.provinsiId = input.get("provinsiId").toString();
+                            }
+                        } catch (Exception e) {
                         }
+
                         if (input.get("email").toString().length() > 0) {
                             user.email = input.get("email").toString();
                         }
@@ -105,7 +118,7 @@ public class getModelData extends HttpServlet {
                         }
                         if (input.get("userlevel").toString().length() > 0) {
                             if (Integer.parseInt(input.get("userlevel").toString()) > 200) {
-                                user.userlevel = 0;
+                                user.userlevel = 200;
                             } else {
                                 user.userlevel = Integer.parseInt(input.get("userlevel").toString());
                             }
@@ -121,7 +134,6 @@ public class getModelData extends HttpServlet {
         out.print(JSONValue.toJSONString(record));
         out.flush();
     }
-    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

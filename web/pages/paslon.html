@@ -1,0 +1,108 @@
+<div ng-controller="paslonController as paslonCtrl">
+    <div ng-show="showmain">
+        <center>
+            <div ng-show="provinsis.length > 0">
+                <div class="form-group">
+                    <div class="dropdown">
+                        <div class="dropdown-toggle" data-toggle="dropdown" >
+                            <div class="input-group">
+                                <input type="text" class="form-control input-lg text-uppercase" ng-model="kawal.searchProvinsi" placeholder="Pilih Provinsi">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default no-border-btn" type="button" ng-click="clear()"><span class="glyphicon glyphicon-remove-circle text-muted fa-2x" aria-hidden="true"></span></button>
+                                </span>
+                            </div><!-- /input-group -->
+                        </div>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="provinsi_i in provinsis| orderBy: 'nama' | filter:kawal.searchProvinsi" ng-click="setProvinsi(provinsi_i)">
+                                {{provinsi_i.nama}}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary btn-lg" id='idcaripaslon' ng-click="caripaslon($event);
+                        $event.stopPropagation();" style="width:100%;margin-bottom: 20px;"><i class="fa fa-check"></i> Cari Profil Pasangan Calon</button>
+            </div>
+            <div ng-show="provinsis.length === 0"><i class="fa fa-spinner fa-pulse fa-5x"></i></div>
+        </center>
+        <div class="panel-group panel-kandidat" id="accordion">
+            <div class="panel panel-default" ng-show="kandidat.provinsi.length > 0" >
+                <div class="panel-heading" data-toggle="collapse" data-target="#provinsiToggle">
+                    <h4 class="text-muted">Provinsi <span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span></h4>
+                </div>
+                <div id="provinsiToggle" class="panel-collapse collapse in">
+                    <div class="panel-body">
+                        <div  class="row kandidat" ng-repeat="wilayah_i in kandidat.provinsi" >
+                            <div class="col-md-4 col-lg-3" ng-repeat="kandidat_i in wilayah_i.kandidat| orderBy:'urut'" style="padding:20px;">
+                                <div class="boxkandidat" ng-click="showkandidat(wilayah_i, kandidat_i)">
+                                    <i class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true" style="font-size:18px;color:rgba(0,122,255,1);padding-top:22px;padding-right: 15px;"></i>
+                                    <h3>{{kandidat_i.nama}}<span>{{kandidat_i.urut}}</span></h3>
+                                    <div class="text-center">
+                                        <small>No urut</small>
+                                        <span>ID Peserta: {{kandidat_i.kpu_id_peserta}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default" ng-show="kandidat['kabupaten-kota'].length > 0" >
+                <div class="panel-heading" data-toggle="collapse" data-target="#kabkotaToggle">
+                    <h4 class="text-muted">Kabupaten/ Kota <span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span></h4>
+                </div>
+                <div id="kabkotaToggle" class="panel-collapse collapse" >
+                    <div class="panel-body">
+                        <div class="row kandidat" ng-repeat="wilayah_i in kandidat['kabupaten-kota']| orderBy:'nama'">
+                            <h4 class="text-primary" data-toggle="collapse" data-target="#kabkotaiToggle{{wilayah_i.kpuid}}" style="border-bottom: 1px solid #ddd;">{{wilayah_i.nama}} <span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span></h4>
+                            <div id="kabkotaiToggle{{wilayah_i.kpuid}}" class="collapse" style="border-bottom: 1px solid #ddd;">
+                                <div class="row"  style="padding:20px;">
+                                    <div class="col-md-4 col-lg-3" ng-repeat="kandidat_i in wilayah_i.kandidat| orderBy:'urut'" >
+                                        <div class="boxkandidat" ng-click="showkandidat(wilayah_i, kandidat_i)">
+                                            <i class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true" style="font-size:18px;color:rgba(0,122,255,1);padding-top:22px;padding-right: 15px;"></i>
+                                            <h3>{{kandidat_i.nama}}<span>{{kandidat_i.urut}}</span></h3>
+                                            <div class="text-center">
+                                                <small>No urut</small>
+                                                <span>ID Peserta: {{kandidat_i.kpu_id_peserta}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-success  text-center" role="alert" style="margin-top: 10px;font-size: 16px;">
+            Ikuti terus informasi tentang fitur-fitur yang akan segera kami release di <a href="https://www.facebook.com/kawalpilkada" target="fb" class="btn btn-primary btn-sm" style='margin-top:5px;'><i class="fa fa-facebook-square"></i> Facebook Page Kawal Pilkada</a> atau <a href="https://twitter.com/kawalpilkada" target="twit" class="btn btn-info btn-sm" style='margin-top:5px;'><i class="fa fa-twitter-square"></i> Twitter @kawalpilkada</a>.
+            <br><br>Anda tertarik untuk <strong>mendaftar jadi relawan</strong>, sila buka <a href="https://www.kawalpilkada.id/#/user-profile.html">Form Pendaftaran</a>
+        </div>
+    </div>
+
+    <div ng-show="!showmain">
+        <center>
+            <div ng-show="detailload"><i class="fa fa-spinner fa-pulse fa-5x"></i></div>
+            <div ng-show="!detailload" class="kandidat">
+                <div class="thumbnail" >
+                    <img ng-src="{{kandidatSelected.img_url}}" alt="{{kandidatSelected.nama}}">
+                    <div class="caption">
+                        <h3 style="cursor: default;">{{kandidatSelected.nama}}</h3>
+                        <p><strong>No Urut:</strong> {{kandidatSelected.urut}}</p>
+                        <p><strong>ID KPU:</strong> {{kandidatSelected.kpu_id_peserta}}</p>
+                        <p><strong>JENIS DUKUNGAN:</strong> {{kandidatSelected["kandidatJSON"][7]}}</p>
+                        <p><strong>PARTAI PENDUKUNG:</strong> {{kandidatSelected["kandidatJSON"][8]}}</p>
+                        <h3 ng-show='kandidatSelected["kandidatJSON"][9].length > 0'><a ng-href='{{kandidatSelected["kandidatJSON"][9]}}' target="kpu">Laporan Awal Dana Kampanye <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></a></h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12"><div ng-bind-html='kandidatSelected["kandidatHTML"]'></div></div>
+                </div>
+            </div>
+        </center>
+        <div class="alert alert-success  text-center" role="alert" style="margin-top: 10px;font-size: 16px;">
+            Ikuti terus informasi tentang fitur-fitur yang akan segera kami release di <a href="https://www.facebook.com/kawalpilkada" target="fb" class="btn btn-primary btn-sm" style='margin-top:5px;'><i class="fa fa-facebook-square"></i> Facebook Page Kawal Pilkada</a> atau <a href="https://twitter.com/kawalpilkada" target="twit" class="btn btn-info btn-sm" style='margin-top:5px;'><i class="fa fa-twitter-square"></i> Twitter @kawalpilkada</a>.
+            <br><br>Anda tertarik untuk <strong>mendaftar jadi relawan</strong>, sila buka <a href="https://www.kawalpilkada.id/#/user-profile.html">Form Pendaftaran</a>
+        </div>
+    </div>
+
+</div>

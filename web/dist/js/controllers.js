@@ -1,4 +1,4 @@
-var $kpuurl = "https://scanc1.kpu.go.id/viewp.php";
+var $kpuurl = "http://scanc1.kpu.go.id/viewp.php";
 var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
 (function() {
     var app = angular.module('controllers', []);
@@ -13,7 +13,8 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
             },
             link: function compile(scope, element, attrs, controller) {
                 scope.$watch('ngModel', function(value) {
-                    element.html($autolinker.link(value));
+                    if (typeof value !== "undefined" && value !== null && value.length > 0)
+                        element.html($autolinker.link(value.replace(/(?:\r\n|\r|\n)/g, '<br/>')));
                 });
             }
         };
@@ -21,10 +22,17 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
     app.controller('tabulasiController', ['$scope', '$http', '$KawalService', '$window', function($scope, $http, $KawalService, $window) {
             this.numberDecimal = 4;
             this.KandidatWilayah0 = "";
+            this.setTooltip = function() {
+                try {
+                    $('[data-toggle="tooltip"]').tooltip();
+                } catch (e) {
+                }
+            }
             this.login = function(url) {
                 var rurl = encodeURIComponent(window.location.hash.substr(1));
                 $KawalService.openPopupLogin($http, url + rurl + "&tahun=" + $scope.$parent.$parent.tahun, $scope.$parent.$parent, $window)
             };
+            this.jumlahTotalKandidat = 0;
             this.roundToTwo = function(num, a) {
                 return $KawalService.roundToTwo(num, a);
             };
@@ -32,11 +40,22 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 return $KawalService.setpercent(a, b);
             };
             var context = this;
-            this.save1 = function(dataSuara, type, $index) {
-                $KawalService.submitSuara($http, $scope, dataSuara, type, $index);
+            this.save1 = function($event, dataSuara, type, $index) {
+                var target = $($event.target);
+                var orignalHtml = target.html();
+                target.html('<i class="fa fa-spinner fa-pulse"></i>');
+                var callback = function() {
+                    target.html(orignalHtml);
+                }
+                $KawalService.submitSuara($http, $scope, dataSuara, type, $index, callback);
             };
-            this.save = function(dataSuara, type, $index) {
-                $KawalService.itemyangsedangdiproses.setTabulasi(true);
+            this.save = function($event, dataSuara, type, $index) {
+                var target = $($event.target);
+                var orignalHtml = target.html();
+                target.html('<i class="fa fa-spinner fa-pulse"></i>');
+                var callback = function() {
+                    target.html(orignalHtml);
+                }
                 if (type === "HC") {
                     dataSuara["errorAlertsHC"] = [];
                     dataSuara["sedangdisaveHC"] = true;
@@ -55,14 +74,15 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                         dataSuara["errorAlertsHC"].push('Suara Tidak Sah tidak boleh kosong');
                     }
                     if (dataSuara["errorAlertsHC"].length > 0) {
-                        $KawalService.itemyangsedangdiproses.setTabulasi(false);
+                        callback();
                         dataSuara["sedangdisaveHC"] = false;
                         return;
                     }
+
                     if (dataSuara["tps_file"].length === 0) {
-                        $KawalService.getUrlFileSuaraTPS($http, $scope, dataSuara, "save/" + type + "/withimage", $index);
+                        $KawalService.getUrlFileSuaraTPS($http, $scope, dataSuara, "save/" + type + "/withimage", $index, callback);
                     } else {
-                        $KawalService.submitSuara($http, $scope, dataSuara, "save/" + type + "/noimage", $index);
+                        $KawalService.submitSuara($http, $scope, dataSuara, "save/" + type + "/noimage", $index, callback);
                     }
                 } else {
                     dataSuara["errorAlerts"] = [];
@@ -80,35 +100,36 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                             dataSuara["errorAlerts"].push('Suara Tidak Sah tidak boleh kosong');
                         }
                         if (dataSuara["errorAlerts"].length > 0) {
-                            $KawalService.itemyangsedangdiproses.setTabulasi(false);
+                            callback();
                             dataSuara["sedangdisave"] = false;
                             return;
                         }
                     }
-                    $KawalService.submitSuara($http, $scope, dataSuara, "save/" + type, $index);
+                    $KawalService.submitSuara($http, $scope, dataSuara, "save/" + type, $index, callback);
                 }
             };
             this.photoChange = function(selected) {
                 var id = parseInt(selected.id.replace("photo", ""));
-                var dataSuara = context.DataSuarasTPS[id];
-                dataSuara.photos = selected.files;
-                for (var i = 0, f; f = dataSuara.photos[i]; i++) {
+                for (var i = 0, f; f = selected.files[i]; i++) {
                     if (!f.type.match('image.*')) {
                         continue;
                     }
-                    var reader = new FileReader();
-                    reader.onload = (function(theFile) {
-                        return function(e) {
-                            $scope.$apply(function() {
-                                dataSuara.photosrc = e.target.result;
-                                dataSuara.showPhoto = true;
-                                dataSuara.errorAlerts = [];
-                                dataSuara.tps_file = [];
-                                context.initDivImg("HC" + id);
-                            });
-                        };
-                    })(f);
-                    reader.readAsDataURL(f);
+                    $scope.$apply(function(scope) {
+                        scope.tabulasiCtrl.DataSuarasTPS[id].photos.push(f)
+                        var reader = new FileReader();
+                        reader.onload = (function(theFile) {
+                            return function(e) {
+                                $scope.$apply(function(scope) {
+                                    scope.tabulasiCtrl.DataSuarasTPS[id].photosrc = e.target.result;
+                                    scope.tabulasiCtrl.DataSuarasTPS[id].showPhoto = true;
+                                    scope.tabulasiCtrl.DataSuarasTPS[id].errorAlerts = [];
+                                    scope.tabulasiCtrl.DataSuarasTPS[id].tps_file = [];
+                                    scope.tabulasiCtrl.initDivImg("HC" + id);
+                                });
+                            };
+                        })(f);
+                        reader.readAsDataURL(f);
+                    });
                 }
             };
             this.controlWilayahs = [
@@ -220,6 +241,13 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                     dataSuara["color"] = "pink";
                 }
             }
+            this.countKandidat = function() {
+                context.jumlahTotalKandidat = 0;
+                angular.forEach(context.KandidatWilayahs, function(kandidatWilayah, key) {
+                    context.jumlahTotalKandidat = context.jumlahTotalKandidat + kandidatWilayah.kandidat.length;
+                });
+
+            }
             this.init = function(tabulasiCtrl, dataSuara, $index) {
                 var parents = dataSuara.key.raw.name.split("#");
                 function pad(num, size) {
@@ -246,6 +274,12 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 dataSuara["files"] = [];
                 dataSuara["TotalsuaraTPS"] = 0;
                 dataSuara["TotalsuaraC1"] = 0;
+                try {
+                    if (!isNaN(dataSuara["nama"])) {
+                        dataSuara["nama"] = parseInt(dataSuara["nama"])
+                    }
+                } catch (e) {
+                }
                 if (dataSuara.statusHC === "N") {
                     dataSuara["statusHCDesc"] = "Belum diisi atau diperbaiki";
                 } else
@@ -325,6 +359,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 if (hashs[0] !== "tabulasi.html" && hashs[0] !== "dashboard.html") {
                     return;
                 }
+                context.jumlahTotalKandidat = 0;
                 context.tingkat = hashs[1];
                 context.KandidatWilayahs = [];
                 context.DataSuaras = [];
@@ -340,7 +375,26 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                     $scope.$parent.$parent.tahun = hashs[2];
                 }
                 $KawalService.itemyangsedangdiproses.setTabulasi(true);
-                if (hashs.length > 3) {
+                var search = false;
+                if (hashs.length === 4) {
+                    if (isNaN(hashs[hashs.length - 1])) {
+                        search = true;
+                        context.KandidatWilayah0 = hashs[hashs.length - 1];
+                        context.KandidatWilayah0 = context.KandidatWilayah0.replace(new RegExp('-', 'g'), ' ')
+                    }
+                }
+                if (hashs.length > 4) {
+                    if (isNaN(hashs[3])) {
+                        var text = hashs[3];
+                        var texthash = window.location.hash;
+                        texthash = texthash.replace(new RegExp('/' + text, 'g'), '')
+                        search = false;
+                        context.KandidatWilayah0 = "";
+                        $KawalService.handleHash(texthash.substr(1), $scope);
+                        hashs = window.location.hash.substr(2).split("/");
+                    }
+                }
+                if (hashs.length > 3 && (!search)) {
                     for (var i = context.controlWilayahs.length + 2; i < hashs.length; i++) {
                         var parentId = hashs[i - 1];
                         if (context.controlWilayahs.length === 1) {
@@ -411,6 +465,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                                     if (data.length > 0) {
                                         context.blmadaData = false;
                                         context.KandidatWilayahs = data;
+                                        context.countKandidat();
                                     }
                                 }
                                 $KawalService.itemyangsedangdiproses.setTabulasi(false);
@@ -427,8 +482,64 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 context.getData();
             });
         }]);
+    app.controller('crowddataController', ['$scope', '$http', '$KawalService', '$window', function($scope, $http, $KawalService, $window) {
+            var context = this;
+            this.crowdatas = [];
+            this.KandidatWilayah0 = "";
+            this.updatedata = function($event, $index, val, crowdata) {
+                var target = $($event.target);
+                var orignalHtml = target.html();
+                target.html('<i class="fa fa-spinner fa-pulse"></i>');
+                var hashs = window.location.hash.substr(2).split("/");
+                $http.post('/kandidat/update-profil-crowd/' + hashs[2] + '/' + hashs[1] + '/' + crowdata.kpu_paslon_id + '/' + val, []).
+                        success(function(data, status, headers, config) {
+                            context.crowdatas[$index] = data[0];
+                            $("#collapse" + context.crowdatas[$index].kpu_paslon_id).addClass("in");
+                            target.html(orignalHtml);
+                        }).
+                        error(function(data, status, headers, config) {
+                            target.html(orignalHtml);
+                        });
+            }
+            this.getData = function() {
+                context.crowdatas = [];
+                $KawalService.itemyangsedangdiproses.setTabulasi(true);
+                var hashs = window.location.hash.substr(2).split("/");
+                if (hashs.length < 2) {
+                    if (typeof $scope.$parent.$parent.tingkat === "undefined" || $scope.$parent.$parent.tingkat === "") {
+                        $scope.$parent.$parent.tingkat = "Provinsi";
+                    }
+                    hashs.push($scope.$parent.$parent.tingkat)
+                    $KawalService.handleHash("/" + hashs[0] + "/" + $scope.$parent.$parent.tingkat + "/" + $scope.$parent.$parent.tahun, $scope);
+                }
+                if (hashs.length < 3) {
+                    $KawalService.handleHash("/" + hashs[0] + "/" + hashs[1] + "/" + $scope.$parent.$parent.tahun, $scope);
+                }
+                $http.get('/kandidat/get-profil-crowd/' + hashs[2] + '/' + hashs[1]).
+                        success(function(data, status, headers, config) {
+                            if (data.length > 0) {
+                                data = data[0]
+                                context.crowdatas = data;
+                            }
+                            $KawalService.itemyangsedangdiproses.setTabulasi(false);
+                        }).
+                        error(function(data, status, headers, config) {
+
+                        });
+            };
+            $KawalService.sendToGa();
+            $scope.$watch(function() {
+                return window.location.hash;
+            }, function(value) {
+                context.getData();
+            });
+        }]);
     app.controller('profilKandidatController', ['$scope', '$http', '$KawalService', '$sce', function($scope, $http, $KawalService, $sce) {
             this.kandidat = $KawalService.getSelectedKandidat();
+            this.props = {
+                target: '_blank',
+                class: 'myLink'
+            };
             this.url = location.href;
             this.kandidatJSON = $KawalService.getSelectedKandidat();
             this.showSumber = false;
@@ -440,7 +551,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 context.dataCari[$index].title = $sce.trustAsHtml(context.dataCari[$index].title);
                 context.dataCari[$index].titleNoFormatting = $sce.trustAsHtml(context.dataCari[$index].titleNoFormatting);
                 context.dataCari[$index].content = $sce.trustAsHtml(context.dataCari[$index].content);
-            }
+            };
             this.getFromJSON = function() {
                 context.dataCari = [];
                 context.moreResult = {}
@@ -453,25 +564,26 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                                 context.kandidatHTML = $sce.trustAsHtml(data[1].substr(0, data[1].length - 10).replace(new RegExp('href="/', 'g'), 'href="http://infopilkada.kpu.go.id/'));
                                 var callback = function(data) {
                                     try {
-                                    var datax = data[0];
-                                    context.moreResult = data[1];
-                                    for (var i = 0; i < datax.length; i++) {
-                                        var found=false;
-                                        for (var ii = 0; ii < context.dataCari.length; ii++) {
-                                            var tempCurrent=context.dataCari[ii];
-                                            if (tempCurrent.url===datax[i].url){
-                                                found=true;
+                                        var datax = data[0];
+                                        context.moreResult = data[1];
+                                        for (var i = 0; i < datax.length; i++) {
+                                            var found = false;
+                                            for (var ii = 0; ii < context.dataCari.length; ii++) {
+                                                var tempCurrent = context.dataCari[ii];
+                                                if (tempCurrent.url === datax[i].url) {
+                                                    found = true;
+                                                }
+                                            }
+                                            if (datax[i].visibleUrl !== 'infopilkada.kpu.go.id'
+                                                    && datax[i].visibleUrl.indexOf("blogspot.com") < 0
+                                                    && datax[i].visibleUrl.indexOf("facebook.com") < 0
+                                                    && datax[i].url.indexOf("www.tribunnews.com/tag/") < 0
+                                                    && (!found)) {
+                                                context.dataCari.push(datax[i]);
                                             }
                                         }
-                                        if (datax[i].visibleUrl !== 'infopilkada.kpu.go.id' 
-                                                && datax[i].visibleUrl.indexOf("blogspot.com")<0
-                                                && datax[i].visibleUrl.indexOf("facebook.com")<0 
-                                                && datax[i].url.indexOf("www.tribunnews.com/tag/")<0 
-                                                && (!found)) {
-                                            context.dataCari.push(datax[i]);
-                                        }
+                                    } catch (e) {
                                     }
-                                }catch(e){}
                                 }
                                 $KawalService.getSentimentAnalysis($http, 0, context.kandidatJSON[1] + " " + context.kandidatJSON[4] + " pilkada " + context.wilayah.nama, callback);
                                 $KawalService.getSentimentAnalysis($http, 4, context.kandidatJSON[1] + " " + context.kandidatJSON[4] + " pilkada " + context.wilayah.nama, callback);
@@ -511,7 +623,117 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                         error(function(data, status, headers, config) {
 
                         });
-            }
+            };
+            this.CrowdProfilData = {};
+            this.CrowdProfilDataTemp = {};
+            this.crowdEdit = false;
+            this.setcrowdEdit = function(val) {
+                context.getFromCrowd(val);
+            };
+            this.errorMsgNotAuthorize = "";
+            this.getFromCrowd = function(edit) {
+                if (typeof edit === "undefined") {
+                    edit = false;
+                }
+                context.CrowdProfilData = {};
+                context.errorMsgNotAuthorize = "";
+                var hashs = window.location.hash.substr(2).split("/");
+                var crowddata = {"nama": "",
+                    "SD": "",
+                    "SMP": "",
+                    "SMA": "",
+                    "S1": "",
+                    "S2": "",
+                    "S3": "",
+                    "Karir_Politik_Birokrasi": "",
+                    "Jejak_Bisnis": "",
+                    "Jejaring_Keluarga": "",
+                    "Aktivitas_Sosial": "",
+                    "Prestasi_Karya": "",
+                    "Riwayat_Kasus": ""};
+                context.CrowdProfilData["ketua"] = $.extend({}, crowddata);
+                context.CrowdProfilData["wakil"] = $.extend({}, crowddata);
+                context.CrowdProfilData["main"] = {validated: "N", kpuid: hashs[3], nama: hashs[4], kpu_paslon_id: context.kandidat.kpu_id_peserta, parentkpuid: context.wilayah.parentkpuid, parentNama: context.wilayah.parentNama, visi: "", misi: "", program_pendidikan: "", program_hukum: "", program_ekonomi: "", dana_kampanye: ""};
+                $KawalService.itemyangsedangdiproses.setKandidat(true);
+                $http.get('/kandidat/get-profil-crowd-single/' + hashs[1] + '/' + hashs[2] + '/' + context.kandidat.kpu_id_peserta).
+                        success(function(data, status, headers, config) {
+                            try {
+                                if (data.length > 0) {
+                                    data = data[0];
+                                    if (data.length > 0) {
+                                        data = data[0];
+                                        if (data.validated === "Y" || (data.validated === "N" && $scope.$parent.$parent.user.logged) || (data.validated === "P" && $scope.$parent.$parent.user.uid === data.diupdate_id) || $scope.$parent.$parent.user.userlevel > 5000) {
+                                            context.CrowdProfilData = data;
+                                            context.CrowdProfilData["ketua"] = $.extend({}, data.profil.ketua);
+                                            context.CrowdProfilData["wakil"] = $.extend({}, data.profil.wakil);
+                                            context.CrowdProfilData["main"] = {validated: data.validated, kpuid: data.kpuid, nama: data.nama, kpu_paslon_id: data.kpu_id_peserta, parentkpuid: data.parentkpuid, parentNama: data.parentNama, visi: data.visi, misi: data.misi, program_pendidikan: data.program_pendidikan, program_hukum: data.program_hukum, program_ekonomi: data.program_ekonomi, dana_kampanye: data.dana_kampanye};
+                                            if (data.validated === "P") {
+                                                context.crowdEdit = edit;
+                                            }
+                                        } else {
+                                            if (data.validated === "P") {
+                                                context.errorMsgNotAuthorize = "Data sudah diisi dan sedang direview.";
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    context.crowdEdit = edit;
+                                }
+
+                            } catch (e) {
+                            }
+
+                            $KawalService.itemyangsedangdiproses.setKandidat(false);
+                        }).
+                        error(function(data, status, headers, config) {
+
+                        });
+            };
+            this.showBtnEdit = function(user) {
+                try {
+                    return (!context.crowdEdit) && ((context.CrowdProfilData['main'].validated === 'N' && user.logged) || (context.CrowdProfilData['main'].validated === 'P' && user.uid === context.CrowdProfilData.diupdate_id) || $scope.$parent.$parent.user.userlevel > 5000);
+                } catch (e) {
+                    return false;
+                }
+            };
+            this.saveit = function($event) {
+                context.setValArray("ketua");
+                context.setValArray("wakil");
+                var target = $($event.target);
+                var orignalHtml = target.html();
+                target.html('<i class="fa fa-spinner fa-pulse"></i>');
+                var hashs = window.location.hash.substr(2).split("/");
+                $http.post('/kandidat/post-profil-crowd/' + hashs[1] + '/' + hashs[2] + '/' + context.kandidat.kpu_id_peserta, context.CrowdProfilData).
+                        success(function(data, status, headers, config) {
+                            data = data[0];
+                            context.CrowdProfilData = data;
+                            context.CrowdProfilData["ketua"] = $.extend({}, data.profil.ketua);
+                            context.CrowdProfilData["wakil"] = $.extend({}, data.profil.wakil);
+                            context.CrowdProfilData["main"] = {validated: data.validated, kpuid: data.kpuid, nama: data.nama, kpu_paslon_id: data.kpu_id_peserta, parentkpuid: data.parentkpuid, parentNama: data.parentNama, visi: data.visi, misi: data.misi, program_pendidikan: data.program_pendidikan, program_hukum: data.program_hukum, program_ekonomi: data.program_ekonomi, dana_kampanye: data.dana_kampanye};
+                            target.html(orignalHtml);
+                            context.crowdEdit = false;
+                        }).
+                        error(function(data, status, headers, config) {
+                            target.html(orignalHtml);
+                        });
+
+            };
+            this.setValArray = function(attribute) {
+                context.CrowdProfilData[attribute + "Array"] = [];
+                context.CrowdProfilData[attribute + "Array"].push(context.CrowdProfilData[attribute ].nama);
+                context.CrowdProfilData[attribute + "Array"].push(context.CrowdProfilData[attribute ].SD);
+                context.CrowdProfilData[attribute + "Array"].push(context.CrowdProfilData[attribute ].SMP);
+                context.CrowdProfilData[attribute + "Array"].push(context.CrowdProfilData[attribute ].SMA);
+                context.CrowdProfilData[attribute + "Array"].push(context.CrowdProfilData[attribute ].S1);
+                context.CrowdProfilData[attribute + "Array"].push(context.CrowdProfilData[attribute ].S2);
+                context.CrowdProfilData[attribute + "Array"].push(context.CrowdProfilData[attribute ].S3);
+                context.CrowdProfilData[attribute + "Array"].push(context.CrowdProfilData[attribute ].Karir_Politik_Birokrasi);
+                context.CrowdProfilData[attribute + "Array"].push(context.CrowdProfilData[attribute ].Jejak_Bisnis);
+                context.CrowdProfilData[attribute + "Array"].push(context.CrowdProfilData[attribute ].Jejaring_Keluarga);
+                context.CrowdProfilData[attribute + "Array"].push(context.CrowdProfilData[attribute ].Aktivitas_Sosial);
+                context.CrowdProfilData[attribute + "Array"].push(context.CrowdProfilData[attribute ].Prestasi_Karya);
+                context.CrowdProfilData[attribute + "Array"].push(context.CrowdProfilData[attribute ].Riwayat_Kasus);
+            };
             this.getData = function() {
                 var test = 0;
                 try {
@@ -532,6 +754,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                                             if ($KawalService.replaceSpecial(value.nama, '-') === hashs[6]) {
                                                 context.kandidat = value;
                                                 context.getFromJSON();
+                                                context.getFromCrowd();
                                             }
                                         });
                                     }
@@ -543,6 +766,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                             });
                 } else {
                     context.getFromJSON();
+                    context.getFromCrowd();
                 }
             };
             $KawalService.sendToGa();
@@ -849,7 +1073,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
             }
             this.photos = [];
             this.files = [];
-            this.dosubmit = function(user, selected) {
+            this.dosubmit = function($event, user, selected) {
                 selected.errorAlerts = [];
                 selected.successAlerts = [];
                 if (selected.kandidat.nama.replace(" ", "") === "") {
@@ -882,8 +1106,14 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 } else {
                     selected.kandidat.tingkatId = selected.kandidat.provinsiId;
                 }
-                selected.submitShow = false;
-                $KawalService.getUrlFileKandidat($http, $scope);
+                var target = $($event.target);
+                var orignalHtml = target.html();
+                target.html('<i class="fa fa-spinner fa-pulse"></i>');
+                var callback = function() {
+                    target.html(orignalHtml);
+                }
+                $KawalService.getUrlFileKandidat($http, $scope, callback);
+                return false;
             }
             this.setProvinsi = function(selected) {
                 this.kandidat.provinsiId = selected.kpuid;
@@ -1009,10 +1239,10 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 $KawalService.sendToGa();
             };
             /*this.setTahun = function(selected) {
-                $scope.$parent.$parent.tahun = selected.tahun;
-                var hashs = window.location.hash.substr(2).split("/");
-                $KawalService.handleHash(hashs[0] + "/" + selected.tahun + "/0", $scope.$parent.$parent);
-            };*/
+             $scope.$parent.$parent.tahun = selected.tahun;
+             var hashs = window.location.hash.substr(2).split("/");
+             $KawalService.handleHash(hashs[0] + "/" + selected.tahun + "/0", $scope.$parent.$parent);
+             };*/
             this.getChild = function(wilayah) {
                 if (wilayah.tingkat === "TPS") {
                     return;
@@ -1069,7 +1299,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
             });
         }]);
     app.controller('dashboardController', ['$scope', '$http', '$KawalService', function($scope, $http, $KawalService) {
-            
+
             this.setHash = function() {
                 if (window.location.hash.substr(window.location.hash.length - 1) === "/") {
                     window.location.hash = window.location.hash.substr(0, window.location.hash.length - 1);
@@ -1118,6 +1348,10 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
             this.searchWilayah1 = "";
             this.searchWilayah0 = "";
             var context = this;
+            this.verifikasi = function() {
+                $scope.$parent.$parent.selectedTemplate.pathmodal = "/pages/verifikasi.html";
+                $('#myModal').modal();
+            }
             $('.dropdown-menu').click(function(event) {
                 var target = $(event.target);
                 if (target.is("input") || target.is("i") || target.is("label") || target.is("div")) {
@@ -1181,7 +1415,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 $scope.$parent.$parent.user.desa = desa.nama;
                 $scope.$parent.$parent.user.desaId = desa.kpuid;
             }
-            this.dosubmit = function(user, selected) {
+            this.dosubmit = function($event, user, selected) {
                 selected.errorAlerts = [];
                 selected.successAlerts = [];
                 if (user.email.replace(" ", "") === "") {
@@ -1192,40 +1426,43 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                     selected.errorAlerts.push({"text": "Silahakan Isi No Kontak Anda"});
                     return;
                 }
-                if (("" + user.userlevel).length < 0) {
-                    selected.errorAlerts.push({"text": "Silahakan Pilih 'Bersedia menjadi Relawan untuk'"});
-                    return;
-                }
-                if (user.provinsi.replace(" ", "") === "") {
-                    selected.errorAlerts.push({"text": "Silahakan Pilih Provinsi Anda"});
-                    return;
-                }
-                if (user.kabkota.replace(" ", "") === "") {
-                    selected.errorAlerts.push({"text": "Silahakan Pilih Kabupaten / Kota Anda"});
-                    return;
-                }
-                if (user.kecamatan.replace(" ", "") === "") {
-                    selected.errorAlerts.push({"text": "Silahakan Pilih Kecamatan Anda"});
-                    return;
-                }
-                if (user.desa.replace(" ", "") === "") {
-                    selected.errorAlerts.push({"text": "Silahakan Pilih Kelurahan / Desa Anda"});
-                    return;
-                }
+                /*if (("" + user.userlevel).length < 0) {
+                 selected.errorAlerts.push({"text": "Silahakan Pilih 'Bersedia menjadi Relawan untuk'"});
+                 return;
+                 }
+                 if (user.provinsi.replace(" ", "") === "") {
+                 selected.errorAlerts.push({"text": "Silahakan Pilih Provinsi Anda"});
+                 return;
+                 }
+                 if (user.kabkota.replace(" ", "") === "") {
+                 selected.errorAlerts.push({"text": "Silahakan Pilih Kabupaten / Kota Anda"});
+                 return;
+                 }
+                 if (user.kecamatan.replace(" ", "") === "") {
+                 selected.errorAlerts.push({"text": "Silahakan Pilih Kecamatan Anda"});
+                 return;
+                 }
+                 if (user.desa.replace(" ", "") === "") {
+                 selected.errorAlerts.push({"text": "Silahakan Pilih Kelurahan / Desa Anda"});
+                 return;
+                 }*/
 
-                selected.submitShow = false;
-                $KawalService.itemyangsedangdiproses.setUser(true);
+                //selected.submitShow = false;
+                var target = $($event.target);
+                var orignalHtml = target.html();
+                target.html('<i class="fa fa-spinner fa-pulse"></i>');
                 $http.post('/getModelData?form_action=updateUser', user).
                         success(function(data, status, headers, config) {
                             user = data.user;
                             selected.submitShow = true;
                             selected.successAlerts.push({"text": "Perubahan Data sudah berhasil disimpan, terima kasih atas kerjasamanya."});
-                            $KawalService.itemyangsedangdiproses.setUser(false);
+                            target.html(orignalHtml);
                         }).
                         error(function(data, status, headers, config) {
                             selected.submitShow = true;
+                            target.html(orignalHtml);
                         });
-
+                return false;
             };
             this.reset = function() {
                 location.reload();
@@ -1253,10 +1490,10 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
             this.sosial = "";
             this.submitShow = true;
             this.close = function(page) {
-                $scope.$parent.selectedTemplate.hash = page;
-                $KawalService.handleHash(page.substr(1), $scope.$parent);
+                $scope.$parent.$parent.selectedTemplate.hash = page;
+                $KawalService.handleHash(page.substr(1), $scope.$parent.$parent);
             }
-            switch ($scope.$parent.user.type) {
+            switch ($scope.$parent.$parent.user.type) {
                 case "fb":
                     this.sosial = "Facebook";
                     break;
@@ -1290,7 +1527,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                             if (getFloat(data.status) > 60) {
                                 context.successAlerts.push({"text": "VERIFIKASI BERHASIL"});
                                 context.successAlerts.push({"text": context.verifiaksi.NAMA + " memiliki " + data.status + "% kecocokan dengan nama di " + context.sosial + " Anda yaitu: " + $scope.user.nama});
-                                $KawalService.setloged($http, data.user, "", $scope);
+                                $KawalService.setloged($http, data.user, "", $scope.$parent.$parent);
                                 $scope.selectedTemplate.closeModal = "/pages/closeModal.html";
                             } else if (getFloat(data.status) >= 0 && getFloat(data.status) <= 60) {
                                 context.errorAlerts.push({"text": context.verifiaksi.NAMA + " memiliki " + data.status + "% kecocokan dengan nama di " + context.sosial + " Anda yaitu: " + $scope.user.nama});

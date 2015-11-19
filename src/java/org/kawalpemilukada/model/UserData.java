@@ -16,11 +16,13 @@ import org.kawalpemilukada.web.controller.CommonServices;
 public class UserData {
 
     @Id public String uid;
+    public String uuid = "";
     public String imgurl = "";
     public String nama = "";
-    public String link = "";
+    @Index public String link = "";
     public String nokontak = "";
-    public String email = "";
+    public String notps = "";
+    @Index public String email = "";
     public String provinsi = "";
     public String provinsiId = "";
     public String kabkota = "";

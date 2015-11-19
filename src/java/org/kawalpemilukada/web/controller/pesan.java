@@ -125,7 +125,7 @@ public class pesan extends HttpServlet {
         } else if (type.equalsIgnoreCase("POST")) {
             try {
                 UserData user = CommonServices.getUser(request);
-                if (user.uid.toString().length() > 0 && user.terverifikasi.equalsIgnoreCase("Y")) {
+                if (user.uid.toString().length() > 0) {
                     String key = input.get(0).toString();
                     String parentId = input.get(10).toString();
 

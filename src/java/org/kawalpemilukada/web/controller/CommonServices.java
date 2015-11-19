@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -41,6 +42,7 @@ import org.json.simple.parser.JSONParser;
 import org.kawalpemilukada.model.Dashboard;
 import org.kawalpemilukada.model.DataSuara;
 import org.kawalpemilukada.model.KandidatWilayah;
+import org.kawalpemilukada.model.MobileSession;
 import org.kawalpemilukada.model.Pesan;
 import org.kawalpemilukada.model.StringKey;
 import org.kawalpemilukada.model.SuaraKandidat;
@@ -84,8 +86,90 @@ public class CommonServices {
             Properties prop = new Properties();
             prop.load(request.getSession().getServletContext().getResourceAsStream("/WEB-INF/" + propFileName));
             result = prop.getProperty(property);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         return result;
+    }
+
+    public static String getWeb(String endpoint) throws IOException {
+        String output = "";
+        URL url;
+        try {
+            url = new URL(endpoint);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("invalid url: " + endpoint);
+        }
+        String body = "";
+        HttpURLConnection conn = null;
+        try {
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setUseCaches(false);
+            conn.setFixedLengthStreamingMode(body.getBytes().length);
+            conn.setRequestMethod("GET");
+            conn.connect();
+            // handle the response
+            int status = conn.getResponseCode();
+            if (status != 200) {
+                //System.out.println("Post failed with error code " + status);
+            } else {
+                try {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder sb1 = new StringBuilder();
+                    String read = br.readLine();
+                    while (read != null) {
+                        sb1.append(read);
+                        read = br.readLine();
+                    }
+                    output = sb1.toString();
+
+                } catch (Exception e) {
+                    //System.out.println(" e.getMessage(): " + e.getMessage());
+                }
+            }
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        return output;
+    }
+
+    public static LinkedHashMap getJsonNik(String inputx) {
+        LinkedHashMap records = new LinkedHashMap();
+        String input = inputx.substring(inputx.indexOf("<span class=\"label\">NIK:</span>"));
+        input = input.substring(0, input.indexOf("<div class=\"fboxfooter\">") - 1);
+        String notps = inputx.substring(inputx.indexOf("<b>No. TPS</b>") + "<b>No. TPS</b>".length());
+        notps = notps.substring(0, notps.indexOf("</tr>"));
+        notps = notps.substring(notps.indexOf("<td style=\"width:70%;\">") + "<td style=\"width:70%;\">".length());
+        notps = notps.substring(0, notps.indexOf("</td>"));
+        records.put("no_tps", notps);
+        String[] data = input.split("<div class=\"form\">");
+        for (int i = 0; i < data.length; i++) {
+            try {
+                String attr = data[i].substring(data[i].indexOf(">") + 1);
+                attr = attr.substring(0, attr.indexOf(":"));
+                attr = attr.replace("/", "-");
+                attr = attr.toLowerCase();
+                String value = data[i].substring(data[i].indexOf("<span class=\"field\">") + "<span class=\"field\">".length());
+                value = value.substring(0, value.indexOf("</"));
+                value = value.replace("`", "'");
+                records.put(attr, value);
+            } catch (Exception e) {
+            }
+        }
+        try {
+            String arg = records.get("kelurahan").toString().replaceAll(" ", "+");
+            arg = arg + ",+" + records.get("kecamatan").toString().replaceAll(" ", "+");
+            arg = arg + ",+" + records.get("kabupaten-kota").toString().replaceAll(" ", "+");
+            arg = arg + ",+" + records.get("provinsi").toString().replaceAll(" ", "+") + ",+Indonesia";
+            String latlong = getWeb("http://maps.google.com/maps/api/geocode/json?sensor=false&address=" + arg);
+            JSONObject obj0 = (JSONObject) JSONValue.parse(latlong);
+            records.put("position", obj0);
+        } catch (Exception e) {
+        }
+        return records;
     }
 
     public static void addPoinToUser(UserData user, int point) {
@@ -511,6 +595,7 @@ public class CommonServices {
         //https://code.google.com/p/getStartCursor-appengine/wiki/Queries#Cursor_Example
         return query;
     }
+
     public static int countPesan(String key) {
         Key<StringKey> dashKey = Key.create(StringKey.class, key);
         QueryKeys<Pesan> query = ofy().load().type(Pesan.class).ancestor(dashKey).keys();
@@ -523,6 +608,19 @@ public class CommonServices {
             JSONObject user = (JSONObject) request.getSession().getAttribute("UserData");
             if (user != null && user.get("uid").toString().length() > 0) {
                 userData = ofy().load().type(UserData.class).id(user.get("uid").toString()).now();
+            } else {
+                String id = (String) request.getParameter("id");
+                String useruuid = (String) request.getParameter("useruuid");
+                String uuid = (String) request.getParameter("uuid");
+
+                if (id != null && useruuid != null && uuid != null) {
+                    if (uuid.length() > 0) {
+                        MobileSession mobileSession = ofy().load().type(MobileSession.class).id(id + "#" + useruuid).now();
+                        if (uuid.equalsIgnoreCase(mobileSession.uuid)) {
+                            userData = ofy().load().type(UserData.class).id(id).now();
+                        }
+                    }
+                }
             }
         } catch (Exception e) {
         }
@@ -554,12 +652,14 @@ public class CommonServices {
         return query.list().size();
 
     }
+
     public static int getKandidatSize() {
         QueryKeys<KandidatWilayah> query = ofy()
                 .load()
                 .type(KandidatWilayah.class).keys();
         return query.list().size();
     }
+
     public static int getPesanSize() {
         QueryKeys<Pesan> query = ofy()
                 .load()
@@ -572,7 +672,11 @@ public class CommonServices {
         try {
             retval = u.toString();
         } catch (Exception ee) {
-            retval = (String) u;
+            try {
+                retval = u + "";
+            } catch (Exception eee) {
+                retval = (String) u;
+            }
         }
         if (u == null) {
             retval = "";
@@ -633,6 +737,7 @@ public class CommonServices {
         //Time in JakartaTime
         return dateFormatLocal.parse(dateFormatGmt.format(new Date()));
     }
+
     public static Date JakartaTime(Date date) throws ParseException {
         SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
         dateFormatGmt.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));

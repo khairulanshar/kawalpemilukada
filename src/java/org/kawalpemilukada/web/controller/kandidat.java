@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -24,6 +25,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
+import org.kawalpemilukada.model.CrowdProfilData;
 import org.kawalpemilukada.model.Dashboard;
 import org.kawalpemilukada.model.KandidatWilayah;
 import org.kawalpemilukada.model.StringKey;
@@ -89,11 +91,12 @@ public class kandidat extends HttpServlet {
                         kandidatWilayah.addkandidat(input.get("nama").toString(), input.get("img_url").toString(), Integer.parseInt(input.get("urut").toString()), input.get("kpu_id_peserta").toString());
                         ofy().save().entity(kandidatWilayah).now();
                         Dashboard dashboard = CommonServices.getDashboard(CommonServices.setParentId("2015", "0"));
-                        dashboard.kandidat=CommonServices.getKandidatSize()+"";
+                        dashboard.kandidat = CommonServices.getKandidatSize() + "";
                         ofy().save().entity(dashboard).now();
                         returnVal.add(JSONValue.parse(gson.toJson(kandidatWilayah)));
                     }
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             } else if (method.equalsIgnoreCase("single")) {
                 String tingkatId = filters[3];
                 Key<StringKey> parentKey = Key.create(StringKey.class, CommonServices.setParentId(tahun, tingkat));
@@ -112,48 +115,154 @@ public class kandidat extends HttpServlet {
                 Object obj = parser.parse(new FileReader("dist/data/" + tingkat + ".json"));
                 JSONObject jsonObject = (JSONObject) obj;
                 JSONArray infoKandidat = (JSONArray) jsonObject.get(tingkatId + "");
+                Object obj1 = parser.parse(new FileReader("dist/data/danakampanye.json"));
+                JSONObject jsonObject1 = (JSONObject) obj1;
+                String urldanakampanye = (String) jsonObject1.get(tingkatId + "");
+                infoKandidat.add(urldanakampanye);
                 returnVal.add(infoKandidat);
-                HttpURLConnection conn = null;
-                URL url;
-                try {
-                    String infokpu = "http://infopilkada.kpu.go.id/index.php?r=Dashboard/viewdetilparpol&id=";
-                    if (!infoKandidat.get(7).toString().equalsIgnoreCase("PARPOL")) {
-                        infokpu = "http://infopilkada.kpu.go.id/index.php?r=Dashboard/viewdetilorang&id=";
-                    }
-                    url = new URL(infokpu + tingkatId);
-                    conn = (HttpURLConnection) url.openConnection();
-                    conn.setDoOutput(true);
-                    conn.setUseCaches(false);
-                    conn.setDoInput(true);
-                    conn.setRequestMethod("GET");
-                    conn.connect();
-                    // handle the response
-                    int status = conn.getResponseCode();
-                    if (status != 200) {
-                    } else {
-                        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                        StringBuilder sb1 = new StringBuilder();
-                        String read = br.readLine();
-                        while (read != null) {
-                            sb1.append(read);
-                            read = br.readLine();
+                if (tingkat.equalsIgnoreCase("dataKandidat")) {
+                    HttpURLConnection conn = null;
+                    URL url;
+                    try {
+                        String infokpu = "http://infopilkada.kpu.go.id/index.php?r=Dashboard/viewdetilparpol&id=";
+                        if (!infoKandidat.get(7).toString().equalsIgnoreCase("PARPOL")) {
+                            infokpu = "http://infopilkada.kpu.go.id/index.php?r=Dashboard/viewdetilorang&id=";
                         }
-                        String text = sb1.toString();
-                        if (infoKandidat.get(7).toString().equalsIgnoreCase("PARPOL")) {
-                            text = text.substring(text.indexOf("<h1>Data Paslon Dukungan Partai Politik"));
-                            text = text.substring(0, text.indexOf("<b>PARTAI PENDUKUNG :</b>"));
+                        url = new URL(infokpu + tingkatId);
+                        conn = (HttpURLConnection) url.openConnection();
+                        conn.setDoOutput(true);
+                        conn.setUseCaches(false);
+                        conn.setDoInput(true);
+                        conn.setRequestMethod("GET");
+                        conn.connect();
+                        // handle the response
+                        int status = conn.getResponseCode();
+                        if (status != 200) {
                         } else {
-                            text = text.substring(text.indexOf("<h1>Data Paslon Dukungan Perorangan"));
-                            text = text.substring(0, text.indexOf("<div id=\"edit-form\"")-1);
+                            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                            StringBuilder sb1 = new StringBuilder();
+                            String read = br.readLine();
+                            while (read != null) {
+                                sb1.append(read);
+                                read = br.readLine();
+                            }
+                            String text = sb1.toString();
+                            if (infoKandidat.get(7).toString().equalsIgnoreCase("PARPOL")) {
+                                text = text.substring(text.indexOf("<h1>Data Paslon Dukungan Partai Politik"));
+                                text = text.substring(0, text.indexOf("<b>PARTAI PENDUKUNG :</b>"));
+                            } else {
+                                text = text.substring(text.indexOf("<h1>Data Paslon Dukungan Perorangan"));
+                                text = text.substring(0, text.indexOf("<div id=\"edit-form\"") - 1);
+                            }
+                            returnVal.add(text);
                         }
-                        returnVal.add(text);
+                    } catch (Exception e) {
+
+                    } finally {
+                        if (conn != null) {
+                            conn.disconnect();
+                        }
+                    }
+                }
+            } else if (method.equalsIgnoreCase("update-profil-crowd")) {
+                try {
+                    UserData user = CommonServices.getUser(request);
+                    if (user.uid.toString().length() > 0 && user.userlevel >= 1000) {
+                        String kpu_paslon_id = filters[3];
+                        Key<StringKey> parentKey = Key.create(StringKey.class, CommonServices.setParentId(tahun, tingkat));
+                        Key<CrowdProfilData> keyWithParent = Key.create(parentKey, CrowdProfilData.class, kpu_paslon_id);
+                        List<CrowdProfilData> crowdProfilDatas = ofy().load().type(CrowdProfilData.class).ancestor(keyWithParent).list();
+
+                        CrowdProfilData crowddata = crowdProfilDatas.get(0);
+                        crowddata.direview_date = CommonServices.JakartaTime();
+                        crowddata.direview_id = user.uid;
+                        crowddata.direview_img = user.imgurl;
+                        crowddata.direview_link = user.link;
+                        crowddata.direview_nama = user.nama;
+                        crowddata.validated = filters[4];
+                        ofy().save().entity(crowddata).now();
+                        returnVal.add(JSONValue.parse(gson.toJson(crowddata)));
                     }
                 } catch (Exception e) {
-                    
-                } finally {
-                    if (conn != null) {
-                        conn.disconnect();
+                }
+            } else if (method.equalsIgnoreCase("get-profil-crowd")) {
+                Key<StringKey> parentKey = Key.create(StringKey.class, CommonServices.setParentId(tahun, tingkat));
+                List<CrowdProfilData> crowdProfilDatas = ofy().load().type(CrowdProfilData.class).ancestor(parentKey).list();
+                returnVal.add(JSONValue.parse(gson.toJson(crowdProfilDatas)));
+            } else if (method.equalsIgnoreCase("get-profil-crowd-single")) {
+
+                String kpu_paslon_id = filters[3];
+                Key<StringKey> parentKey = Key.create(StringKey.class, CommonServices.setParentId(tahun, tingkat));
+                Key<CrowdProfilData> keyWithParent = Key.create(parentKey, CrowdProfilData.class, kpu_paslon_id);
+                List<CrowdProfilData> crowdProfilDatas = ofy().load().type(CrowdProfilData.class).ancestor(keyWithParent).list();
+                try {
+                    if (!crowdProfilDatas.isEmpty()) {
+                        CrowdProfilData crowddata = crowdProfilDatas.get(0);
+                        if (crowddata.validated.equalsIgnoreCase("Y")) {
+                            returnVal.add(JSONValue.parse(gson.toJson(crowdProfilDatas)));
+                        } else if (crowddata.validated.equalsIgnoreCase("P")) {
+                            returnVal.add(JSONValue.parse(gson.toJson(crowdProfilDatas)));
+                        }
                     }
+                } catch (Exception e) {
+                }
+            } else if (method.equalsIgnoreCase("post-profil-crowd")) {
+                try {
+                    UserData user = CommonServices.getUser(request);
+                    if (user.uid.toString().length() > 0) {
+                        StringBuilder sb = new StringBuilder();
+                        String line = null;
+                        BufferedReader reader = request.getReader();
+                        while ((line = reader.readLine()) != null) {
+                            sb.append(line);
+                        }
+                        JSONObject input = (JSONObject) JSONValue.parse(sb.toString());
+                        String kpu_paslon_id = filters[3];
+                        Key<StringKey> parentKey = Key.create(StringKey.class, CommonServices.setParentId(tahun, tingkat));
+                        Key<CrowdProfilData> keyWithParent = Key.create(parentKey, CrowdProfilData.class, kpu_paslon_id);
+                        List<CrowdProfilData> crowdProfilDatas = ofy().load().type(CrowdProfilData.class).ancestor(keyWithParent).list();
+                        CrowdProfilData crowddata = null;
+                        if (crowdProfilDatas.isEmpty()) {
+                            crowddata = new CrowdProfilData(tahun, tingkat, kpu_paslon_id);
+                        } else {
+                            crowddata = crowdProfilDatas.get(0);
+                        }
+                        if (crowddata.validated.equalsIgnoreCase("N") || (crowddata.validated.equalsIgnoreCase("P") && crowddata.diupdate_id.equalsIgnoreCase(user.uid))) {
+                            crowddata.diupdate_date = CommonServices.JakartaTime();
+                            crowddata.diupdate_id = user.uid;
+                            crowddata.diupdate_img = user.imgurl;
+                            crowddata.diupdate_link = user.link;
+                            crowddata.diupdate_nama = user.nama;
+                            crowddata.validated = "P";
+                            JSONObject maindata = (JSONObject) input.get("main");
+                            crowddata.kpuid = maindata.get("kpuid").toString();
+                            crowddata.nama = maindata.get("nama").toString();
+                            crowddata.parentkpuid = maindata.get("parentkpuid").toString();
+                            crowddata.parentNama = maindata.get("parentNama").toString();
+                            
+                            crowddata.visi = maindata.get("visi").toString();
+                            crowddata.misi = maindata.get("misi").toString();
+                            crowddata.program_pendidikan = maindata.get("program_pendidikan").toString();
+                            crowddata.program_hukum = maindata.get("program_hukum").toString();
+                            crowddata.program_ekonomi = maindata.get("program_ekonomi").toString();
+                            crowddata.dana_kampanye = maindata.get("dana_kampanye").toString();
+                            JSONArray ketua = (JSONArray) input.get("ketuaArray");
+                            ArrayList<String> listdata = new ArrayList<String>();
+                            for (int i = 0; i < ketua.size(); i++) {
+                                listdata.add(ketua.get(i).toString());
+                            }
+                            crowddata.addProfil("ketua", listdata);
+                            JSONArray wakil = (JSONArray) input.get("wakilArray");
+                            ArrayList<String> listdatawakil = new ArrayList<String>();
+                            for (int i = 0; i < wakil.size(); i++) {
+                                listdatawakil.add(wakil.get(i).toString());
+                            }
+                            crowddata.addProfil("wakil", listdatawakil);
+                            ofy().save().entity(crowddata).now();
+                        }
+                        returnVal.add(JSONValue.parse(gson.toJson(crowddata)));
+                    }
+                } catch (Exception e) {
                 }
             } else if (method.equalsIgnoreCase("post-profil")) {
                 String tingkatId = filters[3];
@@ -182,14 +291,21 @@ public class kandidat extends HttpServlet {
                          ofy().save().entity(profil).now();
                          kandidats.add(JSONValue.parse(gson.toJson(profil)));*/
                     }
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             } else {
                 if (filters.length < 4) {
                     List<KandidatWilayah> kandidatWilayahs = CommonServices.filterKandidatWilayah(tahun, tingkat, "", "");
                     returnVal.add(JSONValue.parse(gson.toJson(kandidatWilayahs)));
+                } else {
+                    String fileterby = filters[3];
+                    String fileter = filters[4];
+                    List<KandidatWilayah> kandidatWilayahs = CommonServices.filterKandidatWilayah(tahun, tingkat, fileterby, fileter);
+                    returnVal.add(JSONValue.parse(gson.toJson(kandidatWilayahs)));
                 }
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         PrintWriter out = response.getWriter();
         response.setContentType("text/html;charset=UTF-8");
         out.print(JSONValue.toJSONString(returnVal));

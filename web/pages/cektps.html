@@ -1,0 +1,36 @@
+<div ng-controller="cektpsController as cektpsCtrl">
+    <center >
+        <div class="form-group">
+            <div class="input-group">
+                <input type="number" class="form-control input-lg" ng-model="kawal.niksaya" placeholder="Masukan NIK Anda">
+                <span class="input-group-btn">
+                    <button class="btn btn-default no-border-btn" type="button" ng-click="clear()"><span class="glyphicon glyphicon-remove-circle text-muted fa-2x" aria-hidden="true"></span></button>
+                </span>
+            </div><!-- /input-group -->
+        </div>
+        <button type="button" id="caritpsBtn" class="btn btn-primary btn-lg" value="Verfikasi" ng-click="caritps()" style="width:100%;margin-bottom: 20px;"><i class="fa fa-check"></i> Cari TPS saya</button>
+    </center>
+    <div class="row" ng-show="imgurlsaya.length > 0">
+        <div class="col-md-12">
+            <div class="thumbnail">
+                <div class="caption text-center">
+                    <h3>NIK: {{datanik.nik}}</h3>
+                    <h3>Nama: {{datanik.nama}}</h3>
+                    <h3>TPS No: {{datanik.no_tps}}</h3>
+                </div>
+                <div class="text-right text-muted"><b>Sumber</b>: <a target="infopilkada" href="http://data.kpu.go.id/dps2015.php">DPS 2015</a></div>
+                <img ng-src="{{imgurlsaya}}">
+                <div class="caption text-center">
+                    <h4><b>Desa</b>: {{datanik.kelurahan}}</h4>
+                    <h4><b>Kecamatan</b>: {{datanik.kecamatan}}</h4>
+                    <h4><b>Kabupaten/ Kota</b>: {{datanik["kabupaten-kota"]}}</h4>
+                    <h4><b>Provinsi</b>: {{datanik.provinsi}}</h4>
+                </div>
+            </div>
+            <div class="alert alert-success  text-center" role="alert" style="margin-top: 10px;font-size: 16px;">
+                Ikuti terus informasi tentang fitur-fitur yang akan segera kami release di <a href="https://www.facebook.com/kawalpilkada" target="fb" class="btn btn-primary btn-sm" style='margin-top:5px;'><i class="fa fa-facebook-square"></i> Facebook Page Kawal Pilkada</a> atau <a href="https://twitter.com/kawalpilkada" target="twit" class="btn btn-info btn-sm" style='margin-top:5px;'><i class="fa fa-twitter-square"></i> Twitter @kawalpilkada</a>.
+                <br><br>Anda tertarik untuk <strong>mendaftar jadi relawan</strong>, sila buka <a href="https://www.kawalpilkada.id/#/user-profile.html">Form Pendaftaran</a>
+            </div>
+        </div>
+    </div>
+</div>

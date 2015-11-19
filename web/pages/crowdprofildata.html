@@ -1,0 +1,98 @@
+<div ng-controller="crowddataController as crowddataCtrl">
+    <div class="row" >
+        <div class="col-md-12 text-left">
+            <div  class="pull-right" style="width:270px">
+                <div class="form-group" ng-include="selectedTemplate.tahun"></div>
+                <div class="form-group">
+                    <div class="dropdown dropdown-display">
+                        <div class="dropdown-toggle" data-toggle="dropdown">
+                            <b>Kepala Daerah Tingkat</b>: {{tingkat}}  <i class="fa fa-caret-down"></i>
+                        </div>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="javascript:" ng-click="setTingkat('Provinsi')">Provinsi</a>
+                            </li>
+                            <li>
+                                <a href="javascript:" ng-click="setTingkat('Kabupaten-Kota')">Kabupaten/ Kota</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="input-group custom-search-form">
+                    <label class="fa fa-search"></label>
+                    <input type="text" ng-model="crowddataCtrl.KandidatWilayah0" placeholder="Cari Wilayah">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="padding-top:30px">
+        <div class="panel-group" id="accordion">
+            <div class="panel panel-default" ng-repeat="crowdata in crowddataCtrl.crowdatas| orderBy :'parentNama' | filter:crowddataCtrl.KandidatWilayah0">
+                <div class="panel-heading" data-parent="#accordion" data-toggle="collapse" data-target="#collapse{{crowdata.kpu_paslon_id}}" style="cursor: pointer;color:rgba(0,122,255,1);">
+                    <h4 class="panel-title">
+                        {{crowdata.nama}}&nbsp;[Nama Pasangan Calon:&nbsp;{{crowdata.profil["ketua"].nama}}&nbsp;-&nbsp;{{crowdata.profil["wakil"].nama}}]<i class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></i>
+                    </h4>
+                </div>
+                <div id="collapse{{crowdata.kpu_paslon_id}}" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="highlight">
+                                    <span class="cp">Parent Wilayah:</span><span class="nt">{{crowdata.parentNama}}</span>
+                                    <br><span class="cp">Nama Wilayah:</span><span class="nt">{{crowdata.nama}}</span>
+                                    <br><span class="cp">ID Peserta:</span><span class="nt">{{crowdata.kpu_paslon_id}}</span>
+                                    <br><span class="cp">Nama Pasangan Calon:</span><span class="nt">{{crowdata.profil["ketua"].nama}}&nbsp;-&nbsp;{{crowdata.profil["wakil"].nama}}</span>
+                                    <br><span class="cp">Status</span><span class="nt">{{crowdata.validated}}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="highlight">
+                                    <span class="cp">Diisi Oleh:</span><a ng-href="{{crowdata.diupdate_link}}" target="user"><img class="img-circle" ng-src="{{crowdata.diupdate_img}}" alt="{{crowdata.diupdate_nama}}" width="40" height="40" style="margin-left:5px"><span class="nt">{{crowdata.diupdate_nama}}</span></a>
+                                    <br><span class="cp">Diisi tanggal:</span><span class="nt">{{crowdata.diupdate_date}}</span>
+                                </div>
+                                <div class="highlight">
+                                    <span class="cp">Direview Oleh:</span><a ng-href="{{crowdata.direview_link}}" target="user" ng-show="crowdata.direview_link.length > 0"><img class="img-circle" ng-src="{{crowdata.direview_img}}" alt="{{crowdata.direview_nama}}" width="40" height="40" style="margin-left:5px"><span class="nt">{{crowdata.diupdate_nama}}</span></a>
+                                    <br><span class="cp">Direview tanggal:</span><span class="nt">{{crowdata.direview_date}}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="highlight">
+                                    <a href="javascript:" class="btn btn-primary btn-block" role="button" ng-click="crowddataCtrl.updatedata($event, $index, 'Y', crowdata)">Approve</a>
+                                    <a href="javascript:" class="btn btn-warning btn-block" role="button" ng-click="crowddataCtrl.updatedata($event, $index, 'N', crowdata)">Open for All to Edit</a>
+                                    <a href="javascript:" class="btn btn-success btn-block" role="button" ng-click="crowddataCtrl.updatedata($event, $index, 'P', crowdata)">Edit</a>
+                                    <a href="javascript:" class="btn btn-danger btn-block" role="button" ng-click="crowddataCtrl.updatedata($event, $index, 'D', crowdata)">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="detail-view table table-striped table-bordered">
+                            <tbody>
+                                <tr><td style="border-top:1px solid white;border-left:1px solid white;background-color: white;">&nbsp;</td><th>{{crowdata.profil["ketua"].nama}}</th><th>{{crowdata.profil["wakil"].nama}}</th></tr>
+                                <tr class="even"><td colspan="3"><h4>Riwayat Pendidikan:</h4></td></tr>
+                                <tr class="odd"><th>SD</th><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["ketua"].SD'></p></td><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["wakil"].SD'></p></td></tr>
+                                <tr class="even"><th>SMP</th><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["ketua"].SMP'></p></td><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["wakil"].SMP'></p></td></tr>
+                                <tr class="odd"><th>SMA</th><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["ketua"].SMA'></p></td><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["wakil"].SMA'></p></td></tr>
+                                <tr class="even"><th>Diploma / Sarjana (S1)</th><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["ketua"].S1'></p></td><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["wakil"].S1'></p></td></tr>
+                                <tr class="odd"><th>Pascasarjana (S2)</th><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["ketua"].S2'></p></td><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["wakil"].S2'></p></td></tr>
+                                <tr class="even"><th>Doktor (S3)</th><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["ketua"].S3'></p></td><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["wakil"].S3'></p></td></tr>
+                                <tr class="odd"><th><h4>Jejak Karir Politik / Birokrasi:</h4>
+                            Contoh:
+                            <br>2000 - 2003 Ketua DPW Partai X
+                            <br>2003 - 2005 Caleg DPRD Partai X
+                            <br>2005 - 2009 Anggota DPRD</th><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["ketua"].Karir_Politik_Birokrasi'></p></td><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["wakil"].Karir_Politik_Birokrasi'></p></td></tr>
+                            <tr class="odd"><th><h4>Jejak Bisnis:</h4></th><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["ketua"].Jejak_Bisnis'></p></td><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["wakil"].Jejak_Bisnis'></p></td></tr>
+                            <tr class="odd"><th><h4>Riwayat Kasus Kriminal:</h4></th><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["ketua"].Riwayat_Kasus'></p></td><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["wakil"].Riwayat_Kasus'></p></td></tr>
+                            <tr class="odd"><th><h4>Jejaring Keluarga di Pemerintahan:</h4></th><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["ketua"].Jejaring_Keluarga'></p></td><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["wakil"].Jejaring_Keluarga'></p></td></tr>
+                            <tr class="odd"><th><h4>Aktivitas Sosial:</h4></th><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["ketua"].Aktivitas_Sosial'></p></td><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["wakil"].Aktivitas_Sosial'></p></td></tr>
+                            <tr class="odd"><th><h4>Prestasi:</h4></th><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["ketua"].Prestasi_Karya'></p></td><td><p parse-url="crowddataCtrl.props" ng-model='crowdata.profil["wakil"].Prestasi_Karya'></p></td></tr>
+                            </tbody>  
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>

@@ -7,18 +7,18 @@
             controller: function($scope, $http, $KawalService) {
 
                 $KawalService.cekauth($http, $scope);
-                this.setPage = function(page) {
-                    if (!$scope.user.logged) {
-                        return;
+                
+                
+                $(window).bind("load resize", function() {
+                    var width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
+                    if (width >= 768) {
+                        try {
+                            if ($("#myMenu").hasClass("in")) {
+                                $("#myMenu").offcanvas('hide');
+                            }
+                        } catch (e) {
+                        }
                     }
-                    page=page+'/'+$scope.tahun+'/'+$scope.user.provinsiId+'/'+$scope.user.kabkotaId+'/'+$scope.user.kecamatanId+'/'+$scope.user.desaId;
-                    $scope.selectedTemplate.hash = page;
-                    $KawalService.handleHash(page.substr(1), $scope);
-                };
-                $("#menuBtn").click(function() {
-                    $("#navsidebar").show();
-                    $("#pagewrapper").attr("style", "");
-                    $("#menuBtn").hide();
                 });
             },
             controllerAs: "mainHeader"
