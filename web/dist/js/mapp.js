@@ -25,13 +25,7 @@
             } catch (e) {
                 $scope.version = '1';
             }
-            if ($scope.version !== "1.0.1") {
-                $scope.forceupdate = true;
-                try {
-                    $("#centerversi").show();
-                } catch (e) {
-                }
-            }
+            $("#centerversi").show();
             $scope.showmainpage = function() {
                 $scope.showmain = true;
             }

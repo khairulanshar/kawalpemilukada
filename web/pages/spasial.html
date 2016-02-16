@@ -1,0 +1,94 @@
+<div ng-controller="spasialController as spasialCtrl" infinite-scroll="loadMore()">
+    <div class="header-page">
+        <div class="row" style="margin-bottom: 5px;">
+            <div class="dropdown-div"ng-include="selectedTemplate.tahun"></div>
+            <div class="dropdown-div">
+                <div class="dropdown">
+                    <div class="dropdown-toggle" data-toggle="dropdown">
+                        <span>Pilkada Tingkat</span>: {{tingkat}}  <i class="fa fa-caret-down"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="javascript:" ng-click="setTingkat('Provinsi')">Provinsi</a>
+                        </li>
+                        <li>
+                            <a href="javascript:" ng-click="setTingkat('Kabupaten-Kota')">Kabupaten/ Kota</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="dropdown-div">
+                <div class="dropdown">
+                    <div class="dropdown-toggle" data-toggle="dropdown">
+                        <span>Informasi yang ingin ditampilkan</span>: {{spasialCtrl.report}}  <i class="fa fa-caret-down"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="reporti in spasialCtrl.reports">
+                            <a href="javascript:" ng-click="spasialCtrl.setReport(reporti)">{{reporti.text}}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+        <div class="row" style="margin-bottom: 5px;" ng-show="spasialCtrl.report == 'Koalisi Pemenang Pilkada'">
+            <div class="dropdown-div" >
+                <div class="dropdown">
+                    <div class="dropdown-toggle" data-toggle="dropdown">
+                        <span>Kandidat yang didukung oleh</span>: {{spasialCtrl.partai.text}} <span ng-show="spasialCtrl.partai.text.length>0">menang di {{spasialCtrl.partai.menang}} wilayah</span> <i class="fa fa-caret-down"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="partai in spasialCtrl.partais| orderBy :'text'">
+                            <a href="javascript:" ng-click="spasialCtrl.setPartai(partai)">{{partai.text}} menang di {{partai.menang}} wilayah &nbsp;|&nbsp;
+                                <div style="width: 20px;display: inline-block;border:1px solid #0843D5;background-color:rgb({{partai.color.r}},{{partai.color.g}},{{partai.color.b}})">&nbsp;</div></a>
+                        </li>
+                    </ul>
+                </div>
+                &nbsp;|&nbsp;
+                <div style="cursor: default;width: 20px;display: inline-block;border:1px solid #0843D5;background-color:rgb({{spasialCtrl.partai.color.r}},{{spasialCtrl.partai.color.g}},{{spasialCtrl.partai.color.b}})">&nbsp;</div>
+            </div>
+            <div class="dropdown-div" ng-show="spasialCtrl.partai.koalisi.length>0">
+                <div class="dropdown">
+                    <div class="dropdown-toggle" data-toggle="dropdown">
+                        <span>Berkoalisi dengan</span>: {{spasialCtrl.koalisi.text}} <span ng-show="spasialCtrl.koalisi.text.length>0">di {{spasialCtrl.koalisi.jumlah}} wilayah</span> <i class="fa fa-caret-down"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="koalisi in spasialCtrl.partai.koalisi| orderBy :'-jumlah'">
+                            <a href="javascript:" ng-click="spasialCtrl.setKoalisi(koalisi)">{{koalisi.text}}  di {{koalisi.jumlah}} wilayah &nbsp;|&nbsp;
+                                <div style="width: 20px;display: inline-block;border:1px solid #0843D5;background-color:rgb({{koalisi.color.r}},{{koalisi.color.g}},{{koalisi.color.b}})">&nbsp;</div></a>
+                        </li>
+                    </ul>
+                </div>
+               &nbsp;|&nbsp;
+                <div style="cursor: default;width: 20px;display: inline-block;border:1px solid #0843D5;background-color:rgb({{spasialCtrl.koalisi.color.r}},{{spasialCtrl.koalisi.color.g}},{{spasialCtrl.koalisi.color.b}})">&nbsp;</div>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-bottom:0px;padding: 20px;background-color: white;">
+        <div id="mapdiv" style="height: 500px;">
+            <div id="popup" class="ol-popup">
+                <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+                <div id="popup-content">
+
+                </div>
+            </div>
+        </div>
+        <center style="padding:15px;" ng-show="spasialCtrl.report != 'Koalisi Pemenang Pilkada' && spasialCtrl.report != 'Kepemimpinan Perempuan'">
+            <div class="text-muted"><b>{{spasialCtrl.report}}</b></div>
+            <div class="row" >
+                <div class="col-md-4" style="vertical-align: middle;text-align: right;margin-top: 5px;">Terkecil: {{spasialCtrl.formatnumber(spasialCtrl.palingkecil[spasialCtrl.reportattribute])}}</div>
+                <div ng-show="spasialCtrl.reporttype === 0" class="col-md-4" style="vertical-align: middle;height:30px;background-image: linear-gradient(-90deg,  white 2%, #F02316 97%);border:1px solid #F02316;"></div>
+                <div ng-show="spasialCtrl.reporttype === 1" class="col-md-4" style="vertical-align: middle;height:30px;background-image: linear-gradient(90deg,  white 2%, #F02316 97%);border:1px solid #F02316;"></div>
+                <div class="col-md-4" style="vertical-align: middle;text-align: left;margin-top: 5px;">Terbesar: {{spasialCtrl.formatnumber(spasialCtrl.palingbesar[spasialCtrl.reportattribute])}}</div>
+            </div>
+        </center>
+
+    </div>
+
+    <div class="footer-page" style="margin-top:0px;">
+        <div class="row" style="padding:20px 0px;">
+            <div><span class="text-muted">Sumber data Jumlah Pemilih diambil dari: </span><a href="https://data.kpu.go.id/dpt2015.php" targe="dpt">DPT 2015</a></div>
+            <div><span class="text-muted">Khusus untuk Kabupaten Buru Selatan diambil dari: </span><a href="https://pilkada2015.kpu.go.id/buruselatankab" targe="pilkada2015">Pilkada 2015</a></div>
+        </div>
+    </div>
+</div>

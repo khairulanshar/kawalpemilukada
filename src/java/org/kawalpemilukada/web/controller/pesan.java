@@ -197,22 +197,26 @@ public class pesan extends HttpServlet {
                             Key<KandidatWilayah> keyWithParent = Key.create(parentKey, KandidatWilayah.class, tingkat + tingkatId);
                             List<KandidatWilayah> kandidatWilayahs = ofy().load().type(KandidatWilayah.class).ancestor(keyWithParent).list();
                             KandidatWilayah k = kandidatWilayahs.get(0);
-                            k.updatekandidat("", "", Integer.parseInt(urut), countpesan, "");
+                            k.updatekandidat("", "", Integer.parseInt(urut), countpesan, "",0,0,0);
                             ofy().save().entity(k).now();
                             records.put("kandidatWilayah", JSONValue.parse(gson.toJson(k)));
                         }
                     }
                     Dashboard dashboard = CommonServices.getDashboard(CommonServices.setParentId("2015", "0"));
-                    dashboard.comments=CommonServices.getPesanSize()+"";
+                    dashboard.comments = CommonServices.getPesanSize() + "";
                     ofy().save().entity(dashboard).now();
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         } else if (type.equalsIgnoreCase("getUrlFile")) {
             records.put("uploadurl", "");
             try {
-                BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
-                String uploadurl = blobstoreService.createUploadUrl("/upload");
-                records.put("uploadurl", uploadurl);
+                UserData user = CommonServices.getUser(request);
+                if (user.uid.toString().length() > 0) {
+                    BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+                    String uploadurl = blobstoreService.createUploadUrl("/upload");
+                    records.put("uploadurl", uploadurl);
+                }
             } catch (Exception e) {
             }
 

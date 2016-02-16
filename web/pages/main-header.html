@@ -1,4 +1,4 @@
-<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="margin-bottom: 0px;border: 0px;">
+an<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="margin-bottom: 0px;border: 0px;">
 
     <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-recalc="false" data-target=".navmenu" data-canvas=".canvas">
@@ -8,7 +8,7 @@
             <span class="icon-bar"></span>
         </button>
         <div class="navbar-brand-div">
-            <a class="navbar-brand" href="javascript:" ng-click="handleHash('/tabulasi.html?Provinsi')"><img src="../dist/img/iconKPILKADA.png" style="height: 50px;display: inline-block;"></a>
+            <a class="navbar-brand" href="javascript:" ng-click="handleHash('/tabulasi.html?Provinsi')"><img src="../dist/img/iconKPILKADA.png" alt="Kawal Pilkada"></a>
         </div>
     </div>
     <ul class="nav navbar-top-links navbar-right">
@@ -42,31 +42,36 @@
     <!-- /.navbar-header -->
         <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
             <ul class="nav navbar-nav">
-                <li ng-class="{active : isSelected2('#/dashboard.html')}" ng-show="user.userlevel > 1000">
-                    <a shref="javascript:" ng-click="setPage('#/dashboard.html?Provinsi')">Dashboard</a>
-                </li>
-                <li ng-class="{active : isSelected2('#/crowdprofildata.html')}" ng-show="user.userlevel > 1000">
-                    <a shref="javascript:" ng-click="setPage('#/crowdprofildata.html')">CrowData </a>
-                </li>
                 <li  ng-class="{active : isSelected('#/user-profile.html')}"><a href="javascript:" ng-click="setPage('#/user-profile.html')">Pendaftaran</a></li>
+                <li  ng-class="{active : isSelected('#/heroes.html')}"><a href="javascript:" ng-click="setPage('#/heroes.html')">Relawan</a></li>
                 <li class="dropdown" ng-class="{active : isSelected2('#/tabulasi.html')}">
-                    <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true">Tabulasi Suara <span class="caret"></span></a>
+                    <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true">Tabulasi Suara & Profil</a>
                     <ul class="dropdown-menu">
-                        <li ng-class="{active : isSelected2('#/tabulasi.html/Provinsi')}"><a href="javascript:"  ng-click="setPage('#/tabulasi.html?Provinsi')">Provinsi</a></li>
-                        <li ng-class="{active : isSelected2('#/tabulasi.html/Kabupaten-Kota')}"><a href="javascript:" ng-click="setPage('#/tabulasi.html?Kabupaten-Kota')" >Kabupaten/ Kota</a></li>
+                        <li ng-class="{active : isSelected2('#/tabulasi.html/Provinsi')}"><a href="javascript:"  ng-click="setPage('#/tabulasi.html?Provinsi')">Kepala Daerah Provinsi</a></li>
+                        <li ng-class="{active : isSelected2('#/tabulasi.html/Kabupaten-Kota')}"><a href="javascript:" ng-click="setPage('#/tabulasi.html?Kabupaten-Kota')" >Kepala Daerah Kabupaten/ Kota</a></li>
                     </ul>
                 </li>
-                <li class="dropdown" ng-class="{active : isSelected2('#/kandidat.html')}" ng-show="user.userlevel > 1000">
-                    <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true">Pasangan Calon <span class="caret"></span></a>
+                <li  ng-class="{active : isSelected('#/spasial.html')}"><a href="javascript:" ng-click="setPage('#/spasial.html')">Analisis Spasial</a></li>
+                
+                <li class="dropdown">
+                    <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" style="font-size:13px;">
+                        <i class="fa fa-circle"></i><i class="fa fa-circle"></i><i class="fa fa-circle"></i>
+                    </a>
                     <ul class="dropdown-menu">
-                        <li ng-class="{active : isSelected2('#/kandidat.html/Provinsi')}"><a href="javascript:"  ng-click="setPage('#/kandidat.html?Provinsi')">Provinsi</a></li>
-                        <li ng-class="{active : isSelected2('#/kandidat.html/Kabupaten-Kota')}"><a href="javascript:" ng-click="setPage('#/kandidat.html?Kabupaten-Kota')" >Kabupaten/ Kota</a></li>
+                        <li><a href="http://bawaslu.go.id/laporan-pelanggaran-pemilu" target="bawaslu" id="bawaslu">Laporkan Pelanggaran</a></li>
+                        <li><a href="javascript:" ng-click="setPage('#/privasi.html')">Privasi</a></li>
+                        <li ng-show="user.userlevel > 1000"><a href="javascript:"  ng-click="setPage('#/kandidat.html?Provinsi')">Setup Pasangan Kandidat Provinsi</a></li>
+                        <li ng-show="user.userlevel > 1000"><a href="javascript:" ng-click="setPage('#/kandidat.html?Kabupaten-Kota')" >Setup Pasangan Kandidat Kabupaten/ Kota</a></li>
+                        <li ng-show="user.userlevel > 1000"><a href="javascript:" ng-click="setPage('#/crowdprofildata.html')">CrowData</a></li>
+                        <li ng-show="user.userlevel > 1000"><a href="javascript:" ng-click="setPage('#/dashboard.html?Provinsi')">Dashboard</a></li>
+                        <li><a href="https://youtu.be/XzO_FEfj3pY?t=6m51s" target="yotb">Tutorial Mengisi Data Suara dari Scan C1 KPU</a></li>
+                        <li><a href="/video-hitungcepat" target="yotb">Tutorial Foto C1 dan Mengisi Data Suara dari TPS</a></li>
+                        <li><a href="/video-kawalpilkada" target="yotb">Tutorial Fitur-fitur Kawal Pilkada</a></li>
+                        <li><a href="/video-isiprofil" target="yotb">Tutorial Isi Data Profil Pasangan Calon</a></li>
                     </ul>
                 </li>
-                <li>
-                    <a href="http://bawaslu.go.id/laporan-pelanggaran-pemilu" target="bawaslu" id="bawaslu">Laporkan Pelanggaran</a>
-                </li>
-                <li  ng-class="{active : isSelected('#/privasi.html')}"><a href="javascript:" ng-click="setPage('#/privasi.html')">Privasi</a></li>
+                
+                
 
             </ul>
 

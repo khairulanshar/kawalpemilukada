@@ -1,0 +1,29 @@
+<div class="header-page text-center">
+    <h2 style="margin:0px;padding-bottom: 30px">Para Relawan</h2>
+</div>
+<div class="container-fluid" style="background-color: white;padding-top: 30px;min-height: 500px;" ng-controller="heroController as heroCtrl" ng-init="heroCtrl.getData()">
+    <div class="row">
+        <div class="col-md-4" ng-repeat="hero in heroCtrl.heros| orderBy :'-poin'">
+            <a href="{{hero.link}}" target="{{hero.type}}" style="text-decoration: none;">
+                <div class="hero">
+                    <span class="img-circle"><img ng-src="{{hero.imgurl}}"></span>
+                    <span class="nama">
+                        <span>{{hero.nama}}</span>
+                        <span class="poin"><span class="text-muted">Poin: </span>{{hero.poin}}</span>
+                    </span>
+                    <i class="fa fa-angle-right pull-right"></i>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="javascript:" style="text-decoration: none;" ng-click="heroCtrl.getData()">
+                <div class="hero">
+                    <center>
+                        <span class="fa fa-refresh"></span>
+                    </center>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="footer-page"></div>

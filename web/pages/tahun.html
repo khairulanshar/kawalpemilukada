@@ -1,16 +1,9 @@
 
-    <div class="dropdown dropdown-display">
+    <div class="dropdown">
         <div class="dropdown-toggle" data-toggle="dropdown" >
-            <b>Pemilu Kepala Daerah Tahun</b>: {{tahun}}<i class="fa fa-caret-down"></i>
+            <span>Pilkada Tahun</span>: {{tahun}}<i class="fa fa-caret-down"></i>
         </div>
         <ul class="dropdown-menu">
-            <li class="row" style="padding:5px;color:#31708f;border:0px;">
-                <div class="alert alert-info" style="color:#31708f;float: none;border-color: #bce8f1;padding:5px;margin-bottom: 3px;cursor: default;">
-                    <span>
-                        <span class="fa fa-info-circle"></span>&nbsp;&nbsp;Pilih Tahun  <b>2014</b> untuk latihan isi data.
-                    </span>
-                </div>
-            </li>
             <li ng-repeat="tahun in $parent.tahuns">
                 <a href="javascript:" ng-click="setTahun(tahun)">{{tahun}}</a>
             </li>

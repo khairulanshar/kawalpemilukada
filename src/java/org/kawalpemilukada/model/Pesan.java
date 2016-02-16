@@ -49,21 +49,18 @@ public class Pesan {
     public String dari_nama;
     public String dari_img;
     public String dari_link;
-    @Index
-    public String untuk_id;
+    @Index public String untuk_id;
     public String untuk_nama;
     public String untuk_img;
     public String untuk_link;
     public String msg;
     public String icon;
-    @Index
-    public Date creationDate;
+    @Index public Date creationDate;
     ArrayList<childPesan> tanggapanPesans;
     ArrayList<childPesan> setujuPesans;
     ArrayList<childPesan> tidakSetujuPesans;
     ArrayList<filePesan> files;
-     @Index
-    public String status;
+    @Index public String status;
 
     public Pesan() throws ParseException {
         this.tanggapanPesans = new ArrayList();

@@ -16,8 +16,8 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 import com.googlecode.objectify.cmd.Query;
 import com.googlecode.objectify.cmd.QueryKeys;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +25,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -57,6 +61,9 @@ public class CommonServices {
 
     public static final String version = "1";
     public static final String delimeter = "#";
+    private static String urlkpuC1 = "http://scanc1.kpu.go.id/viewp.php";
+    private static String urlkpuC1_1_2015 = "http://103.21.228.33/viewc11.php";
+    private static String urlkpuC1_2_2015 = "http://103.21.228.33/viewc12.php";
 
     public static String setParentId(String val1, String val2) {
         return val1 + delimeter + val2 + delimeter + version;
@@ -79,6 +86,74 @@ public class CommonServices {
     public static String tingkat3 = "Kecamatan";
     public static String tingkat4 = "Desa";
     public static String tingkat5 = "TPS";
+
+    public static void getKpuData(DataSuara dataSuara, String kpuid) {
+        try {
+            Map<String, Object> params = new LinkedHashMap<>();
+            params.put("g-recaptcha-response", "");
+            params.put("id_dapil", kpuid);
+            params.put("id_wilayah", dataSuara.kpuid);
+            String result = getWebWithdata("https://pilkada2015.kpu.go.id/rekapitulasi/get_rekapitulasi_suara_c1_by_id_dapil_and_id_wilayah_format_chartjs_json", params);
+            JSONArray input = (JSONArray) JSONValue.parse(result);
+            int sah = 0;
+            for (int i = 0; i < input.size(); ++i) {
+                try {
+                    JSONObject kandidat = (JSONObject) input.get(i);
+                    if (kandidat.get("suara").toString().length() > 0 && (!kandidat.get("suara").toString().equalsIgnoreCase("0"))) {
+                        dataSuara.suaraKandidat.get(kandidat.get("no_urut").toString() + "").suaraKPU = Integer.parseInt(kandidat.get("suara").toString());
+                    }
+                } catch (Exception e) {
+                }
+            }
+            ofy().save().entity(dataSuara).now();
+        } catch (IOException ex) {
+        }
+    }
+
+    public static void getKpuDataTPS(DataSuara dataSuara, String kpuid) {
+        try {
+            Map<String, Object> params = new LinkedHashMap<>();
+            params.put("g-recaptcha-response", "");
+            params.put("id_dapil", kpuid);
+            params.put("id_tps", dataSuara.kpuid);
+            String result = getWebWithdata("https://pilkada2015.kpu.go.id/rekapitulasi/get_rekapitulasi_suara_c1_by_id_dapil_and_id_tps_format_jsapi_json", params);
+            JSONObject jsonObject = (JSONObject) JSONValue.parse(result);
+            JSONArray input = (JSONArray) jsonObject.get("rows");
+            int sah = 0;
+            for (int i = 0; i < input.size(); ++i) {
+                try {
+                    JSONObject row = (JSONObject) input.get(i);
+                    JSONArray c = (JSONArray) row.get("c");
+                    JSONObject c0 = (JSONObject) c.get(0);
+                    String tpsno = c0.get("v").toString();
+                    tpsno = tpsno.replaceAll("No", "");
+                    tpsno = tpsno.replaceAll(" ", "");
+                    JSONObject c1 = (JSONObject) c.get(1);
+                    String suara = c1.get("v").toString();
+                    suara = suara.replaceAll(" ", "");
+                    dataSuara.suaraKandidat.get(tpsno + "").suaraKPU = Integer.parseInt(suara);
+                    if (dataSuara.sudahDiloadDariKawalC1.equalsIgnoreCase("N")
+                            && (!dataSuara.dilock.equalsIgnoreCase("Y"))) {
+                        if (suara.length() > 0 && (!suara.equalsIgnoreCase("0"))) {
+                            dataSuara.suaraKandidat.get(tpsno + "").suaraVerifikasiC1 = Integer.parseInt(suara);
+                        }
+                    }
+                    sah = sah + Integer.parseInt(suara);
+                } catch (Exception e) {
+                    //System.out.println(dataSuara.nama +"==>"+e.getMessage());
+                    sah = 0;
+                }
+            }
+            if (dataSuara.sudahDiloadDariKawalC1.equalsIgnoreCase("N")
+                    && (!dataSuara.dilock.equalsIgnoreCase("Y"))) {
+                if (sah > 0) {
+                    dataSuara.suarasah = sah;
+                }
+                ofy().save().entity(dataSuara).now();
+            }
+        } catch (IOException ex) {
+        }
+    }
 
     public String getPropValues(String propFileName, String property, HttpServletRequest request) throws IOException {
         String result = "";
@@ -112,6 +187,182 @@ public class CommonServices {
             // handle the response
             int status = conn.getResponseCode();
             if (status != 200) {
+                output = "";
+                //System.out.println("Post failed with error code " + status);
+            } else {
+                try {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder sb1 = new StringBuilder();
+                    String read = br.readLine();
+                    while (read != null) {
+                        sb1.append(read);
+                        read = br.readLine();
+                    }
+                    output = sb1.toString();
+
+                } catch (Exception e) {
+                    output = "";
+                    //System.out.println(" e.getMessage(): " + e.getMessage());
+                }
+            }
+        } catch (Exception ee) {
+            output = "";
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        return output;
+    }
+
+    public static String getWebWithJson(String endpoint, String json) throws IOException {
+        String output = "";
+        URL url;
+        try {
+            url = new URL(endpoint);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("invalid url: " + endpoint);
+        }
+
+        HttpURLConnection conn = null;
+        try {
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setUseCaches(false);
+            conn.setFixedLengthStreamingMode(json.getBytes().length);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Authorization", "dob1DSh6nlHBMVhjifLi#40f706d0-16fb-43fb-b186-bf0d9142aa62");
+            conn.getOutputStream().write(json.getBytes());
+            conn.connect();
+            // handle the response
+            int status = conn.getResponseCode();
+            if (status != 200) {
+                //System.out.println("Post failed with error code " + status);
+            } else {
+                try {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder sb1 = new StringBuilder();
+                    String read = br.readLine();
+                    while (read != null) {
+                        sb1.append(read);
+                        read = br.readLine();
+                    }
+                    output = sb1.toString();
+
+                } catch (Exception e) {
+                    //System.out.println(" e.getMessage(): " + e.getMessage());
+                }
+            }
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        return output;
+    }
+
+    public static String getWebWithdata(String endpoint, String nik, String recaptcha) throws IOException {
+        String output = "";
+        URL url;
+        try {
+            url = new URL(endpoint);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("invalid url: " + endpoint);
+        }
+        Map<String, Object> params = new LinkedHashMap<>();
+        params.put("g-recaptcha-response", recaptcha);
+        params.put("cmd", "Cari.");
+        params.put("wilayah_id", "0");
+        params.put("page", "");
+        params.put("nik_global", nik);
+
+        StringBuilder urlParameters = new StringBuilder();
+        for (Map.Entry<String, Object> param : params.entrySet()) {
+            if (urlParameters.length() != 0) {
+                urlParameters.append('&');
+            }
+            urlParameters.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+            urlParameters.append('=');
+            urlParameters.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+        }
+        byte[] postData = urlParameters.toString().getBytes(StandardCharsets.UTF_8);
+        HttpURLConnection conn = null;
+        try {
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setInstanceFollowRedirects(false);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty("charset", "utf-8");
+            conn.setRequestProperty("Content-Length", Integer.toString(postData.length));
+            conn.setUseCaches(false);
+            try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
+                wr.write(postData);
+            }
+            // handle the response
+            int status = conn.getResponseCode();
+            if (status != 200) {
+                //System.out.println("Post failed with error code " + status);
+            } else {
+                try {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder sb1 = new StringBuilder();
+                    String read = br.readLine();
+                    while (read != null) {
+                        sb1.append(read);
+                        read = br.readLine();
+                    }
+                    output = sb1.toString();
+
+                } catch (Exception e) {
+                    //System.out.println(" e.getMessage(): " + e.getMessage());
+                }
+            }
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        return output;
+    }
+
+    public static String getWebWithdata(String endpoint, Map<String, Object> params) throws IOException {
+        String output = "";
+        URL url;
+        try {
+            url = new URL(endpoint);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("invalid url: " + endpoint);
+        }
+
+        StringBuilder urlParameters = new StringBuilder();
+        for (Map.Entry<String, Object> param : params.entrySet()) {
+            if (urlParameters.length() != 0) {
+                urlParameters.append('&');
+            }
+            urlParameters.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+            urlParameters.append('=');
+            urlParameters.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+        }
+        byte[] postData = urlParameters.toString().getBytes(StandardCharsets.UTF_8);
+        HttpURLConnection conn = null;
+        try {
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setInstanceFollowRedirects(false);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty("charset", "utf-8");
+            conn.setRequestProperty("Content-Length", Integer.toString(postData.length));
+            conn.setUseCaches(false);
+            try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
+                wr.write(postData);
+            }
+            // handle the response
+            int status = conn.getResponseCode();
+            if (status != 200) {
                 //System.out.println("Post failed with error code " + status);
             } else {
                 try {
@@ -139,7 +390,7 @@ public class CommonServices {
     public static LinkedHashMap getJsonNik(String inputx) {
         LinkedHashMap records = new LinkedHashMap();
         String input = inputx.substring(inputx.indexOf("<span class=\"label\">NIK:</span>"));
-        input = input.substring(0, input.indexOf("<div class=\"fboxfooter\">") - 1);
+        input = input.substring(0, input.indexOf("<div class=\"fboxfooter\"") - 1);
         String notps = inputx.substring(inputx.indexOf("<b>No. TPS</b>") + "<b>No. TPS</b>".length());
         notps = notps.substring(0, notps.indexOf("</tr>"));
         notps = notps.substring(notps.indexOf("<td style=\"width:70%;\">") + "<td style=\"width:70%;\">".length());
@@ -156,6 +407,21 @@ public class CommonServices {
                 value = value.substring(0, value.indexOf("</"));
                 value = value.replace("`", "'");
                 records.put(attr, value);
+                if (attr.equalsIgnoreCase("provinsi")) {
+                    records.put("pro", value);
+                }
+                if (attr.equalsIgnoreCase("kabupaten-kota")) {
+                    records.put("kab", value);
+                }
+                if (attr.equalsIgnoreCase("kecamatan")) {
+                    records.put("kec", value);
+                }
+                if (attr.equalsIgnoreCase("kelurahan")) {
+                    records.put("kel", value);
+                }
+                if (attr.equalsIgnoreCase("jenis kelamin")) {
+                    records.put("jenis_kelamin", value);
+                }
             } catch (Exception e) {
             }
         }
@@ -175,6 +441,196 @@ public class CommonServices {
     public static void addPoinToUser(UserData user, int point) {
         user.poin = user.poin + 10;
         ofy().save().entity(user).now();
+    }
+
+    public static void agregate(DataSuara dataSuara, String[] urls, String type) {
+        try {
+            String[] names = dataSuara.key.getRaw().getName().split(delimeter);
+            //Provinsi#2015#21050#1
+            //#/tabulasi.html/Provinsi/2015/20802/20923/21050/21051
+            String tingkat = "";
+            String parentKpuid = "";
+            if (dataSuara.tingkat.equals(tingkat5)) {
+                tingkat = tingkat4;
+                parentKpuid = urls[6];
+                if (parentKpuid.equalsIgnoreCase("all")){
+                    parentKpuid =dataSuara.grandparentkpuid;
+                }
+            } else if (dataSuara.tingkat.equals(tingkat4)) {
+                tingkat = tingkat3;
+                parentKpuid = urls[5];
+            } else if (dataSuara.tingkat.equals(tingkat3)) {
+                tingkat = tingkat2;
+                parentKpuid = urls[4];
+            }
+            Key<StringKey> parentKey = Key.create(StringKey.class, setParentId1(names[0], names[1], parentKpuid));
+            Key<DataSuara> keyWithParent = Key.create(parentKey, DataSuara.class, names[0] + delimeter + tingkat + names[2]);
+            DataSuara dataSuaraparent = ofy().load().type(DataSuara.class).ancestor(keyWithParent).first().now();
+            if (!dataSuaraparent.tingkat.equalsIgnoreCase(tingkat5)) {
+                for (Integer temp : dataSuaraparent.uruts) {
+                    dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraTPS = 0;
+                    dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraVerifikasiC1 = 0;
+                }
+                dataSuaraparent.suarasahHC = 0;
+                dataSuaraparent.suaratidaksahHC = 0;
+                dataSuaraparent.jumlahTPSdilockHC = 0;
+                dataSuaraparent.suarasah = 0;
+                dataSuaraparent.suaratidaksah = 0;
+                dataSuaraparent.jumlahTPSdilock = 0;
+                dataSuaraparent.jumlahTPStidakadaC1 = 0;
+                dataSuaraparent.jumlahEntryC1Salah = 0;
+                Key<StringKey> key1 = Key.create(StringKey.class, setParentId1(names[0], names[1], dataSuaraparent.kpuid));
+                List<DataSuara> dataSuaraList = ofy().load().type(DataSuara.class).ancestor(key1).list();
+                for (DataSuara d : dataSuaraList) {
+                    if (d.tingkat.equalsIgnoreCase(tingkat5)) {
+                        if (d.statusHC.equalsIgnoreCase("Y")) {
+                            dataSuaraparent.suarasahHC += d.suarasahHC;
+                            dataSuaraparent.suaratidaksahHC += d.suaratidaksahHC;
+                            dataSuaraparent.jumlahTPSdilockHC += d.jumlahTPSdilockHC;
+                        }
+                        if (d.dilock.equalsIgnoreCase("Y")) {
+                            dataSuaraparent.suarasah += d.suarasah;
+                            dataSuaraparent.suaratidaksah += d.suaratidaksah;
+                            dataSuaraparent.jumlahTPSdilock += d.jumlahTPSdilock;
+                            dataSuaraparent.jumlahTPStidakadaC1 += d.jumlahTPStidakadaC1;
+                            dataSuaraparent.jumlahEntryC1Salah += d.jumlahEntryC1Salah;
+                        }
+                    } else {
+                        dataSuaraparent.suarasahHC += d.suarasahHC;
+                        dataSuaraparent.suaratidaksahHC += d.suaratidaksahHC;
+                        dataSuaraparent.jumlahTPSdilockHC += d.jumlahTPSdilockHC;
+                        dataSuaraparent.suarasah += d.suarasah;
+                        dataSuaraparent.suaratidaksah += d.suaratidaksah;
+                        dataSuaraparent.jumlahTPSdilock += d.jumlahTPSdilock;
+                        dataSuaraparent.jumlahTPStidakadaC1 += d.jumlahTPStidakadaC1;
+                        dataSuaraparent.jumlahEntryC1Salah += d.jumlahEntryC1Salah;
+                    }
+                    for (Integer temp : dataSuaraparent.uruts) {
+                        if (d.tingkat.equalsIgnoreCase(tingkat5)) {
+                            if (d.statusHC.equalsIgnoreCase("Y")) {
+                                dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraTPS += d.suaraKandidat.get(temp.toString() + "").suaraTPS;
+                            }
+                            if (d.dilock.equalsIgnoreCase("Y")) {
+                                dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraVerifikasiC1 += d.suaraKandidat.get(temp.toString() + "").suaraVerifikasiC1;
+                            }
+                        } else {
+                            dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraTPS += d.suaraKandidat.get(temp.toString() + "").suaraTPS;
+                            dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraVerifikasiC1 += d.suaraKandidat.get(temp.toString() + "").suaraVerifikasiC1;
+                        }
+                    }
+                }
+                ofy().save().entity(dataSuaraparent).now();
+                agregate(dataSuaraparent, urls, type);
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    public static void loopUpdateparent2(JSONArray wilayah, DataSuara dataSuaraTPS, String type, JSONObject selected) {
+        String[] s = dataSuaraTPS.id.split(delimeter);
+        String tingkat = s[0];
+        wilayah = new JSONArray();
+        if (tingkat.equalsIgnoreCase(tingkat1)) {
+            JSONObject provinsi = (JSONObject) selected.get("provinsi");
+            String id = provinsi.get("id").toString();
+            provinsi.put("id", setParentId0(tingkat, id));
+            wilayah.add(provinsi);
+        }
+        wilayah.add(selected.get("kabupaten"));
+        wilayah.add(selected.get("kecamatan"));
+        wilayah.add(selected.get("desa"));
+        for (int wilayahi = wilayah.size() - 1; wilayahi > 0; wilayahi--) {
+            JSONObject wilayahj = (JSONObject) wilayah.get(wilayahi);
+            String id = wilayahj.get("id").toString();
+            String tahun = wilayahj.get("tahun").toString();
+            String kpuid = wilayahj.get("kpuid").toString();
+            JSONObject key = (JSONObject) wilayahj.get("key");
+            JSONObject raw = (JSONObject) key.get("raw");
+            Key<StringKey> key0 = Key.create(StringKey.class, raw.get("name").toString());
+            Key<DataSuara> keyWithParent = Key.create(key0, DataSuara.class, id);
+            DataSuara dataSuaraparent = ofy().load().type(DataSuara.class).ancestor(keyWithParent).first().now();
+            Key<StringKey> key1 = Key.create(StringKey.class, setParentId1(tingkat, tahun, kpuid));
+            List<DataSuara> dataSuaraList = ofy().load().type(DataSuara.class).ancestor(key1).list();
+            if (type.equalsIgnoreCase("HC")) {
+                dataSuaraparent.suarasahHC = 0;
+                dataSuaraparent.suaratidaksahHC = 0;
+                dataSuaraparent.jumlahTPSdilockHC = 0;
+            } else {
+                dataSuaraparent.suarasah = 0;
+                dataSuaraparent.suaratidaksah = 0;
+                dataSuaraparent.jumlahTPSdilock = 0;
+                dataSuaraparent.jumlahTPStidakadaC1 = 0;
+                dataSuaraparent.jumlahEntryC1Salah = 0;
+            }
+            /*dataSuaraparent.suarasahKPU = 0;
+             dataSuaraparent.suaratidaksahKPU = 0;
+             dataSuaraparent.jumlahTPSKPU = 0;
+             dataSuaraparent.jumlahTPSKPUTotal = 0;*/
+            for (Integer temp : dataSuaraparent.uruts) {
+                if (type.equalsIgnoreCase("HC")) {
+                    dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraTPS = 0;
+                } else {
+                    dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraVerifikasiC1 = 0;
+                }
+                dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraKPU = 0;
+            }
+            for (DataSuara d : dataSuaraList) {
+                if (!d.tingkat.equalsIgnoreCase(tingkat5)) {
+                    d.statusHC = dataSuaraTPS.statusHC;
+                    d.dilockHC = dataSuaraTPS.dilockHC;
+                    d.dilock = dataSuaraTPS.dilock;
+                }
+                if (type.equalsIgnoreCase("HC") && d.statusHC.equalsIgnoreCase("Y")) {
+                    dataSuaraparent.suarasahHC += d.suarasahHC;
+                    dataSuaraparent.suaratidaksahHC += d.suaratidaksahHC;
+                    dataSuaraparent.jumlahTPSdilockHC += d.jumlahTPSdilockHC;
+                }
+                if ((!type.equalsIgnoreCase("HC")) && d.dilock.equalsIgnoreCase("Y")) {
+                    dataSuaraparent.suarasah += d.suarasah;
+                    dataSuaraparent.suaratidaksah += d.suaratidaksah;
+                    dataSuaraparent.jumlahTPSdilock += d.jumlahTPSdilock;
+                    dataSuaraparent.jumlahTPStidakadaC1 += d.jumlahTPStidakadaC1;
+                    dataSuaraparent.jumlahEntryC1Salah += d.jumlahEntryC1Salah;
+                }
+                /*dataSuaraparent.suarasahKPU += d.suarasahKPU;
+                 dataSuaraparent.suaratidaksahKPU += d.suaratidaksahKPU;
+                 dataSuaraparent.jumlahTPSKPU += d.jumlahTPSKPU;
+                 dataSuaraparent.jumlahTPSKPUTotal += d.jumlahTPSKPUTotal;*/
+                for (Integer temp : dataSuaraparent.uruts) {
+                    if (type.equalsIgnoreCase("HC") && d.statusHC.equalsIgnoreCase("Y")) {
+                        dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraTPS += d.suaraKandidat.get(temp.toString() + "").suaraTPS;
+                    }
+                    if ((!type.equalsIgnoreCase("HC")) && d.dilock.equalsIgnoreCase("Y")) {
+                        dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraVerifikasiC1 += d.suaraKandidat.get(temp.toString() + "").suaraVerifikasiC1;
+                    }
+                    //dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraKPU += d.suaraKandidat.get(temp.toString() + "").suaraKPU;
+                }
+            }
+            ofy().save().entity(dataSuaraparent).now();
+        }
+    }
+
+    public static String getURLGambarKPU(String tahun, String tingkat) {
+        /*String result = pad(desa_id, 7) + pad(tps_no, 3);
+         String kpuurl = "http://scanc1.kpu.go.id/viewp.php";
+         result = kpuurl + "?f=" + result + no_gambar;*/
+        if (tahun.equalsIgnoreCase("2014")) {
+            return urlkpuC1;
+        }
+        if (tahun.equalsIgnoreCase("2015")) {
+            if (tingkat.equalsIgnoreCase(tingkat1)) {
+                return urlkpuC1_1_2015;
+            } else {
+                return urlkpuC1_2_2015;
+            }
+        }
+
+        return "";
+    }
+
+    public static String pad(String num, int size) {
+        String result = "000000000" + num;
+        return result.substring(result.length() - size);
     }
 
     public static void loopUpdateparent(JSONArray wilayah, DataSuara dataSuaraTPS, String type) {
@@ -207,12 +663,17 @@ public class CommonServices {
                 dataSuaraparent.jumlahTPStidakadaC1 = 0;
                 dataSuaraparent.jumlahEntryC1Salah = 0;
             }
+            /*dataSuaraparent.suarasahKPU = 0;
+             dataSuaraparent.suaratidaksahKPU = 0;
+             dataSuaraparent.jumlahTPSKPU = 0;
+             dataSuaraparent.jumlahTPSKPUTotal = 0;*/
             for (Integer temp : dataSuaraparent.uruts) {
                 if (type.equalsIgnoreCase("HC")) {
                     dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraTPS = 0;
                 } else {
                     dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraVerifikasiC1 = 0;
                 }
+                //dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraKPU = 0;
             }
             for (DataSuara d : dataSuaraList) {
                 if (!d.tingkat.equalsIgnoreCase(tingkat5)) {
@@ -232,7 +693,10 @@ public class CommonServices {
                     dataSuaraparent.jumlahTPStidakadaC1 += d.jumlahTPStidakadaC1;
                     dataSuaraparent.jumlahEntryC1Salah += d.jumlahEntryC1Salah;
                 }
-
+                /*dataSuaraparent.suarasahKPU += d.suarasahKPU;
+                 dataSuaraparent.suaratidaksahKPU += d.suaratidaksahKPU;
+                 dataSuaraparent.jumlahTPSKPU += d.jumlahTPSKPU;
+                 dataSuaraparent.jumlahTPSKPUTotal += d.jumlahTPSKPUTotal;*/
                 for (Integer temp : dataSuaraparent.uruts) {
                     if (type.equalsIgnoreCase("HC") && d.statusHC.equalsIgnoreCase("Y")) {
                         dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraTPS += d.suaraKandidat.get(temp.toString() + "").suaraTPS;
@@ -240,6 +704,7 @@ public class CommonServices {
                     if ((!type.equalsIgnoreCase("HC")) && d.dilock.equalsIgnoreCase("Y")) {
                         dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraVerifikasiC1 += d.suaraKandidat.get(temp.toString() + "").suaraVerifikasiC1;
                     }
+                    //dataSuaraparent.suaraKandidat.get(temp.toString() + "").suaraKPU += d.suaraKandidat.get(temp.toString() + "").suaraKPU;
                 }
             }
             ofy().save().entity(dataSuaraparent).now();
@@ -248,7 +713,6 @@ public class CommonServices {
     }
 
     public static void createWilayah(String[] filters) throws IOException, org.json.simple.parser.ParseException {
-
         String tahun = filters[0];
         String filterby = filters[1];
         String filename = filters[2];
@@ -612,7 +1076,6 @@ public class CommonServices {
                 String id = (String) request.getParameter("id");
                 String useruuid = (String) request.getParameter("useruuid");
                 String uuid = (String) request.getParameter("uuid");
-
                 if (id != null && useruuid != null && uuid != null) {
                     if (uuid.length() > 0) {
                         MobileSession mobileSession = ofy().load().type(MobileSession.class).id(id + "#" + useruuid).now();

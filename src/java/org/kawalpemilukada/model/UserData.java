@@ -18,8 +18,8 @@ public class UserData {
     @Id public String uid;
     public String uuid = "";
     public String imgurl = "";
-    public String nama = "";
-    @Index public String link = "";
+    @Index public String nama = "";
+    public String link = "";
     public String nokontak = "";
     public String notps = "";
     @Index public String email = "";
@@ -34,7 +34,7 @@ public class UserData {
     public String lat = "";
     public String lon = "";
     public String type = "";
-    @Index public Date lastlogin;
+    public Date lastlogin;
     public String terverifikasi = "";
     public int userlevel = 0;
     public boolean logged = true;

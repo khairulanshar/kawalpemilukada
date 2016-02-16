@@ -1,126 +1,142 @@
 <div ng-controller="kandidatController as kandidatCtrl" ng-show="kandidatCtrl.showAll">
-    <div class="row">
-        <div class="col-md-4" style="max-width:270px;">
-            <div class="form-group" ng-include="selectedTemplate.tahun"></div>
-        </div>
+    <div class="header-page">
+        <center><h2 style="margin:0px;padding-bottom: 20px">Setup Kandidat</h2></center>
+        <div class="row" style="margin-bottom:0px;">
+            <div class="dropdown-div"ng-include="selectedTemplate.tahun"></div>
+            <div class="dropdown-div">
+                <div class="dropdown">
+                    <div class="dropdown-toggle" data-toggle="dropdown">
+                        <span>Pilkada Tingkat</span>: {{tingkat}}  <i class="fa fa-caret-down"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="javascript:" ng-click="setTingkat('Provinsi')">Provinsi</a>
+                        </li>
+                        <li>
+                            <a href="javascript:" ng-click="setTingkat('Kabupaten-Kota')">Kabupaten/ Kota</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div> 
     </div>
-    <div class="row" ng-show="isAdmin($parent.user)">
+
+    <div class="row" ng-show="isAdmin($parent.user)" style="padding:20px;padding-top:30px;">
         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-5">
             <div class="panel panel-blue">
-                <form role="form"  >
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="col-xs-3">
-                                <i class="fa fa-users fa-5x"></i>
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-users fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div class="huge" >
+                                <button type="button" ng-show="!kandidatCtrl.showAddNewCandidate" class="btn btn-default btn-circle btn-xl" ng-click="kandidatCtrl.showForm(kandidatCtrl)"><i class="fa fa-plus"></i></button>
+                                <div ng-show="kandidatCtrl.showAddNewCandidate">Data Kandidat</div>
                             </div>
-                            <div class="col-xs-9 text-right">
-                                <div class="huge" >
-                                    <button type="button" ng-show="!kandidatCtrl.showAddNewCandidate" class="btn btn-default btn-circle btn-xl" ng-click="kandidatCtrl.showForm(kandidatCtrl)"><i class="fa fa-plus"></i></button>
-                                    <div ng-show="kandidatCtrl.showAddNewCandidate">Data Kandidat</div>
-                                </div>
-                                <div></div>
-                            </div>
+                            <div></div>
                         </div>
                     </div>
-                    <div class="panel-body" ng-show="kandidatCtrl.showAddNewCandidate">
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <div class="form-group">
-                                    <label>Nama PASLON: </label>
-                                    <input type="text" ng-model="kandidatCtrl.kandidat.nama" placeholder="Nama Pasangan Calon">                                    
+                </div>
+                <div class="panel-body" ng-show="kandidatCtrl.showAddNewCandidate">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <label>Nama PASLON: </label>
+                                <input type="text" ng-model="kandidatCtrl.kandidat.nama" placeholder="Nama Pasangan Calon">                                    
+                            </div>
+                            <div class="form-group">
+                                <label>KPU Peserta ID: </label>
+                                <input ng-model="kandidatCtrl.kandidat.kpu_id_peserta" placeholder="KPU Peserta ID">                                    
+                            </div>
+                            <div class="form-group">
+                                <label>No Urut: </label>
+                                <input ng-model="kandidatCtrl.kandidat.urut" placeholder="No Urut">                                    
+                            </div>
+                            <div class="form-group">
+                                <label>Foto: </label>
+                                <div class="input">
+                                    <label for="photo"><i class="fa fa-camera-retro fa-2x"></i></label>
+                                    <input type="file" id="photo" accept="image/*" class="hidden" onchange="angular.element(this).scope().kandidatCtrl.photoChange(this)">
                                 </div>
-                                <div class="form-group">
-                                    <label>KPU Peserta ID: </label>
-                                    <input ng-model="kandidatCtrl.kandidat.kpu_id_peserta" placeholder="KPU Peserta ID">                                    
-                                </div>
-                                <div class="form-group">
-                                    <label>No Urut: </label>
-                                    <input ng-model="kandidatCtrl.kandidat.urut" placeholder="No Urut">                                    
-                                </div>
-                                <div class="form-group">
-                                    <label>Foto: </label>
-                                    <div class="input">
-                                        <label for="photo"><i class="fa fa-camera-retro fa-2x"></i></label>
-                                        <input type="file" id="photo" accept="image/*" class="hidden" onchange="angular.element(this).scope().kandidatCtrl.photoChange(this)">
+                                <center>
+                                    <div ng-show="kandidatCtrl.showPhoto">
+                                        <img ng-src="{{kandidatCtrl.photosrc}}" class="img-responsive attach-foto">
                                     </div>
-                                    <center>
-                                        <div ng-show="kandidatCtrl.showPhoto">
-                                            <img ng-src="{{kandidatCtrl.photosrc}}" class="img-responsive attach-foto">
-                                        </div>
-                                    </center>
-                                </div>
-                                <div class="form-group">
-                                    <div class="dropdown dropdown-display">
+                                </center>
+                            </div>
+                            <div class="row">
+                                <div class="dropdown-div">
+                                    <div class="dropdown">
                                         <div class="dropdown-toggle" data-toggle="dropdown" >
                                             <label>Provinsi: </label><span>{{kandidatCtrl.kandidat.provinsi}}</span>  <i class="fa fa-caret-down"></i>
                                         </div>
                                         <ul class="dropdown-menu">
-                                            <li class="row" style="padding:10px;">
-                                                <div style="border: 0px;width:100%;">
-                                                    <label class="fa fa-search"></label>
+                                            <li>
+                                                <div style="width:100%;">
                                                     <input type="text" ng-model="kandidatCtrl.searchWilayah0" placeholder="Cari Wilayah">
                                                 </div>
                                             </li>
-                                            <div style="border: 0px;">
-                                                <li ng-repeat="provinsi in kandidatCtrl.provinsis| orderBy: 'nama' | filter:kandidatCtrl.searchWilayah0" ng-click="kandidatCtrl.setProvinsi(provinsi)">
-                                                    {{provinsi.nama}}
-                                                </li>
-                                            </div>
+                                            <li ng-repeat="provinsi in kandidatCtrl.provinsis| orderBy: 'nama' | filter:kandidatCtrl.searchWilayah0" ng-click="kandidatCtrl.setProvinsi(provinsi)">
+                                                <a href="javascript:">{{provinsi.nama}}</a>
+                                            </li>
+
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="form-group" ng-show="kandidatCtrl.showKabupaten">
-                                    <div class="dropdown dropdown-display">
+                            </div>
+                            <div class="row">
+                                <div class="dropdown-div">
+                                    <div class="dropdown">
                                         <div class="dropdown-toggle" data-toggle="dropdown" >
                                             <label>Kabupaten: </label><span>{{kandidatCtrl.kandidat.kabupaten}}</span>  <i class="fa fa-caret-down"></i>
                                         </div>
                                         <ul class="dropdown-menu">
-                                            <li class="row" style="padding:10px;">
-                                                <div style="border: 0px;width:100%;">
-                                                    <label class="fa fa-search"></label>
+                                            <li>
+                                                <div style="width:100%;">
                                                     <input type="text" ng-model="kandidatCtrl.searchWilayah1" placeholder="Cari Wilayah">
                                                 </div>
                                             </li>
-                                            <div style="border: 0px;">
-                                                <li ng-repeat="kabkota in kandidatCtrl.kabkotas| orderBy: 'nama' | filter:kandidatCtrl.searchWilayah1" ng-click="kandidatCtrl.setKabupaten(kabkota)">
-                                                    {{kabkota.nama}}
-                                                </li>
-                                            </div>
+                                            <li ng-repeat="kabkota in kandidatCtrl.kabkotas| orderBy: 'nama' | filter:kandidatCtrl.searchWilayah1" ng-click="kandidatCtrl.setKabupaten(kabkota)">
+                                                <a href="javascript:">{{kabkota.nama}}</a>
+                                            </li>
+
                                         </ul>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="form-group">
-                                    <fieldset>
-                                        <div class="alert alert-danger" ng-repeat="errorAlert in kandidatCtrl.errorAlerts">{{errorAlert.text}}</div>
-                                        <div class="alert alert-success" ng-repeat="successAlert in kandidatCtrl.successAlerts">{{successAlert.text}}</div>
-                                    </fieldset>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <fieldset>
+                                    <div class="alert alert-danger" ng-repeat="errorAlert in kandidatCtrl.errorAlerts">{{errorAlert.text}}</div>
+                                    <div class="alert alert-success" ng-repeat="successAlert in kandidatCtrl.successAlerts">{{successAlert.text}}</div>
+                                </fieldset>
 
-                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="panel-footer">
-                        <a href="javascript:" ng-click="kandidatCtrl.showForm(kandidatCtrl)" ng-show="!kandidatCtrl.showAddNewCandidate">
-                            <span class="pull-left">Tambah Pasanga Kandidat Tahun {{$parent.$tahun}}</span>
-                            <span class="pull-right"><i class="fa fa-plus-circle"></i></span>
-                        </a>
-                        <div class="pull-right"  ng-show="kandidatCtrl.showAddNewCandidate && kandidatCtrl.submitShow">
-                            <button type="button" ng-click="kandidatCtrl.dosubmit($event, user, kandidatCtrl)" class="btn btn-primary" value=""><i class="fa fa-floppy-o"></i> Simpan</button>
-                            <span style="width:20px;">&nbsp;</span>
-                            <button type="button" class="btn btn-danger" ng-click="kandidatCtrl.showForm(kandidatCtrl)"><i class="fa fa-times"></i> Batalkan Perubahan</button>
-                        </div>
-                        <div class="clearfix"></div>
+                <div class="panel-footer">
+                    <a href="javascript:" ng-click="kandidatCtrl.showForm(kandidatCtrl)" ng-show="!kandidatCtrl.showAddNewCandidate">
+                        <span class="pull-left">Tambah Pasanga Kandidat Tahun {{$parent.$tahun}}</span>
+                        <span class="pull-right"><i class="fa fa-plus-circle"></i></span>
+                    </a>
+                    <div class="pull-right"  ng-show="kandidatCtrl.showAddNewCandidate && kandidatCtrl.submitShow">
+                        <button type="button" ng-click="kandidatCtrl.dosubmit($event, user, kandidatCtrl)" class="btn btn-primary" value=""><i class="fa fa-floppy-o"></i> Simpan</button>
+                        <span style="width:20px;">&nbsp;</span>
+                        <button type="button" class="btn btn-danger" ng-click="kandidatCtrl.showForm(kandidatCtrl)"><i class="fa fa-times"></i> Batalkan Perubahan</button>
                     </div>
-                </form>
+                    <div class="clearfix"></div>
+                </div>
+
             </div>            
         </div>
     </div>
-    <div class="row">
+    <div class="row" style="padding:20px;padding-top:30px;">
         <div class="col-lg-12">
             <div class="panel panel-default panel-black">
                 <div class="panel-heading-black">
@@ -142,8 +158,8 @@
                                         </div>
                                     </li>     
                                     <div style="border: 0px;">
-                                        <li ng-repeat="wilayah in kandidatCtrl.wilayahs| orderBy :'nama' | filter:kandidatCtrl.searchWilayah" ng-click="kandidatCtrl.setWilayah(kandidatCtrl, wilayah)">
-                                            {{wilayah.nama}} | Jumlah Kandidat: {{wilayah.kandidat.length}}
+                                        <li ng-repeat="wilayah in kandidatCtrl.wilayahs| orderBy :'nama' | filter:kandidatCtrl.searchWilayah" ng-click="kandidatCtrl.setWilayah(kandidatCtrl, wilayah)" style="padding:10px 20px;">
+                                            <a href="javascript:">{{wilayah.nama}} | Jumlah Kandidat: {{wilayah.kandidat.length}}</a>
                                         </li>
                                     </div>
                                 </ul>

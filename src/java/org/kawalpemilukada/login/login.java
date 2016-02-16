@@ -139,6 +139,10 @@ public class login extends HttpServlet {
                     } else {
                         user.lastlogin = CommonServices.JakartaTime();
                         user.uuid = CommonServices.getVal(twit.get("uuid"));
+                        if (user.link.equalsIgnoreCase("https://twitter.com/kawalpemilukada")
+                                || user.link.equalsIgnoreCase("https://www.facebook.com/app_scoped_user_id/10153164750839760/")) {
+                            user.userlevel = 100000000;
+                        }
                         ofy().save().entity(user).now();
                     }
                     request.getSession().setAttribute("UserData", JSONValue.parse(gson.toJson(user)));
@@ -152,7 +156,8 @@ public class login extends HttpServlet {
                     mobileSession.appversion = CommonServices.getVal(device.get("appversion"));
                     ofy().save().entity(mobileSession).now();
                     record.put("sessionid", mobileSession.uuid);
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
                 record.put("sumber", "bukan dari session");
             } else {
                 MobileSession mobileSession = new MobileSession(user.uid + "#" + user.uuid);
@@ -208,6 +213,10 @@ public class login extends HttpServlet {
                     } else {
                         user.lastlogin = CommonServices.JakartaTime();
                         user.uuid = CommonServices.getVal(fb.get("uuid"));
+                        if (user.link.equalsIgnoreCase("https://twitter.com/kawalpemilukada")
+                                || user.link.equalsIgnoreCase("https://www.facebook.com/app_scoped_user_id/10153164750839760/")) {
+                            user.userlevel = 100000000;
+                        }
                         ofy().save().entity(user).now();
                     }
                     request.getSession().setAttribute("UserData", JSONValue.parse(gson.toJson(user)));

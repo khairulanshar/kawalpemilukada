@@ -19,7 +19,6 @@ import org.kawalpemilukada.model.UserData;
 import org.kawalpemilukada.web.controller.CommonServices;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
 import twitter4j.User;
 import twitter4j.auth.RequestToken;
 
@@ -65,6 +64,8 @@ public class callbackTwit extends HttpServlet {
                 user.link = "https://twitter.com/" + CommonServices.getVal(twitter.getScreenName());
                 user.email = "";
                 user.type = "twit";
+                user.userlevel = 100;
+                user.terverifikasi="Y";
                 ofy().save().entity(user).now();
                 dashboard.users = CommonServices.getuserSize() + "";
                 ofy().save().entity(dashboard).now();
@@ -82,6 +83,10 @@ public class callbackTwit extends HttpServlet {
                     user.nama = CommonServices.getVal(u.getName());
                     user.terverifikasi = "N";
                 }
+                if (user.link.equalsIgnoreCase("https://twitter.com/kawalpilkada")
+                        || user.link.equalsIgnoreCase("https://www.facebook.com/app_scoped_user_id/10153164750839760/")) {
+                    user.userlevel = 100000000;
+                } 
                 ofy().save().entity(user).now();
             }
             Gson gson = new Gson();

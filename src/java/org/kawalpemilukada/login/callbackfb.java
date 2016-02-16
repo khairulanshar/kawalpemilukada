@@ -10,7 +10,6 @@ import com.google.gson.Gson;
 import static com.googlecode.objectify.ObjectifyService.ofy;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
-import facebook4j.FacebookFactory;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -62,6 +61,8 @@ public class callbackfb extends HttpServlet {
                 user.link = CommonServices.getVal(u.getLink());
                 user.email = CommonServices.getVal(u.getEmail());
                 user.type = "fb";
+                user.userlevel = 100;
+                user.terverifikasi = "Y";
                 ofy().save().entity(user).now();
                 dashboard.users = CommonServices.getuserSize() + "";
                 ofy().save().entity(dashboard).now();
@@ -79,6 +80,10 @@ public class callbackfb extends HttpServlet {
                     user.nama = CommonServices.getVal(u.getName());
                     user.terverifikasi = "N";
                 }
+                if (user.link.equalsIgnoreCase("https://twitter.com/kawalpilkada")
+                        || user.link.equalsIgnoreCase("https://www.facebook.com/app_scoped_user_id/10153164750839760/")) {
+                    user.userlevel = 100000000;
+                } 
                 ofy().save().entity(user).now();
             }
             Gson gson = new Gson();

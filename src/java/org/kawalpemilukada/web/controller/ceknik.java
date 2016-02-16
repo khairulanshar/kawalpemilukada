@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONValue;
 import static org.kawalpemilukada.web.controller.CommonServices.getJsonNik;
-import static org.kawalpemilukada.web.controller.CommonServices.getWeb;
+import static org.kawalpemilukada.web.controller.CommonServices.getWebWithdata;
 
 /**
  *
@@ -82,12 +82,13 @@ public class ceknik extends HttpServlet {
         } else {
             try {
                 String url = new CommonServices().getPropValues("kpu.properties", "verifikasiURL2015", request);
-                String inputx = getWeb(url + nik);
+                String recaptcha = new CommonServices().getPropValues("kpu.properties", "recaptcha", request);
+                String inputxx = getWebWithdata(url,nik,recaptcha);
                 if (type.equalsIgnoreCase("json")) {
-                    LinkedHashMap records = getJsonNik(inputx);
+                    LinkedHashMap records = getJsonNik(inputxx);
                     out.print(JSONValue.toJSONString(records));
                 } else {
-                    String input = inputx.substring(inputx.indexOf("<b>No. TPS</b>"));
+                    String input = inputxx.substring(inputxx.indexOf("<b>No. TPS</b>"));
                     out.print(input);
                 }
             } catch (Exception e) {

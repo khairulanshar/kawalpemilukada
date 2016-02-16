@@ -17,10 +17,8 @@ import com.googlecode.objectify.Key;
 @Entity
 public class Dashboard {
 
-    @Parent
-    public Key<StringKey> key;
-    @Id
-    public String id;
+    @Parent public Key<StringKey> key;
+    @Id public String id;
     public String users;
     public String tasks;
     public String comments;

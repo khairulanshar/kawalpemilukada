@@ -18,9 +18,11 @@ public class SuaraKandidat {
     public String img_url;
     public int suaraTPS;
     public int suaraVerifikasiC1;
+    public int suaraKPU;
 
     public SuaraKandidat() {
         this.suaraTPS = 0;
         this.suaraVerifikasiC1 = 0;
+        this.suaraKPU = 0;
     }
 }

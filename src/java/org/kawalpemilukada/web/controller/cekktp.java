@@ -17,6 +17,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import static org.kawalpemilukada.web.controller.CommonServices.getJsonNik;
 import static org.kawalpemilukada.web.controller.CommonServices.getWeb;
+import static org.kawalpemilukada.web.controller.CommonServices.getWebWithdata;
 
 /**
  *
@@ -41,7 +42,8 @@ public class cekktp extends HttpServlet {
         PrintWriter out = response.getWriter();
         response.setContentType("text/html;charset=UTF-8");
         boolean robot = false;
-        String msg="";
+        String msg = "";
+        boolean found=false;
 
         try {
             String ipAddress = request.getHeader("X-FORWARDED-FOR");
@@ -57,7 +59,7 @@ public class cekktp extends HttpServlet {
                 long diffSeconds = (now - date) / 1000 % 60;
                 if (diffSeconds < 10) {
                     robot = true;
-                    msg="Please try another 10 second.";
+                    msg = "Please try another 10 second.";
                 }
                 if (diffSeconds > 600) {
                     Long i = Long.parseLong("1");
@@ -76,35 +78,42 @@ public class cekktp extends HttpServlet {
             }
             if (i >= 10) {
                 robot = true;
-                msg="Please try another 10 minutes.";
+                msg = "Please try another 10 minutes.";
             }
         } catch (Exception e) {
         }
         if (robot) {
-            out.print("You are robot. "+msg);
+            out.print("You are robot. " + msg);
         } else {
-            String inputx = "";
+            String inputxx = "";
             try {
+
+                String url = new CommonServices().getPropValues("kpu.properties", "verifikasiURL", request);
+                String recaptcha = new CommonServices().getPropValues("kpu.properties", "recaptchapres", request);
+                inputxx = getWebWithdata(url, nik, recaptcha);
                 if (type.equalsIgnoreCase("json")) {
-                    String url = new CommonServices().getPropValues("kpu.properties", "verifikasiURL", request);
-                    inputx = getWeb(url + nik);
-                    JSONObject records = (JSONObject) JSONValue.parse(inputx);
+                    LinkedHashMap records = getJsonNik(inputxx);
                     out.print(JSONValue.toJSONString(records));
                 } else {
-                    out.print("{}");
+                    String input = inputxx.substring(inputxx.indexOf("<b>No. TPS</b>"));
+                    out.print(input);
                 }
+
+                
             } catch (Exception e) {
-                inputx = "";
+                inputxx = "";
             }
-            if (inputx.equalsIgnoreCase("")) {
+            if (inputxx.equalsIgnoreCase("")) {
                 try {
+                    String url = new CommonServices().getPropValues("kpu.properties", "verifikasiURL2015", request);
+                    String recaptcha = new CommonServices().getPropValues("kpu.properties", "recaptcha", request);
+                    inputxx = getWebWithdata(url, nik, recaptcha);
                     if (type.equalsIgnoreCase("json")) {
-                        String url = new CommonServices().getPropValues("kpu.properties", "verifikasiURL2015", request);
-                        inputx = getWeb(url + nik);
-                        LinkedHashMap records = getJsonNik(inputx);
+                        LinkedHashMap records = getJsonNik(inputxx);
                         out.print(JSONValue.toJSONString(records));
                     } else {
-                        out.print("{}");
+                        String input = inputxx.substring(inputxx.indexOf("<b>No. TPS</b>"));
+                        out.print(input);
                     }
                 } catch (Exception e) {
                     out.print("NIK tidak terdaftar");

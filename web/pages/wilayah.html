@@ -5,22 +5,7 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-4">
-            <div class="form-group">
-                <div class="dropdown dropdown-display">
-                    <div class="dropdown-toggle" data-toggle="dropdown" >
-                        <span>Pemilu Kepala Daerah Tahun: {{$parent.$tahun}}</span>  <i class="fa fa-caret-down"></i>
-                    </div>
-                    <ul class="dropdown-menu">
-                        <li ng-repeat="tahun in $parent.tahuns">
-                            <a href="javascript:" ng-click="wilCtrl.setTahun(this)">{{tahun}}</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+    
     <div class="row">
         <div class="col-lg-12">
             <div id="map"></div>
@@ -41,13 +26,15 @@
                             <thead>
                                 <tr>
                                     <th>KPU Unik No</th>
+                                    <th>Kode</th>
                                     <th>Nama</th>
                                     <th>Tingkat</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="wilayah in wilCtrl.wilayahs" class="tr-pointer" ng-click="wilCtrl.getChild(wilayah)"ng-mouseover="wilCtrl.getChildMap(wilayah)" ng-mouseleave="wilCtrl.clearChildMap()">
+                                <tr ng-repeat="wilayah in wilCtrl.wilayahs" class="tr-pointer" ng-click="wilCtrl.getChild(wilayah)" > <!--ng-mouseover="wilCtrl.getChildMap(wilayah)" ng-mouseleave="wilCtrl.clearChildMap()"-->
                                     <td>{{wilayah.kpuid}}</td>
+                                    <td>{{wilayah.kode}}</td>
                                     <td>{{wilayah.nama}}</td>
                                     <td>{{wilayah.tingkat}}</td>
                                 </tr>

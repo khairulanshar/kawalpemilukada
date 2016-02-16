@@ -1,33 +1,42 @@
 <div ng-controller="crowddataController as crowddataCtrl">
-    <div class="row" >
-        <div class="col-md-12 text-left">
-            <div  class="pull-right" style="width:270px">
-                <div class="form-group" ng-include="selectedTemplate.tahun"></div>
-                <div class="form-group">
-                    <div class="dropdown dropdown-display">
-                        <div class="dropdown-toggle" data-toggle="dropdown">
-                            <b>Kepala Daerah Tingkat</b>: {{tingkat}}  <i class="fa fa-caret-down"></i>
-                        </div>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="javascript:" ng-click="setTingkat('Provinsi')">Provinsi</a>
-                            </li>
-                            <li>
-                                <a href="javascript:" ng-click="setTingkat('Kabupaten-Kota')">Kabupaten/ Kota</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="input-group custom-search-form">
-                    <label class="fa fa-search"></label>
-                    <input type="text" ng-model="crowddataCtrl.KandidatWilayah0" placeholder="Cari Wilayah">
-                </div>
-
+    <div class="header-page">
+        <div class="row">
+            <div class="col-md-12">
+                <span class="controlwilayah" ng-repeat="controlWilayah in tabulasiCtrl.controlWilayahs| orderBy :'id'"> 
+                    <i class="fa fa-angle-double-right" ng-show="controlWilayah.showdiv" style="padding-right: 15px;"></i>
+                    <span ng-click="tabulasiCtrl.setPage(controlWilayah, $index)" class="tabulasi-nav-span">{{controlWilayah.nama}}</span>
+                </span>
             </div>
         </div>
+        <div class="row" ng-show="tabulasiCtrl.showTable(tabulasiCtrl.DataSuarasTPS) && (!user.logged)">
+            <div class="col-md-6 col-md-offset-3" >
+                <div class="alert alert-danger text-center" >Silahkan Login Terlebih dahulu untuk mengisi data.</div>
+            </div>
+        </div>
+        <div class="row" style="margin-bottom:0px;">
+            <div class="dropdown-div"ng-include="selectedTemplate.tahun"></div>
+            <div class="dropdown-div">
+                <div class="dropdown">
+                    <div class="dropdown-toggle" data-toggle="dropdown">
+                        <span>Pilkada Tingkat</span>: {{tingkat}}  <i class="fa fa-caret-down"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="javascript:" ng-click="setTingkat('Provinsi')">Provinsi</a>
+                        </li>
+                        <li>
+                            <a href="javascript:" ng-click="setTingkat('Kabupaten-Kota')">Kabupaten/ Kota</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="input-group custom-search-form">
+                <input type="text" ng-model="crowddataCtrl.KandidatWilayah0" placeholder="Filter Wilayah {{tingkat}}"><label class="fa fa-search"></label>
+            </div>
+        </div> 
     </div>
 
-    <div class="row" style="padding-top:30px">
+    <div class="row" style="padding:20px;padding-top:30px;">
         <div class="panel-group" id="accordion">
             <div class="panel panel-default" ng-repeat="crowdata in crowddataCtrl.crowdatas| orderBy :'parentNama' | filter:crowddataCtrl.KandidatWilayah0">
                 <div class="panel-heading" data-parent="#accordion" data-toggle="collapse" data-target="#collapse{{crowdata.kpu_paslon_id}}" style="cursor: pointer;color:rgba(0,122,255,1);">
@@ -53,7 +62,7 @@
                                     <br><span class="cp">Diisi tanggal:</span><span class="nt">{{crowdata.diupdate_date}}</span>
                                 </div>
                                 <div class="highlight">
-                                    <span class="cp">Direview Oleh:</span><a ng-href="{{crowdata.direview_link}}" target="user" ng-show="crowdata.direview_link.length > 0"><img class="img-circle" ng-src="{{crowdata.direview_img}}" alt="{{crowdata.direview_nama}}" width="40" height="40" style="margin-left:5px"><span class="nt">{{crowdata.diupdate_nama}}</span></a>
+                                    <span class="cp">Direview Oleh:</span><a ng-href="{{crowdata.direview_link}}" target="user" ng-show="crowdata.direview_link.length > 0"><img class="img-circle" ng-src="{{crowdata.direview_img}}" alt="{{crowdata.direview_nama}}" width="40" height="40" style="margin-left:5px"><span class="nt">{{crowdata.direview_nama}}</span></a>
                                     <br><span class="cp">Direview tanggal:</span><span class="nt">{{crowdata.direview_date}}</span>
                                 </div>
                             </div>

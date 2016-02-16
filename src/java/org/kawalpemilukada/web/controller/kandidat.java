@@ -27,9 +27,11 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.kawalpemilukada.model.CrowdProfilData;
 import org.kawalpemilukada.model.Dashboard;
+import org.kawalpemilukada.model.DataSuara;
 import org.kawalpemilukada.model.KandidatWilayah;
 import org.kawalpemilukada.model.StringKey;
 import org.kawalpemilukada.model.UserData;
+import static org.kawalpemilukada.web.controller.CommonServices.setParentId1;
 
 /**
  *
@@ -239,7 +241,7 @@ public class kandidat extends HttpServlet {
                             crowddata.nama = maindata.get("nama").toString();
                             crowddata.parentkpuid = maindata.get("parentkpuid").toString();
                             crowddata.parentNama = maindata.get("parentNama").toString();
-                            
+
                             crowddata.visi = maindata.get("visi").toString();
                             crowddata.misi = maindata.get("misi").toString();
                             crowddata.program_pendidikan = maindata.get("program_pendidikan").toString();
@@ -264,6 +266,47 @@ public class kandidat extends HttpServlet {
                     }
                 } catch (Exception e) {
                 }
+            } else if (method.equalsIgnoreCase("refreshagregasi")) {
+                JSONParser parser = new JSONParser();
+                Object obj = parser.parse(new FileReader("dist/data/dataKandidat.json"));
+                JSONObject jsonObject = (JSONObject) obj;
+                Object obj2 = parser.parse(new FileReader("dist/data/pemilih.json"));
+                JSONObject pemilih = (JSONObject) obj2;
+                String tingkatId = filters[3];
+                Key<StringKey> parentKey = Key.create(StringKey.class, CommonServices.setParentId(tahun, tingkat));
+                Key<KandidatWilayah> keyWithParent = Key.create(parentKey, KandidatWilayah.class, tingkat + tingkatId);
+                List<KandidatWilayah> kandidatWilayahs = ofy().load().type(KandidatWilayah.class).ancestor(keyWithParent).list();
+                try {
+                    KandidatWilayah kandidatWilayah = kandidatWilayahs.get(0);
+                    kandidatWilayah.jumlahTPS = 0;
+                    kandidatWilayah.jumlahTPSdilock = 0;
+                    kandidatWilayah.suarasah = 0;
+                    kandidatWilayah.suaratidaksah = 0;
+                    try {
+                        kandidatWilayah.totalpemilih = Integer.parseInt(pemilih.get(kandidatWilayah.nama).toString());
+                    } catch (Exception e) {
+                        kandidatWilayah.totalpemilih=0;
+                    }
+                    kandidatWilayah.set0();
+                    Key<StringKey> key1 = Key.create(StringKey.class, setParentId1(tingkat, tahun, tingkatId));
+                    List<DataSuara> dataSuaraList = ofy().load().type(DataSuara.class).ancestor(key1).list();
+                    for (DataSuara d : dataSuaraList) {
+                        kandidatWilayah.jumlahTPS += d.jumlahTPS;
+                        kandidatWilayah.jumlahTPSdilock += d.jumlahTPSdilock;
+                        kandidatWilayah.suarasah += d.suarasah;
+                        kandidatWilayah.suaratidaksah += d.suaratidaksah;
+                        for (Integer temp : d.uruts) {
+                            kandidatWilayah.addsuara(temp,
+                                    d.suaraKandidat.get(temp.toString() + "").suaraTPS,
+                                    d.suaraKandidat.get(temp.toString() + "").suaraVerifikasiC1,
+                                    d.suaraKandidat.get(temp.toString() + "").suaraKPU,
+                                    jsonObject);
+                        }
+                    }
+                    ofy().save().entity(kandidatWilayah).now();
+                } catch (Exception e) {
+                }
+                returnVal.add(JSONValue.parse(gson.toJson(kandidatWilayahs)));
             } else if (method.equalsIgnoreCase("post-profil")) {
                 String tingkatId = filters[3];
                 String urut = filters[4];

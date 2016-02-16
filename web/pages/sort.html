@@ -1,0 +1,11 @@
+
+    <div class="dropdown">
+        <div class="dropdown-toggle" data-toggle="dropdown" >
+            <span>Urut berdasarkan</span>: {{sorttype}}<i class="fa fa-caret-down"></i>
+        </div>
+        <ul class="dropdown-menu">
+            <li ng-repeat="sort in $parent.sorts">
+                <a href="javascript:" ng-click="setSortType(sort)">{{sort}}</a>
+            </li>
+        </ul>
+    </div>

@@ -20,17 +20,21 @@ public class Wilayah {
     @Parent public Key<StringKey> key;
     @Id public String id;
     @Index public String kpuid;
-    @Index public String nama;
+    public String nama;
     @Index public String tingkat;
-    @Index public String tahun;
+    public String tahun;
     public int jumlahTPS;
     public String sudahDisetup1;
     public String sudahDisetup2;
+    @Index public String parentkode;
+    @Index public String kode;
 
 
     public Wilayah() {
         this.sudahDisetup1="N";
         this.sudahDisetup2="N";
+        this.kode="";
+        this.parentkode="";
     }
     public Wilayah(String id,String tahun) {
         this();

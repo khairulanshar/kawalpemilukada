@@ -13,10 +13,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 //import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.kawalpemilukada.model.Dashboard;
@@ -69,6 +71,61 @@ public class getModelData extends HttpServlet {
             ofy().save().entity(dashboard).now();
             record.put("dashboard", JSONValue.parse(gson.toJson(dashboard)));
         }
+        if (form_action.equalsIgnoreCase("getUser")) {
+            try {
+                UserData user = CommonServices.getUser(request);
+                if (user.uid.toString().length() > 0 && user.userlevel > 10000) {
+                    List<UserData> userDatas = ofy().load().type(UserData.class).list();
+                    JSONArray data = new JSONArray();
+                    for (UserData userData : userDatas) {
+                        try {
+                            //if (userData.nokontak != null && userData.nokontak.length() > 0) {
+                                data.add(userData.nama+ " => "+userData.link+ " => "+userData.userlevel);
+                            //}
+                        } catch (Exception ee) {
+
+                        }
+                    }
+                    record.put("data", data);
+                }
+            } catch (Exception e) {
+                record.put("data", e.toString());
+            }
+        }
+        if (form_action.equalsIgnoreCase("getAllUser")) {
+            try {
+                UserData user = CommonServices.getUser(request);
+                if (user.uid.toString().length() > 0 && user.userlevel > 10000) {
+                    List<UserData> userDatas = ofy().load().type(UserData.class).list();
+                    record.put("user", JSONValue.parse(gson.toJson(userDatas)));
+                }
+            } catch (Exception e) {
+                record.put("user", e.toString());
+            }
+        }
+        if (form_action.equalsIgnoreCase("setUser")) {
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            BufferedReader reader = request.getReader();
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            JSONObject input = (JSONObject) JSONValue.parse(sb.toString());
+            try {
+                UserData user = CommonServices.getUser(request);
+                if (user.uid.toString().length() > 0 && user.userlevel > 10000) {
+                    UserData usermaudiupdate = ofy().load().type(UserData.class).id(input.get("uid").toString()).now();
+                    if (usermaudiupdate != null) {
+                        usermaudiupdate.userlevel = Integer.parseInt(input.get("userlevel").toString());
+                        usermaudiupdate.terverifikasi = input.get("terverifikasi").toString();
+                        ofy().save().entity(user).now();
+                        record.put("user", JSONValue.parse(gson.toJson(usermaudiupdate)));
+                    }
+                }
+            } catch (Exception e) {
+                record.put("user", e.toString());
+            }
+        }
         if (form_action.equalsIgnoreCase("updateUser")) {
             StringBuilder sb = new StringBuilder();
             String line = null;
@@ -116,13 +173,13 @@ public class getModelData extends HttpServlet {
                         if (input.get("nokontak").toString().length() > 0) {
                             user.nokontak = input.get("nokontak").toString();
                         }
-                        if (input.get("userlevel").toString().length() > 0) {
+                        /*if (input.get("userlevel").toString().length() > 0) {
                             if (Integer.parseInt(input.get("userlevel").toString()) > 200) {
                                 user.userlevel = 200;
                             } else {
                                 user.userlevel = Integer.parseInt(input.get("userlevel").toString());
                             }
-                        }
+                        }*/
                         ofy().save().entity(user).now();
                         record.put("user", JSONValue.parse(gson.toJson(user)));
                     }
