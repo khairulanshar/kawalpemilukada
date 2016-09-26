@@ -83,10 +83,6 @@ public class callbackTwit extends HttpServlet {
                     user.nama = CommonServices.getVal(u.getName());
                     user.terverifikasi = "N";
                 }
-                if (user.link.equalsIgnoreCase("https://twitter.com/kawalpilkada")
-                        || user.link.equalsIgnoreCase("https://www.facebook.com/app_scoped_user_id/10153164750839760/")) {
-                    user.userlevel = 100000000;
-                } 
                 ofy().save().entity(user).now();
             }
             Gson gson = new Gson();

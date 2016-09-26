@@ -34,7 +34,7 @@
                 </span>
             </div>
         </div>
-        <div class="row" ng-show="tabulasiCtrl.showTable(tabulasiCtrl.DataSuaras)">
+        <div class="row" ng-show="(!tabulasiCtrl.dalambentuktable) && tabulasiCtrl.showTable(tabulasiCtrl.DataSuaras)">
             <div class="col-lg-2">
                 <div class="row" style="margin-bottom:0px;margin-top:20px;">
                     <span class="point-wilayah" >
@@ -122,12 +122,12 @@
             <div class="point-wilayah" >
                 <i class="fa fa-users"></i> <span>{{tabulasiCtrl.jumlahTotalKandidat}}</span> Kandidat
             </div>
-            <div class="dropdown-div" style="margin-bottom:5px;">
+            <div class="dropdown-div">
                 <div class="form-group">
                     <input type="checkbox" ng-model="tabulasiCtrl.showdoneonly" ng-change="tabulasiCtrl.countKandidat()" style="width:20px;">&nbsp;Tampilkan yang sudah <input type="number" ng-model="tabulasiCtrl.numberbench" style="width:30px;text-align: right;">% atau lebih TPS Selesai
                 </div>
             </div>
-            <div class="dropdown-div" style="margin-bottom:5px;">
+            <div class="dropdown-div">
                 <div class="dropdown">
                     <div class="dropdown-toggle" data-toggle="dropdown" >
                         <span>Urut berdasarkan </span>: {{sorttype.text}}<i class="fa fa-caret-down"></i>
@@ -139,6 +139,11 @@
                     </ul>
                 </div>
                 <span class="dropdown-span">&nbsp;|&nbsp;<input type="checkbox" ng-model="tabulasiCtrl.reverse" style="width:20px;"> Dari Besar ke Kecil</span>
+            </div>
+            <div class="dropdown-div">
+                <div class="form-group">
+                    <input type="checkbox" ng-model="tabulasiCtrl.dalambentuktable" style="width:20px;">&nbsp;Tampilkan Dalam Format Tabular
+                </div>
             </div>
             <button type="button" ng-click="tabulasiCtrl.refreshall()" ng-show="user.userlevel > 5000" class="btn btn-primary" style="margin-bottom:5px;">Refresh All</button>
         </div>
@@ -181,6 +186,11 @@
                 </div>
                 <span class="dropdown-span">&nbsp;|&nbsp;<input type="checkbox" ng-model="tabulasiCtrl.reverse" style="width:20px;"> Dari Besar ke Kecil</span>
             </div>
+            <div class="dropdown-div">
+                <div class="form-group">
+                    <input type="checkbox" ng-model="tabulasiCtrl.dalambentuktable" style="width:20px;">&nbsp;Tampilkan Dalam Format Tabular
+                </div>
+            </div>
 
         </div>
     </div>
@@ -210,7 +220,72 @@
     </div>
     <div class="row" style="background-color: white;padding-bottom: 35px;margin-bottom: 0px;padding: 20px 0px;">
         <div class="col-md-12">
-            <div ng-show="tabulasiCtrl.showTable(tabulasiCtrl.KandidatWilayahs)">
+            <div class="table-responsive" ng-show="tabulasiCtrl.dalambentuktable && tabulasiCtrl.showTable(tabulasiCtrl.KandidatWilayahs)">
+                <table class="table table-condensed table-striped table-hover">
+                    <thead> 
+                        <tr > 
+                            <th class="text-left">Nama Wilayah</th> 
+                            <th class="text-right">Jumlah TPS Selesai</th> 
+                            <th class="text-right">Jumlah TPS</th> 
+                            <th class="text-right">Persentase TPS Selesai (%)</th>
+                            <th class="text-right">Suara Sah</th>
+                            <th class="text-right">Suara Tidak Sah</th>
+                            <th class="text-right">Jumlah Pemilih</th>
+                            <th class="text-right">Jumlah yang tidak Memilih</th>
+                            <th class="text-right">Persentase yang tidak Memilih (%)</th>
+                            <th class="text-right">Selisih Suara</th>
+                            <th class="text-right">Selisih Persentase Suara</th>
+                            <th class="info text-center" colspan="2">Perolehan Suara</th>
+                        </tr> 
+                    </thead>
+                    <tbody> 
+                        <tr ng-repeat="kandidatWilayah in tabulasiCtrl.KandidatWilayahs|orderBy:tabulasiCtrl.predicate:tabulasiCtrl.reverse | filter:tabulasiCtrl.KandidatWilayah0" class="text-right"> 
+                            <td class="text-left" ng-init="parent_index = $index;">
+                                <a ng-href="{{tabulasiCtrl.getChildLink(kandidatWilayah)}}">
+                                    {{kandidatWilayah.nama}}
+                                </a>
+                            </td> 
+                            <td>{{tabulasiCtrl.formatnumber(kandidatWilayah.jumlahTPSdilock)}}</th> 
+                            <td>{{tabulasiCtrl.formatnumber(kandidatWilayah.jumlahTPS)}}</td> 
+                            <td>{{kandidatWilayah.percent}}</td>
+                            <td>{{tabulasiCtrl.formatnumber(kandidatWilayah.suarasah)}}</td>
+                            <td>{{tabulasiCtrl.formatnumber(kandidatWilayah.suaratidaksah)}}</td>
+                            <td>{{tabulasiCtrl.formatnumber(kandidatWilayah.totalpemilih)}}</td>
+                            <td>{{tabulasiCtrl.formatnumber(kandidatWilayah.tidakmemilih)}}</td>
+                            <td>{{kandidatWilayah.percenttidakmemilih}}</td>
+                            <td>{{tabulasiCtrl.formatnumber(kandidatWilayah.selisih)}}</td>
+                            <td>{{tabulasiCtrl.formatnumber(kandidatWilayah.percentselisih)}}%</td>
+                            <td class="info">
+                                <div >
+                                    <table class="table table-condensed">
+                                        <thead>
+                                            <tr >
+                                                <th class="text-right">No Urut Kandidat</th>
+                                                <th>Nama Kandidat</th>
+                                                <th class="text-right">Hasil dari Scan C1 KPU</th>
+                                                <th class="text-right">Hasil dari pilkada2015.kpu.go.id</th>
+                                                <th class="text-right">Persentase Scan C1 KPU (%)</th>
+                                                <th class="text-right">Persentase pilkada2015.kpu.go.id (%)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="kandidat in kandidatWilayah.kandidat| orderBy :'urut'" ng-class="{danger: (kandidat.suaraVerifikasiC1-kandidat.suaraKPU!=0)}">
+                                                <td>{{kandidat.urut}}</td>
+                                                <td class="text-left">{{kandidat.nama}}</td>
+                                                <td class="text-right">{{tabulasiCtrl.formatnumber(kandidat.suaraVerifikasiC1)}}</td>
+                                                <td class="text-right">{{tabulasiCtrl.formatnumber(kandidat.suaraKPU)}}</td>
+                                                <td class="text-right">{{kandidat.psuaraVerifikasiC1}}</td>
+                                                <td class="text-right">{{kandidat.psuaraKPU}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr> 
+                    </tbody>
+                </table>
+            </div>
+            <div ng-show="(!tabulasiCtrl.dalambentuktable) && tabulasiCtrl.showTable(tabulasiCtrl.KandidatWilayahs)">
                 <div class="row" style="padding:0px;margin:0px;border:0px;" ng-repeat="kandidatWilayah in tabulasiCtrl.KandidatWilayahs|orderBy:tabulasiCtrl.predicate:tabulasiCtrl.reverse | filter:tabulasiCtrl.KandidatWilayah0" ng-show="kandidatWilayah.done">
                     <div ng-show="tabulasiCtrl.showandhideimg($index, klimitTo, kandidatWilayah)" style="border-bottom: 2px solid rgba(0,0,0,0.12);">
                         <div class="col-lg-2" id="kandidat{{kandidatWilayah.kpuid}}" >
@@ -300,7 +375,7 @@
                                                     <div class="kandidat-angka" ng-show="{{kandidat.selisih > 0}}"><span class="text-muted">Selisih dengan No Urut {{kandidatWilayah.menangnourut}}: </span>{{tabulasiCtrl.formatnumber(kandidat.selisih)}} <span class="text-muted">suara</span></div>
                                                 </center>
                                                 <div class="text-left text-muted">Jenis Dukungan: <b>{{kandidat.jenisDukungan}}</b></div>
-                                                <div class="text-left text-muted" ng-show="{{kandidat.jenisDukungan==='PARPOL'}}">Partai Pendukung: <b>{{kandidat.partaiPendukung}}</b></div>
+                                                <div class="text-left text-muted" ng-show="{{kandidat.jenisDukungan === 'PARPOL'}}">Partai Pendukung: <b>{{kandidat.partaiPendukung}}</b></div>
                                             </div>
                                         </div>
                                     </div>
@@ -310,9 +385,90 @@
                     </div>
                 </div>
             </div>
-
-            <div ng-show="tabulasiCtrl.showTable(tabulasiCtrl.DataSuaras)" >
-                <div class="row" style="border-bottom: 2px solid rgba(0,0,0,0.12);" ng-repeat="dataSuara in tabulasiCtrl.DataSuaras|orderBy:tabulasiCtrl.predicate:tabulasiCtrl.reverse" ng-init="tabulasiCtrl.initDataSuara(dataSuara);tabulasiCtrl.getRobot(dataSuara, dataSuara.kpuid, $index);">
+            <div class="table-responsive" ng-show="tabulasiCtrl.dalambentuktable && tabulasiCtrl.showTable(tabulasiCtrl.DataSuaras)">
+                <table class="table table-condensed table-striped table-hover">
+                    <thead> 
+                        <tr > 
+                            <th class="text-left">Tingkat</th> 
+                            <th class="text-left">Nama Wilayah</th> 
+                            <th class="text-right">Jumlah TPS Selesai</th> 
+                            <th class="text-right">Jumlah TPS</th> 
+                            <th class="text-right">Persentase TPS Selesai (%)</th>
+                            <th class="text-right">Suara Sah</th>
+                            <th class="text-right">Suara Tidak Sah</th>
+                            <th class="info text-center" ng-show="tabulasiCtrl.showC1" colspan="{{tabulasiCtrl.DataSuaras[0].uruts.length}}">Hasil dari Scan C1 KPU</th>
+                            <th class="success text-center" ng-show="tabulasiCtrl.showKPU" colspan="{{tabulasiCtrl.DataSuaras[0].uruts.length}}">Hasil dari pilkada2015.kpu.go.id</th>
+                        </tr> 
+                        <tr > 
+                            <th colspan="7"></th> 
+                            <th class="info text-right" ng-repeat="urut in tabulasiCtrl.uruts| orderBy" ng-show="tabulasiCtrl.showC1">{{tabulasiCtrl.DataSuaras[0].suaraKandidat[urut + ""].nama}}</th>
+                            <th class="success text-right" ng-repeat="urut in tabulasiCtrl.uruts| orderBy" ng-show="tabulasiCtrl.showKPU">{{tabulasiCtrl.DataSuaras[0].suaraKandidat[urut + ""].nama}}</th>
+                        </tr> 
+                    </thead>
+                    <thead>
+                        <tr class="warning"> 
+                            <th class="text-right" colspan="2">Total</th> 
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.jumlahTPSdilock)}}</th> 
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.jumlahTPS)}}</th> 
+                            <th class="text-right">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(tabulasiCtrl.totalsuara.jumlahTPSdilock, tabulasiCtrl.totalsuara.jumlahTPS), tabulasiCtrl.numberDecimal)}}</th>
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suarasah)}}</th>
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suaratidaksah)}}</th>
+                            <th class="warning text-right" ng-show="tabulasiCtrl.showC1" ng-repeat="urut in tabulasiCtrl.uruts| orderBy">
+                                <div>{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraVerifikasiC1)}}</div>
+                                <div class="text-muted" style="font-size: 11px;">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraVerifikasiC1, tabulasiCtrl.totalsuara.suaraVerifikasiC1), tabulasiCtrl.numberDecimal)}}%</div>
+                            </th>
+                            <th class="warning text-right" ng-show="tabulasiCtrl.showKPU" ng-repeat="urut in tabulasiCtrl.uruts| orderBy">
+                                <div>{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraKPU)}}</div>
+                                <div class="text-muted" style="font-size: 11px;">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraVerifikasiC1, tabulasiCtrl.totalsuara.suaraVerifikasiC1), tabulasiCtrl.numberDecimal)}}%</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody> 
+                        <tr ng-repeat="dataSuara in tabulasiCtrl.DataSuaras|orderBy:tabulasiCtrl.predicate:tabulasiCtrl.reverse" class="text-right" ng-class="{danger: dataSuara.hasilbeda}"> 
+                            <td class="text-left">{{dataSuara.tingkat}}</td> 
+                            <td class="text-left">
+                                <a ng-href="{{tabulasiCtrl.getChildLink(dataSuara)}}">
+                                    {{dataSuara.nama}}
+                                </a>
+                            </td> 
+                            <td>{{tabulasiCtrl.formatnumber(dataSuara.jumlahTPSdilock)}}</td> 
+                            <td>{{tabulasiCtrl.formatnumber(dataSuara.jumlahTPS)}}</td> 
+                            <td>{{dataSuara.percent}}</td>
+                            <td>{{tabulasiCtrl.formatnumber(dataSuara.suarasah)}}</td>
+                            <td>{{tabulasiCtrl.formatnumber(dataSuara.suaratidaksah)}}</td>
+                            <td class="info" ng-repeat="urut in tabulasiCtrl.uruts| orderBy" ng-show="tabulasiCtrl.showC1">
+                                <div>{{tabulasiCtrl.formatnumber(dataSuara.suaraKandidat[urut + ""].suaraVerifikasiC1)}}</div>
+                                <div class="text-muted" style="font-size: 11px;">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(dataSuara.suaraKandidat[urut + ""].suaraVerifikasiC1, dataSuara.total['suaraVerifikasiC1']), tabulasiCtrl.numberDecimal)}}%</div>
+                            </td>
+                            <td class="success" ng-repeat="urut in tabulasiCtrl.uruts| orderBy" ng-show="tabulasiCtrl.showC1">
+                                <div>{{tabulasiCtrl.formatnumber(dataSuara.suaraKandidat[urut + ""].suaraKPU)}}</div>
+                                <div class="text-muted" style="font-size: 11px;">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(dataSuara.suaraKandidat[urut + ""].suaraKPU, dataSuara.total['suaraKPU']), tabulasiCtrl.numberDecimal)}}%</div>
+                            </td>
+                           
+                        </tr> 
+                    </tbody>
+                    <tfoot>
+                        <tr class="warning"> 
+                            <th class="text-right" colspan="2">Total</th> 
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.jumlahTPSdilock)}}</th> 
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.jumlahTPS)}}</th> 
+                            <th class="text-right">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(tabulasiCtrl.totalsuara.jumlahTPSdilock, tabulasiCtrl.totalsuara.jumlahTPS), tabulasiCtrl.numberDecimal)}}</th>
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suarasah)}}</th>
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suaratidaksah)}}</th>
+                            <th class="warning text-right" ng-show="tabulasiCtrl.showC1" ng-repeat="urut in tabulasiCtrl.uruts| orderBy">
+                                <div>{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraVerifikasiC1)}}</div>
+                                <div class="text-muted" style="font-size: 11px;">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraVerifikasiC1, tabulasiCtrl.totalsuara.suaraVerifikasiC1), tabulasiCtrl.numberDecimal)}}%</div>
+                            </th>
+                            <th class="warning text-right" ng-show="tabulasiCtrl.showKPU" ng-repeat="urut in tabulasiCtrl.uruts| orderBy">
+                                <div>{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraKPU)}}</div>
+                                <div class="text-muted" style="font-size: 11px;">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraVerifikasiC1, tabulasiCtrl.totalsuara.suaraVerifikasiC1), tabulasiCtrl.numberDecimal)}}%</div>
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div ng-show="(!tabulasiCtrl.dalambentuktable) && tabulasiCtrl.showTable(tabulasiCtrl.DataSuaras)" >
+                <div class="row" style="border-bottom: 2px solid rgba(0,0,0,0.12);" ng-repeat="dataSuara in tabulasiCtrl.DataSuaras|orderBy:tabulasiCtrl.predicate:tabulasiCtrl.reverse" ng-init="tabulasiCtrl.initDataSuara(dataSuara); tabulasiCtrl.getRobot(dataSuara, dataSuara.kpuid, $index);">
                     <div class="col-lg-2">
                         <div class="row" style="margin-bottom:0px;margin-top:20px;">
                             <span class="point-wilayah" >
@@ -348,7 +504,7 @@
                             </div>
                         </div>
                         <div class="row" ng-show="{{tabulasiCtrl.getTingkatChild(dataSuara) === 'Desa' || tabulasiCtrl.getTingkatChild(dataSuara) === 'Kecamatan'}}">
-                            <div class="col-xs-12 text-center" ng-show="{{dataSuara.jumlahTPS<1000}}">
+                            <div class="col-xs-12 text-center" ng-show="{{dataSuara.jumlahTPS < 1000}}">
                                 <a class="point-table" style="cursor:pointer;" ng-href="{{tabulasiCtrl.getChildLink(dataSuara, 'all')}}">
                                     <img src="/dist/img/Tabulasi icon@2x.png" alt="tabulasi" style="width:14px;"><b>Semua TPS</b>
                                 </a>
@@ -407,7 +563,7 @@
                     </div>
                 </div>
             </div>
-
+            
             <div ng-show="tabulasiCtrl.showTable(tabulasiCtrl.DataSuarasTPS) && (!tabulasiCtrl.alltps)">
                 <div class="row tps-nav">
                     <div class="col-md-3"><a href="javascript:" ng-click="tabulasiCtrl.setDesa(tabulasiCtrl.desaSelectedPrev)"><i class="fa fa-angle-double-left"></i> {{tabulasiCtrl.desaSelectedPrev.nama}} | {{tabulasiCtrl.desaSelectedPrev.jumlahTPS}}</a></div>
@@ -426,7 +582,88 @@
                     <div class="col-md-3 text-right"><a href="javascript:" ng-click="tabulasiCtrl.setDesa(tabulasiCtrl.desaSelectedNext)">{{tabulasiCtrl.desaSelectedNext.nama}} | {{tabulasiCtrl.desaSelectedNext.jumlahTPS}} TPS <i class="fa fa-angle-double-right"></i></a></div>
                 </div>
             </div>
-            <div ng-show="tabulasiCtrl.showTable(tabulasiCtrl.DataSuarasTPS)" style="overflow-x: auto;font-size: 9pt;">
+            
+            <div class="table-responsive" ng-show="tabulasiCtrl.dalambentuktable && tabulasiCtrl.showTable(tabulasiCtrl.DataSuarasTPS)">
+                <table class="table table-condensed table-striped table-hover">
+                    <thead> 
+                        <tr > 
+                            <th class="text-left">Tingkat</th> 
+                            <th class="text-left">No TPS</th> 
+                            <th class="text-right">Jumlah TPS Selesai</th> 
+                            <th class="text-right">Jumlah TPS</th> 
+                            <th class="text-right">Persentase TPS Selesai (%)</th>
+                            <th class="text-right">Suara Sah</th>
+                            <th class="text-right">Suara Tidak Sah</th>
+                            <th class="info text-center" ng-show="tabulasiCtrl.showC1" colspan="{{tabulasiCtrl.DataSuarasTPS[0].uruts.length}}">Hasil dari Scan C1 KPU</th>
+                            <th class="success text-center" ng-show="tabulasiCtrl.showKPU" colspan="{{tabulasiCtrl.DataSuarasTPS[0].uruts.length}}">Hasil dari pilkada2015.kpu.go.id</th>
+                        </tr> 
+                        <tr > 
+                            <th colspan="7"></th> 
+                            <th class="info text-right" ng-repeat="urut in tabulasiCtrl.uruts| orderBy" ng-show="tabulasiCtrl.showC1">{{tabulasiCtrl.DataSuarasTPS[0].suaraKandidat[urut + ""].nama}}</th>
+                            <th class="success text-right" ng-repeat="urut in tabulasiCtrl.uruts| orderBy" ng-show="tabulasiCtrl.showKPU">{{tabulasiCtrl.DataSuarasTPS[0].suaraKandidat[urut + ""].nama}}</th>
+                        </tr> 
+                    </thead>
+                    <thead>
+                        <tr class="warning"> 
+                            <th class="text-right" colspan="2">Total</th> 
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.jumlahTPSdilock)}}</th> 
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.jumlahTPS)}}</th> 
+                            <th class="text-right">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(tabulasiCtrl.totalsuara.jumlahTPSdilock, tabulasiCtrl.totalsuara.jumlahTPS), tabulasiCtrl.numberDecimal)}}</th>
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suarasah)}}</th>
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suaratidaksah)}}</th>
+                            <th class="warning text-right" ng-show="tabulasiCtrl.showC1" ng-repeat="urut in tabulasiCtrl.uruts| orderBy">
+                                <div>{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraVerifikasiC1)}}</div>
+                                <div class="text-muted" style="font-size: 11px;">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraVerifikasiC1, tabulasiCtrl.totalsuara.suaraVerifikasiC1), tabulasiCtrl.numberDecimal)}}%</div>
+                            </th>
+                            <th class="warning text-right" ng-show="tabulasiCtrl.showKPU" ng-repeat="urut in tabulasiCtrl.uruts| orderBy">
+                                <div>{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraKPU)}}</div>
+                                <div class="text-muted" style="font-size: 11px;">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraVerifikasiC1, tabulasiCtrl.totalsuara.suaraVerifikasiC1), tabulasiCtrl.numberDecimal)}}%</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody> 
+                        <tr ng-repeat="dataSuara in tabulasiCtrl.DataSuarasTPS" class="text-right" ng-class="{danger: dataSuara.hasilbeda}"> 
+                            <td class="text-left">{{dataSuara.tingkat}}</td> 
+                            <td class="text-left">{{dataSuara.nama}}</td> 
+                            <td>{{tabulasiCtrl.formatnumber(dataSuara.jumlahTPSdilock)}}</td> 
+                            <td>{{tabulasiCtrl.formatnumber(dataSuara.jumlahTPS)}}</td> 
+                            <td>{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(dataSuara.jumlahTPSdilock, dataSuara.jumlahTPS), tabulasiCtrl.numberDecimal)}}</td>
+                            <td>{{tabulasiCtrl.formatnumber(dataSuara.suarasah)}}</td>
+                            <td>{{tabulasiCtrl.formatnumber(dataSuara.suaratidaksah)}}</td>
+                            <td class="info" ng-repeat="urut in tabulasiCtrl.uruts| orderBy" ng-show="tabulasiCtrl.showC1">
+                                <div>{{tabulasiCtrl.formatnumber(dataSuara.suaraKandidat[urut + ""].suaraVerifikasiC1)}}</div>
+                                <div class="text-muted" style="font-size: 11px;">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(dataSuara.suaraKandidat[urut + ""].suaraVerifikasiC1, dataSuara.total['suaraVerifikasiC1']), tabulasiCtrl.numberDecimal)}}%</div>
+                            </td>
+                            <td class="success" ng-repeat="urut in tabulasiCtrl.uruts| orderBy" ng-show="tabulasiCtrl.showC1">
+                                <div>{{tabulasiCtrl.formatnumber(dataSuara.suaraKandidat[urut + ""].suaraKPU)}}</div>
+                                <div class="text-muted" style="font-size: 11px;">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(dataSuara.suaraKandidat[urut + ""].suaraKPU, dataSuara.total['suaraKPU']), tabulasiCtrl.numberDecimal)}}%</div>
+                            </td>
+                           
+                        </tr> 
+                    </tbody>
+                    <tfoot>
+                        <tr class="warning"> 
+                            <th class="text-right" colspan="2">Total</th> 
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.jumlahTPSdilock)}}</th> 
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.jumlahTPS)}}</th> 
+                            <th class="text-right">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(tabulasiCtrl.totalsuara.jumlahTPSdilock, tabulasiCtrl.totalsuara.jumlahTPS), tabulasiCtrl.numberDecimal)}}</th>
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suarasah)}}</th>
+                            <th class="text-right">{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suaratidaksah)}}</th>
+                            <th class="warning text-right" ng-show="tabulasiCtrl.showC1" ng-repeat="urut in tabulasiCtrl.uruts| orderBy">
+                                <div>{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraVerifikasiC1)}}</div>
+                                <div class="text-muted" style="font-size: 11px;">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraVerifikasiC1, tabulasiCtrl.totalsuara.suaraVerifikasiC1), tabulasiCtrl.numberDecimal)}}%</div>
+                            </th>
+                            <th class="warning text-right" ng-show="tabulasiCtrl.showKPU" ng-repeat="urut in tabulasiCtrl.uruts| orderBy">
+                                <div>{{tabulasiCtrl.formatnumber(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraKPU)}}</div>
+                                <div class="text-muted" style="font-size: 11px;">{{tabulasiCtrl.roundToTwo(tabulasiCtrl.setpercent(tabulasiCtrl.totalsuara.suaraKandidat[urut + ""].suaraVerifikasiC1, tabulasiCtrl.totalsuara.suaraVerifikasiC1), tabulasiCtrl.numberDecimal)}}%</div>
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            
+            <div ng-show="(!tabulasiCtrl.dalambentuktable) && tabulasiCtrl.showTable(tabulasiCtrl.DataSuarasTPS)" style="overflow-x: auto;font-size: 9pt;">
                 <table class="table table-striped table-bordered table-hover" style="margin-bottom: 0px">
                     <thead>
                         <tr>
@@ -516,7 +753,7 @@
                                     <div class="div-img">
                                         <a href="javascript:" ng-click="tabulasiCtrl.putarGambar(dataSuara, dataSuara.kpuid, 90)"><i class="fa fa-repeat"></i></a>
                                         <a href="javascript:" ng-click="tabulasiCtrl.resizeGambar(dataSuara, dataSuara.kpuid, 'currentkpugambar')"><i class="fa fa-expand"></i></a>
-                                        <a href="javascript:" ng-click="tabulasiCtrl.putarGambar(dataSuara, dataSuara.kpuid, -90)"><i class="fa fa-undo"></i></a>
+                                        <a href="javascript:" ng-click="tabulasiCtrl.putarGambar(dataSuara, dataSuara.kpuid, - 90)"><i class="fa fa-undo"></i></a>
                                     </div>
 
                                     <div style="width: 500px; height: 500px; overflow: auto;margin-top:-20px;" id="divimg{{dataSuara.kpuid}}">
@@ -629,7 +866,7 @@
                 </span>
             </div>
         </div>
-        <div class="row" ng-show="tabulasiCtrl.showTable(tabulasiCtrl.DataSuaras)">
+        <div class="row" ng-show="(!tabulasiCtrl.dalambentuktable) && tabulasiCtrl.showTable(tabulasiCtrl.DataSuaras)">
             <div class="col-lg-2">
                 <div class="row" style="margin-bottom:0px;margin-top:20px;">
                     <span class="point-wilayah" >
@@ -725,7 +962,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <a href="javascript:" ng-click="tabulasiCtrl.putarGambar2(90)"><i class="fa fa-repeat fa-2x"></i></a>
-                    <a href="javascript:" ng-click="tabulasiCtrl.putarGambar2(-90)" style="float:right;"><i class="fa fa-undo fa-2x"></i></a>
+                    <a href="javascript:" ng-click="tabulasiCtrl.putarGambar2( - 90)" style="float:right;"><i class="fa fa-undo fa-2x"></i></a>
                 </div>
                 <div class="modal-body" id="modal-content-img" data-rot=0></div>
             </div>

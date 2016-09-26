@@ -1,3 +1,4 @@
+/*25 Feb 2016*/
 var $kpuurl = "http://scanc1.kpu.go.id/viewp.php";
 var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
 (function () {
@@ -765,6 +766,12 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
             var context = this;
             this.predicate = 'nama';
             this.reverse = false;
+            this.dalambentuktable = false;
+
+
+            this.setdalambentuktable = function () {
+
+            };
             this.sumall = function (dataSuara) {
                 dataSuara.suarasah = 0;
                 angular.forEach(dataSuara.uruts, function (value, key) {
@@ -1131,27 +1138,44 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 }
             };
             this.options = {size: 30, animate: true, barColor: '#F02316', trackColor: 'white', scaleColor: false, lineWidth: 3};
+            this.toInt = function (a) {
+                try {
+                    if (a.toString().length > 0) {
+                        return parseInt(a);
+                    } else {
+                        return 0;
+                    }
+                } catch (e) {
+                    return 0;
+                }
+            }
             this.initDataSuara = function (dataSuara) {
                 dataSuara.total = {suaraTPS: 0, suaraVerifikasiC1: 0, suaraKPU: 0};
                 dataSuara.ppercent = {};
-                angular.forEach(dataSuara.uruts, function (value, key) {
-                    dataSuara.total.suaraTPS += dataSuara.suaraKandidat[value + ''].suaraTPS;
-                    dataSuara.total.suaraVerifikasiC1 += dataSuara.suaraKandidat[value + ''].suaraVerifikasiC1;
-                    dataSuara.total.suaraKPU += dataSuara.suaraKandidat[value + ''].suaraKPU;
+                dataSuara.hasilbeda = false;
+                if (dataSuara)
+                    angular.forEach(dataSuara.uruts, function (value, key) {
+                        dataSuara.total.suaraTPS += dataSuara.suaraKandidat[value + ''].suaraTPS;
+                        dataSuara.total.suaraVerifikasiC1 += dataSuara.suaraKandidat[value + ''].suaraVerifikasiC1;
+                        dataSuara.total.suaraKPU += dataSuara.suaraKandidat[value + ''].suaraKPU;
 
-                    context.totalsuara.suaraKandidat[value + ''].suaraTPS = context.totalsuara.suaraKandidat[value + ''].suaraTP + dataSuara.suaraKandidat[value + ''].suaraTPS;
-                    context.totalsuara.suaraKandidat[value + ''].suaraVerifikasiC1 = context.totalsuara.suaraKandidat[value + ''].suaraVerifikasiC1 + dataSuara.suaraKandidat[value + ''].suaraVerifikasiC1;
-                    context.totalsuara.suaraKandidat[value + ''].suaraKPU = context.totalsuara.suaraKandidat[value + ''].suaraKPU + dataSuara.suaraKandidat[value + ''].suaraKPU;
-                });
+                        context.totalsuara.suaraKandidat[value + ''].suaraTPS = context.totalsuara.suaraKandidat[value + ''].suaraTPS + dataSuara.suaraKandidat[value + ''].suaraTPS;
+                        context.totalsuara.suaraKandidat[value + ''].suaraVerifikasiC1 = context.totalsuara.suaraKandidat[value + ''].suaraVerifikasiC1 + dataSuara.suaraKandidat[value + ''].suaraVerifikasiC1;
+                        context.totalsuara.suaraKandidat[value + ''].suaraKPU = context.totalsuara.suaraKandidat[value + ''].suaraKPU + dataSuara.suaraKandidat[value + ''].suaraKPU;
+                        if (parseInt(dataSuara.suaraKandidat[value + ''].suaraVerifikasiC1) - parseInt(dataSuara.suaraKandidat[value + ''].suaraKPU) !== 0) {
+                            dataSuara.hasilbeda = true;
+                        }
+
+                    });
 
                 //context.totalsuara = {"c1": 0, "HC": 0, "KPU": 0, "sah": 0, "tidaksah": 0, "suaraKandidat": context.DataSuaras[0].suaraKandidat};
                 context.totalsuara.suaraTPS += dataSuara.total.suaraTPS;
                 context.totalsuara.suaraVerifikasiC1 += dataSuara.total.suaraVerifikasiC1;
                 context.totalsuara.suaraKPU += dataSuara.total.suaraKPU;
-                context.totalsuara.suarasah += dataSuara.suarasah;
-                context.totalsuara.suaratidaksah += dataSuara.suaratidaksah;
-                context.totalsuara.jumlahTPS += dataSuara.jumlahTPS;
-                context.totalsuara.jumlahTPSdilock += dataSuara.jumlahTPSdilock;
+                context.totalsuara.suarasah += context.toInt(dataSuara.suarasah);
+                context.totalsuara.suaratidaksah += context.toInt(dataSuara.suaratidaksah);
+                context.totalsuara.jumlahTPS += context.toInt(dataSuara.jumlahTPS);
+                context.totalsuara.jumlahTPSdilock += context.toInt(dataSuara.jumlahTPSdilock);
                 context.totalsuara.percent = context.roundToTwo(context.setpercent(context.totalsuara.jumlahTPSdilock, context.totalsuara.jumlahTPS), context.numberDecimal);
 
                 var attributes = ['suaraTPS', 'suaraVerifikasiC1', 'suaraKPU'];
@@ -1861,6 +1885,10 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                 dataSuara["getSuaraRobot"] = true;
                 dataSuara["showrecord"] = true;
                 dataSuara["sedangmengambilsuararobot"] = false;
+                dataSuara.hasilbeda = false;
+                if (dataSuara.dilock === "Y") {
+                    this.initDataSuara(dataSuara);
+                }
             };
             this.getSuaraRobot = function (dataSuara) {
                 var hashs = window.location.hash.substr(2).split("/");
@@ -1873,17 +1901,17 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                     $http.post('/suara/getkpudataTPS/' + hashs[2] + '/' + wil, [dataSuara]).
                             success(function (data, status, headers, config) {
                                 if (data.length > 0) {
-                                        for (var ii = 0; ii < context.DataSuarasTPS.length; ii++) {
-                                            try {
-                                                if (dataSuara.kpuid === context.DataSuarasTPS[ii].kpuid) {
-                                                    context.DataSuarasTPS[ii].getSuaraRobot = false;
-                                                    context.DataSuarasTPS[ii].sedangmengambilsuararobot = false;
-                                                    context.DataSuarasTPS[ii].suaraKandidat = data[0].suaraKandidat;
-                                                    context.DataSuarasTPS[ii].suarasah = data[0].suarasah;
-                                                }
-                                            } catch (e) {
+                                    for (var ii = 0; ii < context.DataSuarasTPS.length; ii++) {
+                                        try {
+                                            if (dataSuara.kpuid === context.DataSuarasTPS[ii].kpuid) {
+                                                context.DataSuarasTPS[ii].getSuaraRobot = false;
+                                                context.DataSuarasTPS[ii].sedangmengambilsuararobot = false;
+                                                context.DataSuarasTPS[ii].suaraKandidat = data[0].suaraKandidat;
+                                                context.DataSuarasTPS[ii].suarasah = data[0].suarasah;
                                             }
+                                        } catch (e) {
                                         }
+                                    }
                                 } else {
                                     dataSuara["sedangmengambilsuararobot"] = false;
                                 }
@@ -2120,6 +2148,7 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                                             context.namas = data[0].namas;
                                             context.uruts = data[0].uruts;
                                             if (context.DataSuaras.length > 0) {
+                                                context.totalsuara = {"jumlahTPSdilock": 0, "jumlahTPS": 0, "suaraVerifikasiC1": 0, "suaraTPS": 0, "suaraKPU": 0, "suarasah": 0, "suaratidaksah": 0, "suaraKandidat": {}};
                                                 angular.forEach(context.uruts, function (value, key) {
                                                     context.totalsuara.suaraKandidat[value + ""] = {}
                                                     context.totalsuara.suaraKandidat[value + ""].urut = context.DataSuaras[0].suaraKandidat[value + ''].urut;
@@ -2130,6 +2159,19 @@ var $autolinker = new Autolinker({newWindow: true, className: "myLink"});
                                                     context.totalsuara.suaraKandidat[value + ""].suaraKPU = 0;
                                                 });
                                             }
+
+                                        }
+                                        if (context.DataSuarasTPS.length > 0) {
+                                            context.totalsuara = {"jumlahTPSdilock": 0, "jumlahTPS": 0, "suaraVerifikasiC1": 0, "suaraTPS": 0, "suaraKPU": 0, "suarasah": 0, "suaratidaksah": 0, "suaraKandidat": {}};
+                                            angular.forEach(context.uruts, function (value, key) {
+                                                context.totalsuara.suaraKandidat[value + ""] = {}
+                                                context.totalsuara.suaraKandidat[value + ""].urut = context.DataSuarasTPS[0].suaraKandidat[value + ''].urut;
+                                                context.totalsuara.suaraKandidat[value + ""].nama = context.DataSuarasTPS[0].suaraKandidat[value + ''].nama;
+                                                context.totalsuara.suaraKandidat[value + ""].img_url = context.DataSuarasTPS[0].suaraKandidat[value + ''].img_url;
+                                                context.totalsuara.suaraKandidat[value + ""].suaraTPS = 0;
+                                                context.totalsuara.suaraKandidat[value + ""].suaraVerifikasiC1 = 0;
+                                                context.totalsuara.suaraKandidat[value + ""].suaraKPU = 0;
+                                            });
                                         }
                                     }
                                 }
